@@ -1,4 +1,4 @@
-name: pdf-renderer
+name: kms
 version: 0.2.0
 language: rust
 
