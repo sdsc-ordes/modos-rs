@@ -8,8 +8,8 @@
       "email": "gabriel.nuetzi@sdsc.ethz.ch"
     },
     "license": {
-      "name": "AGPLv3",
-      "identifier": "AGPLv3"
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0"
     },
     "version": "0.0.1"
   },
