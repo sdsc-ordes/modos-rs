@@ -41,6 +41,16 @@ jobs:
           - name: test-gateway
             command: just ci::run quitsh test -c "gateway"
             allow_failure: false
+          - name: test-quitsh
+            command: just ci::run quitsh test -c "quitsh"
+            allow_failure: false
+
+          - name: image-kms
+            command: just ci::run quitsh image -c "kms"
+            allow_failure: false
+          - name: image-gateway
+            command: just ci::run quitsh image -c "gateway"
+            allow_failure: false
 
     steps:
       - uses: actions/checkout@v4

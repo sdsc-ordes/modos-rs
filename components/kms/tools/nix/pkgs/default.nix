@@ -1,6 +1,6 @@
 args:
 let
-  compName = "pdf-renderer";
+  compName = "kms";
 
   service = args.pkgs.callPackage ./service (args // { inherit compName; });
   service-dev = args.pkgs.callPackage ./service (

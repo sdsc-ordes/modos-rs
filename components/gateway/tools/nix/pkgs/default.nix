@@ -3,7 +3,7 @@ let
   # debug/release builds -> debug with debug symbols for the debugger (also we misuse this, to
   # enable certain things)
 
-  compName = "nats-server";
+  compName = "gateway";
 
   service = args.pkgs.callPackage ./service (args // { inherit compName; });
   service-dev = args.pkgs.callPackage ./service (
