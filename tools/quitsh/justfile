@@ -1,0 +1,60 @@
+set positional-arguments
+set fallback := true
+set shell := ["bash", "-cue"]
+comp_dir := justfile_directory()
+root_dir := `git rev-parse --show-toplevel`
+out_dir := comp_dir / ".output"
+
+default:
+    just --list --unsorted
+
+# Build quitsh.
+build *args:
+    cd "{{comp_dir}}" && \
+    GOWORK=off go build -tags debug -o "{{out_dir}}/bin/quitsh" "$@" ./cmd/quitsh/main.go
+
+# Run quitsh in the current directory.
+[no-cd]
+run *args: build
+    "{{out_dir}}/bin/quitsh" "$@"
+
+# Test the `quitsh`. To execute specific tests you can use `-run regexp`.
+test *args:
+    GOWORK=off go test -tags debug,test "$@" ./...
+
+# Run integration tests for `quitsh`.
+test-integration *args: build
+    mkdir -p "{{out_dir}}/coverage" && \
+    QUITSH_BIN_DIR="{{out_dir}}/bin" \
+    QUITSH_COVERAGE_DIR="{{out_dir}}/coverage" \
+    GOWORK=off \
+        go test -tags debug,test,integration "$@" ./...
+
+package-nix *args:
+    cd {{root_dir}} && \
+    nix build -L "./tools/nix#quitsh" -o "{{out_dir}}/package" && \
+    nix build -L "./tools/nix#quitsh.passthru.tests.version"
+
+# Update the quitsh original and quitsh custodian
+# dependency to latest.
+update-deps branch="main" custodianBranch="main":
+    #!/usr/bin/env bash
+    set -eu
+
+    echo "Updating 'quitsh'."
+
+    shaCustodian=$(git ls-remote -q \
+        https://gitlab.com/data-custodian/custodian.git \
+        refs/heads/{{custodianBranch}} | cut -f 1)
+
+    shaQuitsh=$(git ls-remote -q \
+        https://github.com/sdsc-ordes/quitsh.git \
+        refs/heads/{{branch}} | cut -f 1)
+    go get -u "github.com/sdsc-ordes/quitsh@$shaQuitsh"
+
+    go get -u "gitlab.com/data-custodian/custodian/tools/quitsh@$shaCustodian"
+    go get -u "gitlab.com/data-custodian/custodian/components/lib-common@$shaCustodian"
+    go get -u "gitlab.com/data-custodian/custodian/components/contract-manager@$shaCustodian"
+
+    go mod tidy
+    git add .

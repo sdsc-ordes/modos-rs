@@ -1,0 +1,14 @@
+# Settings for codecov.
+codecov: {}
+
+ignore:
+  - ".*/gen/.*"
+
+coverage:
+  status:
+    project:
+      default:
+        informational: True
+    patch:
+      default:
+        informational: True

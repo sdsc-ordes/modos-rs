@@ -1,0 +1,6 @@
+server:
+  hostname: localhost
+  port: 3020
+
+log:
+  forceDevLog: true

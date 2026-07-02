@@ -1,0 +1,147 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "service",
+    "description": "This is a markdown to pdf conversion service.",
+    "contact": {
+      "name": "Gabriel Nützi",
+      "email": "gabriel.nuetzi@sdsc.ethz.ch"
+    },
+    "license": {
+      "name": "AGPLv3",
+      "identifier": "AGPLv3"
+    },
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "crate::handler"
+        ],
+        "description": "Check if service is healthy.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "If the service is ready."
+          }
+        }
+      }
+    },
+    "/render": {
+      "post": {
+        "tags": [
+          "crate::handler"
+        ],
+        "description": "Render a PDF.",
+        "operationId": "render",
+        "requestBody": {
+          "description": "Tar gzip archive containing the markdown content to render to a PDF.",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "$ref": "#/components/schemas/BinaryBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully rendered the PDF.",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "The content disposition header."
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "description": "The length of the rendered file."
+              }
+            },
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinaryBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpError"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Default Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BinaryBody": {
+        "type": "string",
+        "format": "binary"
+      },
+      "HttpError": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "message"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

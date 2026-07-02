@@ -1,0 +1,4 @@
+[cargo]
+  features = ["development", "production"]
+[logging]
+  level = "debug"

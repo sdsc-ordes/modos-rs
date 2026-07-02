@@ -1,0 +1,28 @@
+[package]
+  authors     = ["Gabriel Nutzi <gabriel.nuetzi@sdsc.ethz.ch>"]
+  description = "This is a library which converts markdown to pdf."
+  edition     = "2024"
+  homepage    = " https://github.com/sdsc-ordes/modos-rs"
+  keywords    = []
+  license     = "AGPLv3"
+  name        = "pdf-render"
+  version     = '0.0.1'
+
+[dependencies]
+  anyhow     = "1.0.102"
+  common     = { workspace = true }
+  fs_extra   = "1.3.0"
+  path-clean = "1.0.1"
+  serde      = { version = "1.0.228", features = ["derive"] }
+  snafu      = { version = "0.9.0", features = ["backtrace", "futures"] }
+  tracing    = { version = "0.1.44", features = ["release_max_level_info", "max_level_trace"] }
+
+[lints.clippy]
+  needless_return = "warn"
+  pedantic        = "deny"
+
+[features]
+  development = []
+  production  = []
+  staging     = []
+  testing     = []

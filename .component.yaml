@@ -1,0 +1,11 @@
+name: global
+version: 0.0.1
+language: none
+
+targets:
+  lint-security:
+    tags:
+      - allow-failure
+    steps:
+      - runner: trivy
+    inputs: ["self"]

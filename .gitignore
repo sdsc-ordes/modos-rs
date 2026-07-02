@@ -1,0 +1,31 @@
+# Output folders.
+.output
+
+# All .env files
+.env
+.env.yml
+.env.yaml
+
+# Nix
+.direnv
+.devenv
+
+# Vendir temporary folder.
+.vendir*
+
+# Links
+.taplo.toml
+.rustfmt.toml
+.prettierrc.yaml
+.yamllint.yaml
+.typos.toml
+.golangci.yaml
+go.work
+go.work.sum
+
+logs
+
+.agents
+.claude
+CLAUDE.md
+AGENTS.md

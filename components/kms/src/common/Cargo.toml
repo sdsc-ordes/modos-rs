@@ -1,0 +1,64 @@
+[package]
+  authors     = ["Gabriel Nutzi <gabriel.nuetzi@sdsc.ethz.ch>"]
+  description = "This is a common library for the HTTP services."
+  edition     = "2024"
+  homepage    = " https://github.com/sdsc-ordes/modos-rs"
+  keywords    = []
+  license     = "AGPLv3"
+  name        = "common"
+  version     = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+  async-trait = "0.1.75"
+  axum = { version = "0.8.8", features = ["macros"] }
+  data-encoding = "2.5.0"
+  futures = "0.3.30"
+  ring = "0.17.7"
+  scopeguard = "1.2.0"
+  simple-error = "0.3.0"
+  slog = { version = "2.8.2", features = ["anyhow", "max_level_trace", "release_max_level_info"] }
+  slog-async = "2.8.0"
+  slog-json = { version = "2.6.1", features = ["nested-values"] }
+  slog-term = { version = "2.9.0", features = ["serde"] }
+  strum = { version = "0.28.0", features = ["derive"] }
+  strum_macros = "0.28.0"
+  time = { version = "0.3.47", features = ["formatting"] }
+  tracing = { version = "0.1.44", features = ["release_max_level_info", "max_level_trace"] }
+  tracing-slog = "0.4.0"
+  tracing-subscriber = { version = "0.3.23", features = [
+    "env-filter",
+    "json",
+    "serde_json",
+    "time",
+  ] }
+  utoipa = { version = "5.4.0", features = [
+    "axum_extras",
+    "time",
+    "url",
+    "yaml",
+    "uuid",
+    "chrono",
+  ] }
+
+  [dependencies.chrono]
+    features = ['serde', 'clock']
+    version  = "0.4.32"
+
+  [dependencies.snafu]
+    features = ["std", "backtrace", "futures"]
+    version  = "0.9.0"
+
+  [dependencies.serde]
+    features = ["derive"]
+    version  = "1.0"
+
+  [dependencies.uuid]
+    features = ["v4", "fast-rng", "macro-diagnostics", "serde"]
+    version  = "1.6.1"
+
+[features]
+  development = []
+  production  = []
+  staging     = []
+  testing     = []

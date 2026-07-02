@@ -1,0 +1,12 @@
+[default]
+  extend-ignore-identifiers-re = ["daa\\w*", "dga\\w*"]
+  locale                       = "en-us"
+
+  [default.extend-words]
+    "DAA" = "DAA"
+    "DGA" = "DGA"
+    "daa" = "daa"
+    "dga" = "dga"
+
+[files]
+  extend-exclude = ["*.png", "*.jpg", "*.ico", "*.svg"]

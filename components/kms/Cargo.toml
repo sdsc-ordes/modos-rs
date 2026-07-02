@@ -1,0 +1,8 @@
+[workspace]
+  members  = ["src/common", "src/pdf-render", "src/service"]
+  resolver = "2"
+
+  [workspace.dependencies]
+    common     = { path = "src/common" }
+    pdf-render = { path = "src/pdf-render" }
+    service    = { path = "src/service" }

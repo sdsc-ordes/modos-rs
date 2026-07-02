@@ -1,0 +1,12 @@
+[toolchain]
+  channel = "nightly-2026-03-17"
+  components = [
+    "rustfmt",
+    "rust-analyzer",
+    "miri",
+    "rust-docs",
+    "clippy",
+    "rust-src",
+    "llvm-tools-preview",
+  ]
+  profile = "default"

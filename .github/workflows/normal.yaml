@@ -1,0 +1,54 @@
+name: normal
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - name: lint-security
+            command: just ci::run quitsh exec-target "global::lint-security"
+            allow_failure: true
+
+          - name: lint-kms
+            command: just ci::run quitsh lint -c "kms"
+            allow_failure: false
+          - name: lint-gateway
+            command: just ci::run quitsh lint -c "gateway"
+            allow_failure: false
+
+          - name: build-kms
+            command: just ci::run quitsh build -c "kms"
+            allow_failure: false
+          - name: build-gateway
+            command: just ci::run quitsh build -c "gateway"
+            allow_failure: false
+
+          - name: test-kms
+            command: just ci::run quitsh test -c "kms"
+            allow_failure: false
+          - name: test-gateway
+            command: just ci::run quitsh test -c "gateway"
+            allow_failure: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-nix
+        with:
+          cachix_cache_name: "${{ secrets.CACHIX_CACHE_NAME }}"
+          cachix_auth_token: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: ${{ matrix.name }}
+        continue-on-error: ${{ matrix.allow_failure }}
+        run: ${{ matrix.command }}

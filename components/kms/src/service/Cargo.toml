@@ -1,0 +1,57 @@
+[package]
+  authors     = ["Gabriel Nützi <gabriel.nuetzi@sdsc.ethz.ch>"]
+  description = "This is a markdown to pdf conversion service."
+  edition     = "2024"
+  homepage    = " https://github.com/sdsc-ordes/modos-rs"
+  keywords    = []
+  license     = "Apache-2.0"
+  name        = 'service'
+  version     = '0.0.1'
+
+[[bin]]
+  name = "service"
+  path = "src/bin/service.rs"
+
+[dependencies]
+  # Workspace deps.
+  common     = { workspace = true }
+  pdf-render = { workspace = true }
+  # Non workspace deps.
+  anyhow = "1.0.102"
+  async-compression = { version = "0.4.41", features = ["tokio", "gzip"] }
+  axum = "0.8.8"
+  clap = { version = "4.6.0", features = ['derive'] }
+  futures-util = "0.3.32"
+  serde = { version = "1.0.228", features = ["derive"] }
+  serde_json = "1.0.149"
+  serde_yaml = "0.9.34"
+  slog = "2.8.2"
+  snafu = { version = "0.9.0", features = ["backtrace", "futures"] }
+  tar = "0.4.45"
+  tempdir = "0.3.7"
+  tokio = { version = "1.50.0", features = ["full"] }
+  tokio-util = { version = "0.7.18", features = ["io", "io-util"] }
+  tower-http = { version = "0.6.8", features = ["trace"] }
+  tracing = { version = "0.1.44", features = ["release_max_level_info", "max_level_trace"] }
+  tracing-subscriber = { version = "0.3.23", features = ["env-filter", "serde_json", "time"] }
+  url = { version = "2.5.8", features = ["serde"] }
+  utoipa = { version = "5.4.0", features = [
+    "axum_extras",
+    "time",
+    "url",
+    "yaml",
+    "uuid",
+    "chrono",
+  ] }
+
+
+[lints.clippy]
+  needless_return = "warn"
+  pedantic        = "deny"
+
+[features]
+  # Forward feature flags to dependencies.
+  development = ["pdf-render/development", "common/development"]
+  production  = ["pdf-render/production", "common/production"]
+  staging     = ["pdf-render/staging", "common/staging"]
+  testing     = ["pdf-render/testing", "common/testing"]
