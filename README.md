@@ -42,7 +42,7 @@ with some core packages and services written in Rust.
 
 - [ ] Remove pure eval.
 - [ ] Add prek over quitsh commands. Remove /tools/scripts bash crap.
-- [ ] Make loading of component packages also a `.parts` file.
+- [ ] Make loading of component packages also a
 
 ## Installation
 

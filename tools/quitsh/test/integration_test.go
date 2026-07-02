@@ -3,7 +3,6 @@
 package test
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -12,7 +11,6 @@ import (
 	"github.com/sdsc-ordes/quitsh/pkg/exec/git"
 	fs "github.com/sdsc-ordes/quitsh/pkg/filesystem"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,10 +40,12 @@ func setup(t *testing.T) (ciTool *exec.CmdContext) {
 func TestCLIVersion(t *testing.T) {
 	ciTool := setup(t)
 
-		out, err := ciTool.GetCombined(
-			"-C", repoRoot,
-			"list",
-		)
-		require.NoError(t, err)
-}
+	_, repoRoot, err := git.NewCtxAtRoot(".")
+	require.NoError(t, err)
 
+	_, err = ciTool.GetCombined(
+		"-C", repoRoot,
+		"list",
+	)
+	require.NoError(t, err)
+}

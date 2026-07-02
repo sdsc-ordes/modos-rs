@@ -163,7 +163,7 @@ let
           quitsh.toolchains = [ "coverage-upload" ];
 
           packages = [
-            pkgsPinned.codecov-cli
+            pkgs.codecov-cli
           ];
         }
       ];
