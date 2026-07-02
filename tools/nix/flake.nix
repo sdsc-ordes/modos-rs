@@ -21,6 +21,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Pinning some packages:
+    nixpkgs-codecov.url = "github:nixos/nixpkgs?ref=b6a8526db03f735b89dd5ff348f53f752e7ddc8e";
+
     # The devenv module to create good development shells.
     # The `nixpkgs-devenv` must aligned with the pinned version.
     devenv = {

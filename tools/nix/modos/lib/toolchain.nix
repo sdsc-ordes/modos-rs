@@ -163,7 +163,7 @@ let
           quitsh.toolchains = [ "coverage-upload" ];
 
           packages = [
-            pkgs.codecov-cli
+            pkgsPinned.codecov-cli
           ];
         }
       ];
@@ -195,6 +195,8 @@ let
               dotenv.enable = true;
 
               packages = [
+                pkgs.cachix
+
                 # Essentials.
                 pkgs.git
                 pkgs.just

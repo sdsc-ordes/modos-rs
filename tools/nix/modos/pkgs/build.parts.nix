@@ -6,6 +6,8 @@
 {
   perSystem =
     {
+      system,
+      self',
       config,
       inputs',
       pkgs,
@@ -13,6 +15,17 @@
     }:
     let
       cn = config.modos;
+
+      codecov-cli = self'.packages.codecov-cli;
+      # let
+      #   pkgs = import inputs.nixpkgs-codecov {
+      #     inherit system;
+      #     config = {
+      #       allowUnfree = true;
+      #     };
+      #   };
+      # in
+      # pkgs.codecov-cli;
 
       rust = lib.genAttrs [ "shell" "release" ] (
         name:
@@ -34,6 +47,7 @@
         go = pkgs.go_1_26;
         inherit (pkgs) process-compose;
 
+        inherit codecov-cli;
         inherit rust;
 
         minio = inputs'.nixpkgs-minio.legacyPackages.minio;

@@ -23,6 +23,10 @@ jobs:
             command: just ci::run quitsh exec-target "global::lint-security"
             allow_failure: true
 
+          - name: lint-nix-hash
+            command: just ci::run quitsh nix fix-hash
+            allow_failure: false
+
           - name: lint-kms
             command: just ci::run quitsh lint -c "kms"
             allow_failure: false

@@ -1555,6 +1555,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-codecov": {
+      "locked": {
+        "lastModified": 1762596750,
+        "narHash": "sha256-rXXuz51Bq7DHBlfIjN7jO8Bu3du5TV+3DSADBX7/9YQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "b6a8526db03f735b89dd5ff348f53f752e7ddc8e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "b6a8526db03f735b89dd5ff348f53f752e7ddc8e",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-devenv": {
       "inputs": {
         "nixpkgs-src": "nixpkgs-src"
@@ -1945,6 +1961,7 @@
         "flake-parts": "flake-parts_4",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs_6",
+        "nixpkgs-codecov": "nixpkgs-codecov",
         "nixpkgs-devenv": "nixpkgs-devenv",
         "quitsh": "quitsh",
         "rust-overlay": "rust-overlay_3",
