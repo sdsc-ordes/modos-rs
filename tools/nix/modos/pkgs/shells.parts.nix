@@ -8,23 +8,30 @@ let
 in
 {
   perSystem =
-    { config, pkgs, ... }:
+    {
+      config,
+      pkgs,
+      pkgsStable,
+      ...
+    }:
     let
-      cn = config.modos;
+      modos = config.modos;
 
-      # Add all modos package.
+      # Add modos package-namespace to the `nixpkgs` package set.
+      # For  `devenv` module functions
       pkgsEx = pkgs // {
-        modos = cn.pkgs;
+        modos = modos.packages;
       };
 
-      devenvs = cn.lib.toolchain.createDevenvModules {
-        pkgs = pkgsEx;
-        pkgsPinned = cn.build.pinned;
+      # Create a set of devenv modules.
+      devenvs = modos.lib.toolchain.createDevenvModules {
+        inherit pkgs pkgsStable modos;
       };
 
+      # Define all shells over the set of `devenvs` modules.
       shells = lib.attrsets.mapAttrs (
         name: modules:
-        cn.lib.shell.mkShell {
+        modos.lib.shell.mkShell {
           pkgs = pkgsEx;
           inherit
             modules
@@ -35,6 +42,6 @@ in
       ) devenvs;
     in
     {
-      modos = { inherit shells; };
+      modos.shells = shells;
     };
 }

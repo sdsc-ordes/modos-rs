@@ -1,16 +1,18 @@
 {
-  pkgs,
-  modosLib,
+  cacert,
+  dockerTools,
+  # Own arguments.
+  modos,
   service,
   ...
 }:
-pkgs.dockerTools.buildLayeredImage {
-  name = "dac-portal/${service.pname}-service";
+dockerTools.buildLayeredImage {
+  name = "modos-rs/${service.pname}-service";
   tag = service.version;
 
   contents = [
-    modosLib.image.etcGroupAndPasswd
-    pkgs.cacert
+    modos.packages.image.etcGroupAndPasswd
+    cacert
     service
   ];
 
@@ -28,7 +30,7 @@ pkgs.dockerTools.buildLayeredImage {
       "/workspace/data" = { };
     };
     Env = [
-      "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+      "SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt"
     ];
     Labels = {
       "org.opencontainers.image.source" = "https://gitlab.com/data-custodian/dac-portal";

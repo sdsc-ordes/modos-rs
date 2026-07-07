@@ -22,7 +22,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Pinning some packages:
-    nixpkgs-codecov.url = "github:nixos/nixpkgs?ref=b6a8526db03f735b89dd5ff348f53f752e7ddc8e";
+    rustfs.url = "github:rustfs/rustfs/5d737eaeb7fcab5d40c655ba60a494e93dd98922";
+    # ref: commit points to nixpkgs-unstable
+    process-compose.url = "github:nixos/nixpkgs/b5aa0fbd538984f6e3d201be0005b4463d8b09f8";
 
     # The devenv module to create good development shells.
     # The `nixpkgs-devenv` must aligned with the pinned version.
@@ -33,10 +35,6 @@
     # This is the rolling nixpkgs with what devenv was tested.
     nixpkgs-devenv = {
       url = "github:cachix/devenv-nixpkgs?ref=ec3063523dcd911aeadb50faa589f237cdab5853";
-    };
-    devenv-root = {
-      url = "file+file:///dev/null";
-      flake = false;
     };
 
     # Format the repo with nix-treefmt.
@@ -84,9 +82,16 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
       lib.pipe inputs.import-tree [
         # NOTE: Uncomment the below to inspect what modules are loaded.
-        # (i: i.map (x: lib.info "Importing :${x}" x))
+        (i: i.map (x: lib.info "modos: Importing: '${x}'" x))
         (i: i.filter (lib.hasInfix ".parts."))
-        (i: i ./.)
+        (
+          i:
+          i [
+            ./.
+            ../quitsh
+            ../../components
+          ]
+        )
       ]
     );
 }

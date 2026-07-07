@@ -15,7 +15,6 @@ let
 in
 {
   inherit rootDir;
-  compsDir = rootDir + "/components";
 
   getRootPathRel = libComponent.getRootPathRel;
   getRootPath = libComponent.getRootPath;

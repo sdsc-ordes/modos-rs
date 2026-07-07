@@ -1,19 +1,20 @@
 {
   lib,
-  modosLib,
+  # Own arguments.
+  modos,
   compName,
   buildType ? "release",
   environmentType ? "production",
   ...
 }:
-modosLib.build.buildGoModule {
+modos.lib.build.buildGoModule {
   inherit buildType environmentType;
   inherit compName;
 
   pname = compName;
-  version = modosLib.component.readVersion compName;
+  version = modos.lib.component.readVersion compName;
 
-  src = modosLib.fileset.toSource [
+  src = modos.lib.fileset.toSource [
     compName
     "quitsh" # just for tests.
   ];

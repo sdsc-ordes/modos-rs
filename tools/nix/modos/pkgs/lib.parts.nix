@@ -10,14 +10,13 @@ let
 in
 {
   perSystem =
-    { pkgs, ... }:
-    let
-      buildSystem = pkgs.stdenv.buildPlatform.system;
-    in
     {
-      # The modos library with root fileset and components.
+      ...
+    }:
+    {
+      # The modos library fully instantiated.
       modos.lib = self.lib.mkExtendedLib {
-        inherit buildSystem rootDir rootFileset;
+        inherit rootDir rootFileset;
       };
     };
 }

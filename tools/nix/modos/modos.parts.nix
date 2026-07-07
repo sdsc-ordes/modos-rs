@@ -1,12 +1,33 @@
 {
+  lib,
   flake-parts-lib,
   ...
 }:
 let
   inherit (flake-parts-lib) mkPerSystemOption;
+
+  mkLibOption =
+    desc:
+    lib.mkOption {
+      type = lib.types.lazyAttrsOf lib.types.raw;
+      description = desc;
+      default = { };
+    };
+
+  libDefs = {
+    build = mkLibOption "Build support functions and pinned packages.";
+    common = mkLibOption "Common helper functions.";
+    nixpkgs = mkLibOption "Nixpkgs package import utility.";
+    service = mkLibOption "Service modules for 'service-flake'.";
+    shell = mkLibOption "Shell utilities.";
+    toolchain = mkLibOption "Nix shell modules for 'devenv'.";
+  };
 in
 {
-  # Defining a `perSystem` scoped NixOS module-system option.
+  # The flakes own library.
+  options.flake.lib = libDefs;
+
+  # Defining a `perSystem` scoped module option.
   options.perSystem = mkPerSystemOption (
     {
       config,
@@ -23,34 +44,32 @@ in
       # and exported below into the flake.
       options = {
         modos = {
-          lib = lib.mkOption {
-            type = lib.types.lazyAttrsOf lib.types.raw;
-            description = "The library functions.";
-            default = { };
+          # This includes all library functionality which is dependend
+          # on `rootDir`, `pkgs`,`pkgsStable`.
+          lib = libDefs // {
+            image = mkLibOption "Image building functionality.";
+            component = mkLibOption "Component scoped helper functions.";
+            fileset = mkLibOption "Component scoped filesets utility.";
           };
 
-          build = lib.mkOption {
-            type = lib.types.lazyAttrsOf lib.types.raw;
-            description = "The build functionality.";
-            default = { };
-          };
-
-          pkgs = lib.mkOption {
+          packages = lib.mkOption {
             type = lib.types.attrsOf lib.types.package;
-            description = "All packages.";
+            description = "All global exported packages.";
             default = { };
           };
 
           components = {
             packages = lib.mkOption {
-              type = lib.types.raw;
-              description = "Packages per component.";
+              type = lib.types.attrsOf (lib.types.attrsOf lib.types.package);
+              description = "Packages for each component: <compName> -> <pkgs-set>.";
               default = { };
             };
+
             packages-flat = lib.mkOption {
               type = lib.types.attrsOf lib.types.package;
-              description = "Flat packages set per component.";
-              default = [ ];
+              description = "Flat packages set for all component (read-only).";
+              default = modos.lib.common.attrset.flattenDrvs modos.components.packages;
+              readOnly = true;
             };
           };
 
@@ -58,6 +77,12 @@ in
             type = lib.types.attrsOf lib.types.package;
             description = "All development Nix shells.";
             default = { };
+          };
+
+          debug = lib.mkOption {
+            type = lib.types.raw;
+            description = "Debugging Nix evaluations with free-form stuff just for `nix repl`.";
+            internal = true;
           };
         };
       };
@@ -71,8 +96,8 @@ in
         packages = {
           inherit (config.modos) quitsh;
         }
-        // modos.components.packages-flat
-        // modos.pkgs;
+        // modos.components.packages-flat # All component packages.
+        // modos.packages; # All other packages.
 
         # Expose all shells.
         devShells = modos.shells;

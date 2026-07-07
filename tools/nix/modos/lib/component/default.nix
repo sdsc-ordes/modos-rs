@@ -10,10 +10,8 @@ let
   query = (import ./query.nix) { inherit lib libCommon configFileName; };
 
   # All components.
+  compsDir = lib.path.append rootDir "./components";
   comps = query.getComponents { path = rootDir; };
-
-  # All package functions.
-  packages = (import ./packages.nix) { inherit lib libCommon; };
 in
 {
   inherit configFileName;
@@ -23,14 +21,23 @@ in
   # Type: [Component] (see `getComponents`).
   inherit comps;
 
-  # Define all packages for each component in `components` which are defined in
-  # `./tools/nix/pkgs` in each component folder.
-  # Attribute set `args` is forwarded to the import.
-  loadPackages = args: packages.import { inherit args comps; };
+  # The components root dir.
+  inherit compsDir;
 
   # Root paths of components.
   getRootPathRel = compName: (lib.getAttr compName comps).pathRel;
   getRootPath = compName: (lib.getAttr compName comps).path;
+
+  # Get the component in `comps` determined by a subpath `path` inside
+  # a components directory.
+  getCompFromPath =
+    path:
+    let
+      matchPrefix = entry: lib.path.hasPrefix entry.value.path path;
+      compFound = lib.findFirst matchPrefix null (lib.attrsets.attrsToList comps);
+    in
+    assert lib.assertMsg (compFound != null) "Component from '${path}' not found.";
+    compFound.value;
 
   /*
     Get the version of a component.

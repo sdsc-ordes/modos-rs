@@ -3,8 +3,8 @@ package main
 import (
 	"modos-rs/tools/quitsh/cmd/quitsh/cmd"
 	"modos-rs/tools/quitsh/pkg/build"
-	dpConfig "modos-rs/tools/quitsh/pkg/config"
-	dpRunner "modos-rs/tools/quitsh/pkg/runner"
+	modosConfig "modos-rs/tools/quitsh/pkg/config"
+	modosRunner "modos-rs/tools/quitsh/pkg/runner"
 	"os"
 
 	cnConfig "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/config"
@@ -26,7 +26,7 @@ func main() {
 		log.PanicE(err, "Could not setup logger.")
 	}
 
-	args := dpConfig.New()
+	args := modosConfig.New()
 
 	cli, err := cli.New(
 		&args.Commands.Root,
@@ -63,11 +63,11 @@ func main() {
 		&args.Lint,
 		&args.Test,
 		&args.Image,
-		&args.Manifest,
+		nil,
 		&args.Nix,
 		cli.RunnerFactory())
 
-	dpRunner.RegisterAll(
+	modosRunner.RegisterAll(
 		&args.Lint,
 		&args.Build,
 		&args.Test,

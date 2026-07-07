@@ -7,9 +7,10 @@
       treefmt = treefmtEval.config.build.wrapper;
     in
     {
-      modos.pkgs = {
+      modos.packages = {
         inherit treefmt;
       };
+
       formatter = treefmt;
     };
 }

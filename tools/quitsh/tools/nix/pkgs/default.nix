@@ -4,15 +4,14 @@
   installShellFiles,
   testers,
   git,
-  modosLib,
-  self,
+  # Own arguments.
+  self, # quitsh itself (recursive)
+  modos,
 }:
 let
-  compName = "quitsh";
-  libComponent = modosLib.component;
-  libFileset = modosLib.fileset;
-
-  version = libComponent.readVersion compName;
+  comp = modos.lib.component.getCompFromPath ./.;
+  compName = comp.name;
+  version = modos.lib.component.readVersion compName;
 in
 # NOTE: It can be that this derivation does not build anymore.
 #       This is probably due to caching of the source directory.
@@ -21,11 +20,12 @@ in
 buildGo125Module {
   inherit version;
   pname = compName;
-  src = libFileset.toSource [
+
+  src = modos.lib.fileset.toSource [
     compName
   ];
 
-  modRoot = libFileset.getRootPathRel compName;
+  modRoot = modos.lib.fileset.getRootPathRel compName;
 
   # This hash defines the fixed-output derivation of the dependencies (FOD).
   # You can set the hash to "" and do:
@@ -33,7 +33,7 @@ buildGo125Module {
   # just nix::package quitsh
   # ```
   # to check if a new hash must be here:
-  vendorHash = "sha256-HHM+XAGyJYgkG3YYmhFtG+eG6OvVX8LZPWBoPqM6Adw=";
+  vendorHash = "sha256-56OaYPBDEC4XKkBsMcNcqFgm7evbWRhjek5Fbi5fhfI=";
   proxyVendor = true;
 
   nativeBuildInputs = [ installShellFiles ];

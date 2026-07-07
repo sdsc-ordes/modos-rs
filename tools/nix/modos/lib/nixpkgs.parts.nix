@@ -32,23 +32,28 @@ let
     pkgs;
 in
 {
-  pkgs =
-    {
-      system,
-      overlays ? [ ],
-    }:
-    importPkgs {
-      nixpkgs = inputs.nixpkgs;
-      inherit system overlays;
-    };
+  flake.lib.nixpkgs = {
+    # Shorthand to access the std library in the `nix repl`.
+    lib = inputs.nixpkgs.lib;
 
-  pkgsStable =
-    {
-      system,
-      overlays ? [ ],
-    }:
-    importPkgs {
-      nixpkgs = inputs.nixpkgs-stable;
-      inherit system overlays;
-    };
+    pkgs =
+      {
+        system,
+        overlays ? [ ],
+      }:
+      importPkgs {
+        nixpkgs = inputs.nixpkgs;
+        inherit system overlays;
+      };
+
+    pkgsStable =
+      {
+        system,
+        overlays ? [ ],
+      }:
+      importPkgs {
+        nixpkgs = inputs.nixpkgs-stable;
+        inherit system overlays;
+      };
+  };
 }

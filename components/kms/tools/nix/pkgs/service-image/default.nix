@@ -1,16 +1,17 @@
 {
-  modosLib,
-  pkgs,
+  cacert,
+  dockerTools,
+  # Own arguments.
+  modos,
   service,
   ...
 }:
-pkgs.dockerTools.buildLayeredImage {
+dockerTools.buildLayeredImage {
   name = "modos-rs/${service.pname}-service";
   tag = service.version;
 
   contents = [
-    pkgs.cacert
-    modosLib.image.etcGroupAndPasswd
+    modos.packages.image.etcGroupAndPasswd
   ];
 
   fakeRootCommands = ''
@@ -27,7 +28,7 @@ pkgs.dockerTools.buildLayeredImage {
       "/workspace/data" = { };
     };
     Env = [
-      "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+      "SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt"
     ];
     Labels = {
       "org.opencontainers.image.source" = "https://github.com/sdsc-ordes/modos-rs";

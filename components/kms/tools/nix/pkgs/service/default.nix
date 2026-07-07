@@ -1,8 +1,8 @@
 {
   lib,
   makeWrapper,
-  cowsay,
-  modosLib,
+  # Own arguments.
+  modos,
   compName,
   buildType ? "release",
   environmentType ? "production",
@@ -11,10 +11,11 @@
 let
   target = "service";
 
-  # TODO: remove this.
-  runtimeDeps = cowsay;
+  # Specify some more runtime dependencies if needed.
+  # Dependencies should be added on the `service`.
+  runtimeDeps = [ ];
 in
-modosLib.build.buildRustPackage {
+modos.lib.build.buildRustPackage {
   inherit
     compName
     buildType
@@ -23,9 +24,9 @@ modosLib.build.buildRustPackage {
     ;
   pname = compName;
 
-  version = modosLib.component.readVersion compName;
+  version = modos.lib.component.readVersion compName;
 
-  src = modosLib.fileset.toSource [ compName ];
+  src = modos.lib.fileset.toSource [ compName ];
 
   vendorHash = "sha256-ugPJchw4qIT05+aMFaQ2a4oO757/XSUkyUJwwnf6VQA=";
 
@@ -36,7 +37,7 @@ modosLib.build.buildRustPackage {
   # Add runtime dependencies.
   postInstall = ''
     wrapProgram "$out/bin/${target}" \
-      --prefix PATH : ${lib.makeBinPath [ runtimeDeps ]}
+      --prefix PATH : ${lib.makeBinPath runtimeDeps}
   '';
 
   meta = {
