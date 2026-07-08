@@ -1,16 +1,19 @@
-{ lib, ... }:
+{ lib, modos, ... }:
 let
 
-  # Create `devenv` modules where `pkgs` and `pkgsStable` are the normal packages from `nixpkgs`.
+  # Create `devenv` modules where `pkgs` and `pkgsStable`
+  # are the normal packages from `nixpkgs`.
+  # The modos global config is `modos`, where the system
+  # scoped one is `modos'`.
   createDevenvModules =
     {
       pkgs,
       pkgsStable,
-      modos,
+      modos',
     }:
     let
       # The pinned packages.
-      pkgsPinned = modos.lib.build.pinned;
+      pkgsPinned = modos'.packages.pinned;
 
       quitsh-direct-drv = pkgs.writeShellApplication {
         name = "quitsh-direct";
@@ -30,7 +33,7 @@ let
       };
 
       quitsh-direct-ci-drv = pkgs.writeShellScriptBin "quitsh-direct" ''
-        exec ${lib.getExe modos.packages.quitsh} "$@"
+        exec ${lib.getExe modos'.packages.global.quitsh} "$@"
       '';
 
       quitsh-direct = [
@@ -233,8 +236,8 @@ let
 
           packages = [
             quitsh-direct-ci-drv
-            modos.packages.bootstrap
-            modos.packages.quitsh
+            modos'.packages.global.bootstrap
+            modos'.packages.global.quitsh
             pkgs.podman
 
             pkgs.openssh # SSH agent
@@ -278,7 +281,7 @@ let
     };
 in
 {
-  flake.lib.toolchain = {
+  modos.lib.toolchain = {
     inherit createDevenvModules;
   };
 }

@@ -1,15 +1,17 @@
 {
+  modos,
   ...
 }:
 {
   perSystem =
-    { config, pkgs, ... }:
+    { pkgs, modos', ... }:
     let
-      modos = config.modos;
       comp = modos.lib.component.getCompFromPath ./.;
 
       args = {
         inherit modos;
+        build = modos'.build;
+        etcGroupAndPasswd = modos'.packages.image.etcGroupAndPasswd;
         compName = comp.name;
       };
 
@@ -29,7 +31,7 @@
       service-image = pkgs.callPackage ./service-image (args // { inherit service; });
     in
     {
-      modos.components.packages.${comp.name} = {
+      modos.packages.component.${comp.name} = {
         inherit
           service
           service-dev

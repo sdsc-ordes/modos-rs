@@ -2,10 +2,9 @@
 {
   lib,
   inputs,
+  modos,
   ...
 }:
-let
-in
 {
   perSystem =
     {
@@ -15,25 +14,21 @@ in
       ...
     }:
     let
-      modos = config.modos;
-
-      # Add modos package-namespace to the `nixpkgs` package set.
-      # For  `devenv` module functions
-      pkgsEx = pkgs // {
-        modos = modos.packages;
-      };
+      modos' = config.modos;
 
       # Create a set of devenv modules.
       devenvs = modos.lib.toolchain.createDevenvModules {
-        inherit pkgs pkgsStable modos;
+        inherit pkgs;
+        inherit pkgsStable;
+        inherit modos';
       };
 
       # Define all shells over the set of `devenvs` modules.
       shells = lib.attrsets.mapAttrs (
         name: modules:
         modos.lib.shell.mkShell {
-          pkgs = pkgsEx;
           inherit
+            pkgs
             modules
             inputs
             ;

@@ -2,7 +2,7 @@
   cacert,
   dockerTools,
   # Own arguments.
-  modos,
+  etcGroupAndPasswd,
   service,
   ...
 }:
@@ -11,7 +11,7 @@ dockerTools.buildLayeredImage {
   tag = service.version;
 
   contents = [
-    modos.packages.image.etcGroupAndPasswd
+    etcGroupAndPasswd
     cacert
     service
   ];

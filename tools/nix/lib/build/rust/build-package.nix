@@ -1,8 +1,7 @@
 {
   lib,
   rust-platform,
-  # Our common dac-portal stuff:
-  libComponent, # An instance of the modos 'components' library.
+  libComponent,
   ...
 }:
 {

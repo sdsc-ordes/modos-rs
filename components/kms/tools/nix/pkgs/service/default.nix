@@ -3,19 +3,21 @@
   makeWrapper,
   # Own arguments.
   modos,
+  build,
   compName,
   buildType ? "release",
   environmentType ? "production",
   ...
 }:
 let
+  inherit (modos.lib) component fileset;
   target = "service";
 
   # Specify some more runtime dependencies if needed.
   # Dependencies should be added on the `service`.
   runtimeDeps = [ ];
 in
-modos.lib.build.buildRustPackage {
+build.buildRustPackage {
   inherit
     compName
     buildType
@@ -24,9 +26,9 @@ modos.lib.build.buildRustPackage {
     ;
   pname = compName;
 
-  version = modos.lib.component.readVersion compName;
+  version = component.readVersion compName;
 
-  src = modos.lib.fileset.toSource [ compName ];
+  src = fileset.toSource [ compName ];
 
   vendorHash = "sha256-ugPJchw4qIT05+aMFaQ2a4oO757/XSUkyUJwwnf6VQA=";
 

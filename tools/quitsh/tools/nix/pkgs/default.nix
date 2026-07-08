@@ -9,9 +9,11 @@
   modos,
 }:
 let
-  comp = modos.lib.component.getCompFromPath ./.;
+  inherit (modos.lib) fileset component;
+
+  comp = component.getCompFromPath ./.;
   compName = comp.name;
-  version = modos.lib.component.readVersion compName;
+  version = component.readVersion compName;
 in
 # NOTE: It can be that this derivation does not build anymore.
 #       This is probably due to caching of the source directory.
@@ -21,11 +23,11 @@ buildGo125Module {
   inherit version;
   pname = compName;
 
-  src = modos.lib.fileset.toSource [
+  src = fileset.toSource [
     compName
   ];
 
-  modRoot = modos.lib.fileset.getRootPathRel compName;
+  modRoot = fileset.getRootPathRel compName;
 
   # This hash defines the fixed-output derivation of the dependencies (FOD).
   # You can set the hash to "" and do:

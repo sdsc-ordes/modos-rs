@@ -4,7 +4,7 @@
   ...
 }:
 let
-  # Make the full modos library,
+  # Make the full modosrary,
   # by instantiating it with `rootDir` and `rootFileset`.
   # The output is a merge of `lib` with additional functionality
   # like `components` and `fileset` functionality.

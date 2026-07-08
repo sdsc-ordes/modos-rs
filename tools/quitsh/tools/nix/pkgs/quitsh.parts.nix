@@ -1,18 +1,17 @@
-{ ... }:
+{ modos, ... }:
 {
   perSystem =
     {
-      config,
       pkgs,
       ...
     }:
     let
       quitsh = pkgs.callPackage ./. {
         self = quitsh;
-        inherit (config) modos;
+        inherit modos;
       };
     in
     {
-      modos.packages = { inherit quitsh; };
+      modos.packages.global = { inherit quitsh; };
     };
 }

@@ -18,21 +18,9 @@ develop *args:
     args=("$@") && [ "${#args[@]}" != 0 ] ||
         args=(env SHELL="$SHELL" "$SHELL")
 
-    # NOTE: Configurable flakes are not yet here:
-    # This is for reading env. variable in the flake
-    # to control behavior:
-    # See configurable flakes: https://github.com/NixOS/nix/issues/5663
-    if [ "${QUITSH_NIX_NO_PURE_EVAL:-}" = "true" ]; then
-       nix_args+=("--no-pure-eval")
-    fi
-
-    source "$(dirname "{{source_file()}}")/devenv.sh" &&
-        root_file=$(set_devenv_root "$root_dir")
-
     nix develop \
-        "${nix_args[@]}" \
+        --no-pure-eval \
         --accept-flake-config \
-        --override-input devenv-root "path:$root_file" \
         "$flake_dir#$shell" \
         --command "${args[@]}"
 
@@ -43,18 +31,12 @@ repl:
     #!/usr/bin/env bash
     set -eu
 
-    nix_args=()
-    if [ "${QUITSH_NIX_NO_PURE_EVAL:-}" = "true" ]; then
-       nix_args+=("--no-pure-eval")
-    fi
-
     root_dir=$(git rev-parse --show-toplevel) || exit 1
     flake_dir="$root_dir/tools/nix"
 
     nix repl \
-        "${nix_args[@]}" \
+        --no-pure-eval \
         --accept-flake-config \
-        --override-input devenv-root "path:$root_dir/.devenv/state/pwd" \
         "$flake_dir"
 
 # Build a package in the `packages` output of `flake.nix`
@@ -73,12 +55,9 @@ package attrname *args:
     mkdir -p "$out_dir"
     outlink="$out_dir/$attrname"
 
-    source "$(dirname "{{source_file()}}")/devenv.sh" &&
-        root_file=$(set_devenv_root "$root_dir")
-
     nix build \
         --accept-flake-config \
-        --override-input devenv-root "path:$root_file" \
+        --no-pure-eval \
         -L "$flake_dir#$attrname" \
         "${nix_args[@]}" \
         --out-link "$outlink" --json

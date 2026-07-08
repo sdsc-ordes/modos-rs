@@ -7,7 +7,7 @@
       treefmt = treefmtEval.config.build.wrapper;
     in
     {
-      modos.packages = {
+      modos.packages.global = {
         inherit treefmt;
       };
 
