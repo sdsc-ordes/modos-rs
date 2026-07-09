@@ -9,6 +9,7 @@
     {
       self',
       inputs',
+      modos',
       pkgs,
       ...
     }:
@@ -17,7 +18,6 @@
         repo
         component
         build
-        packages
         ;
 
       process-compose = inputs'.process-compose.legacyPackages.process-compose;
@@ -56,7 +56,7 @@
       modos.build = {
         # Generate the Go build-support functions.
         buildGoModule = pkgs.callPackage build.createBuildGoModule {
-          inherit (packages) quitsh;
+          inherit (modos'.packages.global) quitsh;
           inherit (pkgsPinned) go;
           libComponent = component;
         };

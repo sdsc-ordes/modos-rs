@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (config.modos.lib) common repo component;
+  inherit (config.modos.lib) repo component;
 
   # The components root dir.
   compsDir = lib.path.append repo.rootDir "./components";
@@ -20,7 +20,6 @@ in
     # Root paths of components.
     getRootPathRel = compName: (lib.getAttr compName component.comps).pathRel;
     getRootPath = compName: (lib.getAttr compName component.comps).path;
-    getBuildDir = common.getBuildDir;
 
     # Get the component in `comps` determined by a subpath `path` inside
     # a components directory.

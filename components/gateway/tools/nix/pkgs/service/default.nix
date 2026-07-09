@@ -9,7 +9,7 @@
   ...
 }:
 let
-  inherit (modos.lib) component;
+  inherit (modos.lib) fileset component;
 in
 build.buildGoModule {
   inherit buildType environmentType;
@@ -18,7 +18,7 @@ build.buildGoModule {
   pname = compName;
   version = component.readVersion compName;
 
-  src = modos.fileset.toSource [
+  src = fileset.toSource [
     compName
     "quitsh" # just for tests.
   ];

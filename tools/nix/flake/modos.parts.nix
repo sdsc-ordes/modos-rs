@@ -27,7 +27,7 @@ let
   };
 
   libModosDefs = libDefs // {
-    repo = mkLibOption "Repository definintions.";
+    repo = mkLibOption "Repository definitions.";
     component = mkLibOption "Component scoped helper functions.";
     fileset = mkLibOption "Component scoped filesets utilities.";
   };
