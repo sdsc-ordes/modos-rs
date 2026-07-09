@@ -38,12 +38,6 @@ with some core packages and services written in Rust.
 
 </details>
 
-## TODO
-
-- [x] Remove pure eval.
-- [ ] Add prek over quitsh commands. Remove /tools/scripts bash crap.
-- [x] Make loading of component packages also a
-
 ## Installation
 
 Describe the installation instruction here.
