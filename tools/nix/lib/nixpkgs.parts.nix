@@ -13,7 +13,7 @@ let
   # normal host platform.
   #
   # Options:
-  # - If `USE_LIBC_MUSL` is set it will use the `musl` version..
+  # - If `USE_LIBC_MUSL` is set it will use the `musl` version.
   importPkgs =
     {
       nixpkgs,
@@ -36,7 +36,7 @@ in
     # Shorthand to access the std library in the `nix repl`.
     lib = inputs.nixpkgs.lib;
 
-    pkgs =
+    importPkgs =
       {
         system,
         overlays ? [ ],
@@ -46,7 +46,7 @@ in
         inherit system overlays;
       };
 
-    pkgsStable =
+    importPkgsStable =
       {
         system,
         overlays ? [ ],

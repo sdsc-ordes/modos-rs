@@ -1,7 +1,7 @@
 { lib, ... }:
 let
-  # The same as `read` but only reads some toplevel single-line attributes.
-  # This is only to avoid (IFD).
+  # Reads only some top-level single-line `keywords` from the YAML file
+  # at `path`. This is a lightweight parser to avoid IFD.
   readSimple =
     path: keywords:
     let

@@ -186,7 +186,7 @@ let
             enable = true;
             package = pkgs.prek;
             configPath = "./tools/configs/prek/prek.toml";
-            # WARNING: Only `pre-commit` cause Git LFS hooks might be ignored since `prek` does not support LFS.
+            # WARNING: Only `pre-commit`, because Git LFS hooks might be ignored since `prek` does not support LFS.
             default_stages = [ "pre-commit" ];
           };
 
@@ -223,7 +223,7 @@ let
                 pkgs.fd
 
                 # Web-Traffic
-                pkgs.xh # WARNING: Use this instead of httpie adds PYTHONPATH
+                pkgs.xh # WARNING: Use this instead of httpie, which adds PYTHONPATH
                 pkgs.jwt-cli # Decode jwt tokens.
 
                 # Inspect/upload images.

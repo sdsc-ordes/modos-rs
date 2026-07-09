@@ -1,11 +1,9 @@
 {
-  config,
   lib,
   flake-parts-lib,
   ...
 }:
 let
-  configG = config;
   inherit (flake-parts-lib) mkPerSystemOption;
 
   mkLibOption =
@@ -28,7 +26,6 @@ let
 
   libModosDefs = libDefs // {
     repo = mkLibOption "Repository definitions.";
-    component = mkLibOption "Component scoped helper functions.";
     fileset = mkLibOption "Component scoped filesets utilities.";
   };
 
@@ -36,24 +33,27 @@ let
 in
 {
   options = {
-    # Define the flakes own standalone reusable library
-    # which is not repository/system/pkgs depedend.
+    # Define `lib` as flake output which is our
+    # own standalone reusable library which is not
+    # repository/system/pkgs dependent.
     flake.lib = libDefs;
 
     # Define the modos namespace with repository scoped functionality.
     # Include libs in `flake.lib`.
     modos.lib = libModosDefs;
 
+    # Define the modos namespace as a flake output.
+    flake.modos = lib.mkOption {
+      type = lib.types.raw;
+      readOnly = true;
+    };
+
     # Defining a `perSystem` scoped module option `modos`.
     perSystem = mkPerSystemOption (
       {
-        config,
         lib,
         ...
       }:
-      let
-        cfg = config.modos;
-      in
       {
         # Define a new `modos` namespace options available with
         # `config.modos` inside `perSystem = {config,...}`.
@@ -91,8 +91,7 @@ in
 
             component-flat = lib.mkOption {
               type = lib.types.attrsOf lib.types.package;
-              description = "Flat packages set for all component (read-only).";
-              default = configG.modos.lib.common.attrset.flattenDrvs cfg.packages.component;
+              description = "Flat packages set for all components (read-only).";
               readOnly = true;
             };
           };
@@ -103,43 +102,7 @@ in
             default = { };
           };
         };
-
-        config = {
-          legacyPackages.modos = cfg;
-
-          # Expose all packages.
-          packages = cfg.packages.global // cfg.packages.component-flat;
-
-          # Expose all shells.
-          devShells = cfg.shells;
-        };
       }
     );
-
-    # Define the modos namespace as a flake output.
-    flake.modos = lib.mkOption {
-      type = lib.types.raw;
-      readOnly = true;
-    };
-  };
-
-  config = {
-    # Inject standalone library into `modos.lib`.
-    modos.lib = configG.flake.lib;
-
-    # Expose `modos` global namespace on the flake.
-    flake.modos = configG.modos;
-
-    # Make `modos` function parameter available on flake-parts modules.
-    # and make `modos'` function parameter available also `perSystem`.
-    _module.args.modos = configG.modos;
-    perSystem =
-      {
-        config,
-        ...
-      }:
-      {
-        _module.args.modos' = config.modos;
-      };
   };
 }

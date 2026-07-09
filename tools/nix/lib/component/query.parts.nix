@@ -20,18 +20,20 @@ in
 
       # Type
       ```
-      getComponents :: Path -> { "component-a" = {path, basename, config}; ... }@Component
+      getComponents :: { path, configName ? } -> { "<name>" = { name, path, pathRel, config }; ... }
       ```
 
       # Examples
       ```nix
-      getComponents ./components
+      getComponents { path = ./components; }
       =>
       {
-        pdp = {
-          basename = "service-a"; # Read from `.component.yaml`
-          path = ./component/service-a;
-          config = ./components/service-a/.component.yaml;
+        # Keyed by `name` read from `.component.yaml`.
+        service-a = {
+          name = "service-a";
+          path = ./components/service-a;         # Absolute component path.
+          pathRel = "service-a";                 # Path relative to the search root.
+          config = { name; version; language; }; # Parsed from `.component.yaml`.
         };
         ...
       }
@@ -88,7 +90,7 @@ in
           let
             dirs = getDirs path; # dirs = [ entry, ...]
           in
-          # Concatng will reduce all [ visitDir(entry) => [], ... ] to
+          # Concatenating will reduce all [ visitDir(entry) => [], ... ] to
           # one flat map.
           builtins.concatMap visitDir dirs;
 

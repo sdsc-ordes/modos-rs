@@ -1,9 +1,9 @@
 { ... }:
 {
   flake.lib.service = {
-    # Service modules for `service-flake`.
+    # Service modules for `services-flake`.
     modules = {
-      service.garage = import ./garage.nix;
+      garage = import ./garage.nix;
     };
   };
 }

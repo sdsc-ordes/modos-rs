@@ -21,7 +21,7 @@ let
   # by concatenating keys with delimiter `del` and taking only
   # the values which fulfill `cond`
   #
-  # flattenCond:: String -> (Key -> Value -> Bool) -> AttrSet
+  # flattenTill:: String -> (Path -> Value -> Bool) -> AttrSet -> AttrSet
   flattenTill =
     del: cond: attrs:
     lib.listToAttrs (
@@ -38,7 +38,7 @@ let
   # by concatenating keys with delimiter `del`.
   #
   # Type:
-  # flatten:: String -> AttrsSet -> AttrSet
+  # flatten:: String -> AttrSet -> AttrSet
   #
   # Example:
   # set = { a = { b = { c = 1;}; d = 3; }; };

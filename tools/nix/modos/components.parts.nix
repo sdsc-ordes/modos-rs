@@ -36,15 +36,15 @@ in
       Get the version of a component.
 
       # Inputs
-      `compRoot`: The component source directory where `.component.yaml` resides.
+      `compName`: The component name (as read from `.component.yaml`).
 
       # Type
       ```
-      readVersion :: Path -> String
+      readVersion :: String -> String
       ```
       # Examples
       ```nix
-      readVersion "./components/a"
+      readVersion "service-a"
       => "3.0.1"
       ```
     */

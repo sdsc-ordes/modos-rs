@@ -20,6 +20,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
 
     # Pinning some packages:
     rustfs.url = "github:rustfs/rustfs/5d737eaeb7fcab5d40c655ba60a494e93dd98922";
@@ -27,7 +28,7 @@
     process-compose.url = "github:nixos/nixpkgs/b5aa0fbd538984f6e3d201be0005b4463d8b09f8";
 
     # The devenv module to create good development shells.
-    # The `nixpkgs-devenv` must aligned with the pinned version.
+    # The `nixpkgs-devenv` must be aligned with the pinned version.
     devenv = {
       url = "github:cachix/devenv?ref=v2.1.2";
       inputs.nixpkgs.follows = "nixpkgs-devenv";

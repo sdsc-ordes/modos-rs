@@ -14,11 +14,11 @@
   # The source (component directory) of this Rust build.
   src,
   # The SRI hash of the vendored dependencies.
-  # If vendor hash is `nulL`, then no dependencies are fetched and
+  # If vendor hash is `null`, then no dependencies are fetched and
   # the build relies on the vendor folder within the source.
   vendorHash,
 
-  # Meta information for `mkDerivation.
+  # Meta information for `mkDerivation`.
   meta,
 
   # The output binary.
@@ -28,7 +28,7 @@
   buildType ? "release",
   environmentType ? "production",
   ...
-}@args: # NOTE: `args` doesnt capture default arguments.
+}@args: # NOTE: `args` doesn't capture default arguments.
 let
   compDirRel = libComponent.getRootPathRel compName;
   # The name of the derivation.

@@ -18,9 +18,7 @@ _: {
   # Markdown, JSON, YAML, etc.
   programs.prettier.enable = true;
   settings.formatter.prettier.excludes = [
-    "components/.old/*"
-    "tools/deploy/.old/*"
-    "*/api/openapi*" # this are symlinks, which prettier cannot deal with
+    "*/api/openapi*" # these are symlinks, which prettier cannot deal with
     ".golangci.yaml" # this is a symlink, which prettier cannot deal with
     ".yamllint.yaml" # this is a symlink, which prettier cannot deal with
   ];

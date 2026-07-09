@@ -19,11 +19,11 @@
   # The source directory of this Go build.
   src,
   # The SRI hash of the vendored dependencies.
-  # If vendor hash is `nulL`, then no dependencies are fetched and
+  # If vendor hash is `null`, then no dependencies are fetched and
   # the build relies on the vendor folder within the source.
   vendorHash,
 
-  # Meta information for `mkDerivation.
+  # Meta information for `mkDerivation`.
   meta,
 
   # Build inputs used by this build of the derivation.
@@ -40,7 +40,7 @@
   buildType ? "release",
   environmentType ? "production",
   ...
-}@args: # NOTE: `args` doesnt capture default arguments.
+}@args: # NOTE: `args` doesn't capture default arguments.
 let
   buildDir = libComponent.getBuildDir ".";
   compDirRel = libComponent.getRootPathRel compName;
@@ -56,7 +56,7 @@ let
   # Use the same toolchain as the invoked `go` executable.
   GOTOOLCHAIN = "local";
 
-  # Define the toolchain variable for `cnQuitsh` to
+  # Define the toolchain variable for `quitsh` to
   # work with `--skip-toolchain-dispatch`.
   QUITSH_TOOLCHAINS = "build-go";
 
