@@ -180,8 +180,25 @@ let
         }
       ];
 
+      git-hooks = [
+        {
+          git-hooks = {
+            enable = true;
+            package = pkgs.prek;
+            configPath = "./tools/configs/prek/prek.toml";
+            # WARNING: Only `pre-commit` cause Git LFS hooks might be ignored since `prek` does not support LFS.
+            default_stages = [ "pre-commit" ];
+          };
+
+          packages = [
+            pkgs.prek
+          ];
+        }
+      ];
+
       default =
         ci
+        ++ git-hooks
         ++ build-go
         ++ dev-go
         ++ manifest-ytt
@@ -204,9 +221,6 @@ let
                 pkgs.git
                 pkgs.just
                 pkgs.fd
-
-                # Manifests
-                # added by manifest-ytt module.
 
                 # Web-Traffic
                 pkgs.xh # WARNING: Use this instead of httpie adds PYTHONPATH
