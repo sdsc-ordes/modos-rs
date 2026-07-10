@@ -27,9 +27,13 @@ repo = "local"
   name = "treefmt"
   language = "system"
   entry = "just format"
+  pass_filenames = false
+  require_serial = true
 
   [[repos.hooks]]
   id = "quitsh"
   name = "quitsh"
   language = "system"
   entry = "./tools/quitsh/tools/scripts/update-quitsh-version.sh"
+  pass_filenames = false
+  require_serial = true
