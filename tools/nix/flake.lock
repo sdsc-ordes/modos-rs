@@ -1946,6 +1946,21 @@
         "type": "github"
       }
     },
+    "process-compose-flake": {
+      "locked": {
+        "lastModified": 1782060835,
+        "narHash": "sha256-Q8HH2t1l3MITtWCWY4ytcH5F/Q7aAHo3Iq/QTMAKTe0=",
+        "owner": "Platonic-Systems",
+        "repo": "process-compose-flake",
+        "rev": "464ff6880737f063c3f0d3d2c7781fda9190868f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Platonic-Systems",
+        "repo": "process-compose-flake",
+        "type": "github"
+      }
+    },
     "quitsh": {
       "inputs": {
         "devenv": "devenv_2",
@@ -1983,9 +1998,11 @@
         "nixpkgs-devenv": "nixpkgs-devenv",
         "nixpkgs-stable": "nixpkgs-stable",
         "process-compose": "process-compose",
+        "process-compose-flake": "process-compose-flake",
         "quitsh": "quitsh",
         "rust-overlay": "rust-overlay_3",
         "rustfs": "rustfs",
+        "services-flake": "services-flake",
         "systems": "systems_4",
         "treefmt-nix": "treefmt-nix_4"
       }
@@ -2091,6 +2108,21 @@
         "owner": "rustfs",
         "repo": "rustfs",
         "rev": "5d737eaeb7fcab5d40c655ba60a494e93dd98922",
+        "type": "github"
+      }
+    },
+    "services-flake": {
+      "locked": {
+        "lastModified": 1783213527,
+        "narHash": "sha256-yIVKacNpTvEY+xQf2MzNn6jerRrazrkXxTwmwTK4N7M=",
+        "owner": "juspay",
+        "repo": "services-flake",
+        "rev": "1c9142a3d74abc53aed62687106ee15e873dc3ff",
+        "type": "github"
+      },
+      "original": {
+        "owner": "juspay",
+        "repo": "services-flake",
         "type": "github"
       }
     },

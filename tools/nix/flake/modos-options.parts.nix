@@ -96,6 +96,12 @@ in
             };
           };
 
+          services.config = lib.mkOption {
+            type = lib.types.attrsOf lib.types.raw;
+            description = "The process-compose configuration to inspect.";
+            default = { };
+          };
+
           shells = lib.mkOption {
             type = lib.types.attrsOf lib.types.package;
             description = "All development Nix shells.";

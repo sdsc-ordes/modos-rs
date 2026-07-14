@@ -56,6 +56,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Process-compose setup for services.
+    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
+    services-flake.url = "github:juspay/services-flake";
+
     # Importing flake-parts modules recursively.
     import-tree = {
       url = "github:vic/import-tree";
@@ -83,7 +87,7 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
       lib.pipe inputs.import-tree [
         # NOTE: Uncomment the below to inspect what modules are loaded.
-        # (i: i.map (x: lib.info "modos: Importing: '${x}'" x))
+        (i: i.map (x: lib.info "modos: Importing: '${x}'" x))
         (i: i.filter (lib.hasInfix ".parts."))
         (
           i:
