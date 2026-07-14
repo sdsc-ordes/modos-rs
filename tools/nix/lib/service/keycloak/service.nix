@@ -147,7 +147,93 @@ let
   keycloak-health = pkgs.writeShellScriptBin "keycloak-health" ''
     ${pkgs.curl}/bin/curl -k --head -fsS "https://localhost:${toString cfg.settings.http-management-port}${lib.removeSuffix "/" cfg.settings.http-management-relative-path}/health/ready"
   '';
+
+  dataDir = "./" + cfg.dataDir;
+  keycloakEnv = {
+    KC_HOME_DIR = dataDir + "/keycloak";
+    KC_CONF_DIR = dataDir + "/keycloak/conf";
+    KC_TMP_DIR = dataDir + "/keycloak/tmp";
+
+    KC_BOOTSTRAP_ADMIN_USERNAME = "admin";
+    KC_BOOTSTRAP_ADMIN_PASSWORD = "${lib.escapeShellArg cfg.initialAdminPassword}";
+  };
+
+  keycloak-start =
+    pkgs.writeShellScriptBin "keycloak-start"
+      # Bash
+      ''
+        set -euo pipefail
+        mkdir -p "$KC_HOME_DIR"
+        mkdir -p "$KC_HOME_DIR/conf"
+        mkdir -p "$KC_HOME_DIR/tmp"
+
+        # Always remove the symlinks for the realm imports.
+        rm -rf "$KC_HOME_DIR/data/import" || true
+        mkdir -p "$KC_HOME_DIR/data/import"
+
+        ln -fs ${keycloakBuild}/providers "$KC_HOME_DIR/"
+        ln -fs ${keycloakBuild}/lib "$KC_HOME_DIR/"
+        install -D -m 0600 ${confFile} "$KC_HOME_DIR/conf/keycloak.conf"
+
+        echo "Keycloak config:"
+        ${keycloakBuild}/bin/kc.sh show-config || true
+
+        echo "Import realms (if any)..."
+        ${builtins.concatStringsSep "\n" realmImport}
+        echo "========================"
+
+        echo "Start keycloak:"
+        exec ${keycloakBuild}/bin/kc.sh start --optimized --import-realm
+      '';
 in
 {
 
+  services.keycloak.settings = lib.mapAttrs (n: v: lib.mkOptionDefault v) {
+    # We always enable http since we also use it to check the health.
+    http-enabled = true;
+    db = cfg.database.type;
+
+    health-enabled = true;
+    http-management-relative-path = "/";
+
+    log-console-level = "info";
+    log-level = "info";
+
+    https-certificate-file =
+      if providedSSLCerts then cfg.sslCertificate else "${dummyCertificates}/ssl-cert.crt";
+    https-certificate-key-file =
+      if providedSSLCerts then cfg.sslCertificateKey else "${dummyCertificates}/ssl-cert.key";
+  };
+
+  settings.processes = lib.mkIf cfg.enable {
+    keycloak = {
+      environment = keycloakEnv;
+      command = "${lib.getExe keycloak-start}";
+      readiness_probe = {
+        exec = {
+          command = "${lib.getExe keycloak-health}";
+        };
+        initial_delay_seconds = 10;
+        timeout_seconds = 4;
+        failure_threshold = 20;
+      };
+    };
+
+    keycloak-realm-export = lib.mkIf cfg.scripts.exportRealm {
+      command = "${keycloak-realm-export}/bin/keycloak-realm-export";
+      disabled = true;
+      description = ''
+        Export a realm '$1' (first argument) from keycloak to location '$2' (second argument).
+      '';
+    };
+
+    # Export all configured realms.
+    keycloak-realm-export-all = lib.mkIf (realmsExport != [ ]) {
+      command = "${keycloak-realm-export-all}/bin/keycloak-realm-export-all";
+      disabled = true;
+      description = ''
+        Save the configured realms from keycloak, to back them up. You can run it manually.
+      '';
+    };
+  };
 }

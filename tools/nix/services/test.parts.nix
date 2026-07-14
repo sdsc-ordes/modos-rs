@@ -12,7 +12,7 @@
   perSystem =
     { config, ... }:
     {
-      process-compose."test" =
+      process-compose."test-services" =
         # Process-compose NixOS module.
         { pkgs, pkgsStable, ... }:
         {
@@ -24,11 +24,11 @@
           cli.options = {
             keep-project = true;
             unix-socket = "./.output/process-compose/pc.sock";
+            log-file = ".output/process-compose/log.txt";
           };
 
           settings = {
             log_level = "debug";
-            log_location = ".output/process-compose/log.txt";
             ordered_shutdown = true;
           };
 
@@ -41,11 +41,21 @@
               log_location = ".output/process-compose/log/${name}.log";
             };
 
-          services.keycloak.enable = true;
+          services.keycloak = {
+            enable = true;
+            dataDir = ".output/process-compose/data";
+            realms = {
+              modos = {
+                path = "./tools/configs/keycloak/modos-realm.json";
+                import = false;
+                export = true;
+              };
+            };
+          };
         };
 
       modos.services.config = {
-        test = config.process-compose.test;
+        test = config.process-compose.test-services;
       };
     };
 }

@@ -29,6 +29,13 @@ in
         server.
       '';
     };
+    dataDir = mkOption {
+      type = types.str;
+      default = "./data";
+      description = ''
+        Base directory where keycloak stores its data `<dataDir>/keycloak`.
+      '';
+    };
 
     sslCertificate = mkOption {
       type = types.nullOr (
