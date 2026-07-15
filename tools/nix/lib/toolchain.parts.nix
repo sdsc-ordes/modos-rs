@@ -63,7 +63,7 @@ let
         )
       ];
 
-      addSetup = modules: modules ++ quitsh-setup;
+      addSetup = modules: modules ++ quitsh-setup ++ no-devenv-processes;
 
       build-go = [
         {
@@ -193,6 +193,18 @@ let
           packages = [
             pkgs.prek
           ];
+        }
+      ];
+
+      no-devenv-processes = [
+        {
+          # Disable all process-compose stuff.
+          # Set to native manager to not have PC_ env. variables.
+          process.manager.implementation = "native";
+
+          env = {
+            PC_SOCKET_PATH = lib.mkForce ".output/process-compose/pc.sock";
+          };
         }
       ];
 

@@ -9,6 +9,7 @@
 # Nix
 .direnv
 .devenv
+result
 
 # Vendir temporary folder.
 .vendir*

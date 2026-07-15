@@ -5,6 +5,7 @@ root_dir := `git rev-parse --show-toplevel`
 flake_dir := root_dir / "tools/nix"
 output_dir := root_dir / ".output"
 build_dir := output_dir / "build"
+pc_socket := output_dir / "process-compose" / "pc.sock"
 
 mod nix "./tools/just/nix.just"
 mod ci "./tools/just/ci.just"
@@ -74,9 +75,24 @@ test: setup
     just quitsh test --components "*" --parallel --fix
 
 # Run the test services.
-[group('general')]
-run-services *args:
-    nix run -L --show-trace "./tools/nix#test-services"
+[group('services')]
+services-start *args:
+    nix run -L --show-trace "./tools/nix#test-services" -- --detached --detached-with-tui "$@"
+
+# Stop the test services.
+[group('services')]
+services-stop *args:
+    process-compose -u "{{pc_socket}}" down
+
+# Attach to the running test services.
+[group('services')]
+services-attach *args:
+    process-compose -u "{{pc_socket}}"  attach
+
+[group('keycloak')]
+export-realm:
+    process-compose -u "{{pc_socket}}" process stop keycloak || true
+    process-compose -u "{{pc_socket}}" process start keycloak-realm-export-all
 
 # Update dependencies.
 [group('aux')]

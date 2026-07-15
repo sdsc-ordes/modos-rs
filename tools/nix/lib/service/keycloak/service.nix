@@ -132,7 +132,7 @@ let
 
   realmsToExport = lib.filterAttrs (_: v: v.export) cfg.realms;
   realmsExport =
-    if (!cfg.processes.exportRealms || lib.length (lib.attrNames realmsToExport) == 0) then
+    if (!cfg.exportRealms || lib.length (lib.attrNames realmsToExport) == 0) then
       [ ]
     else
       assertKeycloakStopped
@@ -230,15 +230,6 @@ in
         timeout_seconds = 4;
         failure_threshold = 20;
       };
-    };
-
-    keycloak-realm-export = lib.mkIf cfg.scripts.exportRealm {
-      environment = keycloakEnv;
-      command = "${keycloak-realm-export}/bin/keycloak-realm-export";
-      disabled = true;
-      description = ''
-        Export a realm '$1' (first argument) from keycloak to location '$2' (second argument).
-      '';
     };
 
     # Export all configured realms.

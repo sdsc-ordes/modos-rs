@@ -2259,10 +2259,10 @@
       "createdTimestamp": 1784117721190,
       "credentials": [
         {
-          "createdDate": 1784117721288,
+          "createdDate": 1784123372212,
           "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}",
           "id": "b0c4da52-94da-453d-b273-7034c8ac294d",
-          "secretData": "{\"value\":\"8ZoINJmqKVHF3rc/p5u5B6Xb1ZavVg+fEEkhXi+kUKg=\",\"salt\":\"stQnSPuEnMUeenLsTZiklA==\",\"additionalParameters\":{}}",
+          "secretData": "{\"value\":\"O8K7ejcjbJKRiXmal2nLvSoUMkBmV2UWfyH/YD/GBpc=\",\"salt\":\"5cOU/PA0oRIq+DjfYR6sLg==\",\"additionalParameters\":{}}",
           "type": "password"
         }
       ],

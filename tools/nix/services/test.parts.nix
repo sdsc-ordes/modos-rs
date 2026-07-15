@@ -26,6 +26,7 @@
             keep-project = true;
             unix-socket = "./.output/process-compose/pc.sock";
             log-file = ".output/process-compose/log.txt";
+            no-server = false;
           };
 
           settings = {
@@ -45,6 +46,9 @@
           services.keycloak = {
             enable = true;
             dataDir = ".output/process-compose/data";
+
+            settings.http-port = 8081;
+
             realms = {
               modos = {
                 path = "./tools/configs/keycloak/modos-realm.json";
