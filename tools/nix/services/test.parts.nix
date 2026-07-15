@@ -47,7 +47,7 @@
             realms = {
               modos = {
                 path = "./tools/configs/keycloak/modos-realm.json";
-                import = false;
+                import = true;
                 export = true;
               };
             };
