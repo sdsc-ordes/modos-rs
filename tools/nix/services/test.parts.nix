@@ -19,6 +19,7 @@
           imports = [
             inputs.services-flake.processComposeModules.default
             self.processComposeModules.keycloak
+            self.processComposeModules.mailhog
           ];
 
           cli.options = {
@@ -51,6 +52,11 @@
                 export = true;
               };
             };
+          };
+
+          services.mailhog = {
+            smtp.port = 1026;
+            enable = true;
           };
         };
 
