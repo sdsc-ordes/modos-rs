@@ -74,7 +74,7 @@ let
   realmImport = lib.mapAttrsToList (
     realm: e:
     let
-      f = config.env.DEVENV_ROOT + "/" + e.path;
+      f = dataDir + "/" + e.path;
     in
     ''
       echo "Symlinking realm file '${f}' to import path '$KC_HOME_DIR/data/import'."
@@ -122,11 +122,7 @@ let
       ++ lib.mapAttrsToList (
         realm: e:
         let
-          file =
-            if e.path == null then
-              (config.env.DEVENV_STATE + "/keycloak/realm-export/${realm}.json")
-            else
-              e.path;
+          file = if e.path == null then (dataDir + "/keycloak/realm-export/${realm}.json") else e.path;
         in
         ''
           echo "Exporting realm '${realm}' to '${file}'."
