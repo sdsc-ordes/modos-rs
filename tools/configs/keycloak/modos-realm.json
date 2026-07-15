@@ -14,10 +14,15 @@
     "cibaBackchannelTokenDeliveryMode": "poll",
     "cibaExpiresIn": "120",
     "cibaInterval": "5",
+    "clientOfflineSessionIdleTimeout": "0",
+    "clientOfflineSessionMaxLifespan": "0",
+    "clientSessionIdleTimeout": "0",
+    "clientSessionMaxLifespan": "0",
     "oauth2DeviceCodeLifespan": "600",
     "oauth2DevicePollingInterval": "5",
     "parRequestUriLifespan": "60",
-    "realmReusableOtpCode": "false"
+    "realmReusableOtpCode": "false",
+    "scimApiEnabled": "false"
   },
   "authenticationFlows": [
     {
@@ -815,7 +820,8 @@
             "introspection.token.claim": "true",
             "jsonType.label": "String",
             "multivalued": "true",
-            "user.attribute": "foo"
+            "user.attribute": "foo",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "7520fdc7-4a89-4e2a-aca6-4971b673472d",
@@ -1002,7 +1008,8 @@
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "String",
-            "user.session.note": "client_id"
+            "user.session.note": "client_id",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "420dc4c9-d83e-4645-bc7f-edac5ecdfd15",
@@ -1017,7 +1024,8 @@
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "String",
-            "user.session.note": "clientAddress"
+            "user.session.note": "clientAddress",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "21dd2d1d-eaa4-48a4-804f-f5de5d0fb802",
@@ -1032,7 +1040,8 @@
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "String",
-            "user.session.note": "clientHost"
+            "user.session.note": "clientHost",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "ee5d419c-954a-4c2e-94d9-ae7f23cca8d9",
@@ -1105,7 +1114,8 @@
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "String",
-            "multivalued": "true"
+            "multivalued": "true",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "89d16d5a-cab0-40e4-94bb-45d2e39cbcca",
@@ -1363,7 +1373,8 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "true",
-            "introspection.token.claim": "true"
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "ad893a3d-eacb-482a-8404-5eafca5f8459",
@@ -1400,7 +1411,8 @@
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "long",
-            "user.session.note": "AUTH_TIME"
+            "user.session.note": "AUTH_TIME",
+            "userinfo.token.claim": "true"
           },
           "consentRequired": false,
           "id": "e787cbfb-6c9d-446f-8193-2662ee66d08e",
@@ -1530,6 +1542,7 @@
       "alwaysDisplayInConsole": false,
       "attributes": {
         "client.use.lightweight.access.token.enabled": "true",
+        "post.logout.redirect.uris": "+",
         "realm_client": "false"
       },
       "authenticationFlowBindingOverrides": {},
@@ -1572,6 +1585,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
+        "post.logout.redirect.uris": "+",
         "realm_client": "true"
       },
       "authenticationFlowBindingOverrides": {},
@@ -1614,6 +1628,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
+        "post.logout.redirect.uris": "+",
         "realm_client": "true"
       },
       "authenticationFlowBindingOverrides": {},
@@ -1792,14 +1807,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-full-name-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper",
-            "saml-user-property-mapper",
-            "oidc-usermodel-property-mapper",
             "saml-user-attribute-mapper",
+            "oidc-full-name-mapper",
+            "saml-role-list-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-address-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         },
         "id": "8a7e7753-b1f7-4ee1-bc5f-5c62ac61679f",
@@ -1830,14 +1845,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
-            "saml-user-property-mapper",
-            "oidc-address-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-user-attribute-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "oidc-usermodel-property-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper"
           ]
         },
         "id": "74842203-5618-4574-9c8c-910612390d11",
@@ -1891,6 +1906,18 @@
         "providerId": "max-clients",
         "subComponents": {},
         "subType": "anonymous"
+      }
+    ],
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+          ]
+        },
+        "id": "a1109477-22c1-4f5d-837e-e0af3dadaf30",
+        "providerId": "declarative-user-profile",
+        "subComponents": {}
       }
     ]
   },
@@ -1966,10 +1993,10 @@
   "quickLoginCheckMilliSeconds": 1000,
   "realm": "modos",
   "refreshTokenMaxReuse": 0,
-  "registrationAllowed": false,
-  "registrationEmailAsUsername": false,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
   "registrationFlow": "registration",
-  "rememberMe": false,
+  "rememberMe": true,
   "requiredActions": [
     {
       "alias": "CONFIGURE_TOTP",
@@ -2100,7 +2127,7 @@
   ],
   "requiredCredentials": ["password"],
   "resetCredentialsFlow": "reset credentials",
-  "resetPasswordAllowed": false,
+  "resetPasswordAllowed": true,
   "revokeRefreshToken": false,
   "roles": {
     "client": {
@@ -2461,7 +2488,7 @@
   "ssoSessionMaxLifespanRememberMe": 0,
   "userManagedAccessAllowed": false,
   "verifiableCredentialsEnabled": false,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "waitIncrementSeconds": 60,
   "webAuthnPolicyAcceptableAaguids": [],
   "webAuthnPolicyAttestationConveyancePreference": "not specified",
