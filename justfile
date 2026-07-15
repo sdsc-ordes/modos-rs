@@ -89,8 +89,12 @@ services-stop *args:
 services-attach *args:
     process-compose -u "{{pc_socket}}"  attach
 
+# Delete all data from the services.
+services-delete-data:
+    rm -rf "{{output_dir}}/process-compose"
+
 [group('keycloak')]
-export-realm:
+service-keycloak-export:
     process-compose -u "{{pc_socket}}" process stop keycloak || true
     process-compose -u "{{pc_socket}}" process start keycloak-realm-export-all
 

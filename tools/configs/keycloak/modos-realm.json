@@ -1046,31 +1046,6 @@
         "display.on.consent.screen": "false",
         "include.in.token.scope": "false"
       },
-      "description": "OpenID Connect scope for add acr (authentication context class reference) to the token",
-      "id": "ae1504d0-13eb-4a0e-9331-3bc22b4ddb75",
-      "name": "acr",
-      "protocol": "openid-connect",
-      "protocolMappers": [
-        {
-          "config": {
-            "access.token.claim": "true",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "ad893a3d-eacb-482a-8404-5eafca5f8459",
-          "name": "acr loa level",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-acr-mapper"
-        }
-      ]
-    },
-    {
-      "attributes": {
-        "display.on.consent.screen": "false",
-        "include.in.token.scope": "false"
-      },
       "description": "OpenID Connect scope for add all basic claims to the token",
       "id": "646b9f4f-a708-4aea-acc0-14af898f7c34",
       "name": "basic",
@@ -1107,87 +1082,13 @@
     },
     {
       "attributes": {
-        "consent.screen.text": "",
-        "display.on.consent.screen": "false",
-        "include.in.token.scope": "false"
+        "consent.screen.text": "${offlineAccessScopeConsentText}",
+        "display.on.consent.screen": "true"
       },
-      "description": "OpenID Connect scope for add allowed web origins to the access token",
-      "id": "a24d1871-a03c-4c27-98dd-845cc6fdf6f4",
-      "name": "web-origins",
-      "protocol": "openid-connect",
-      "protocolMappers": [
-        {
-          "config": {
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "e8e6a7f4-71ec-4808-8c1a-caa8332a1e69",
-          "name": "allowed web origins",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-allowed-origins-mapper"
-        }
-      ]
-    },
-    {
-      "attributes": {
-        "display.on.consent.screen": "false",
-        "include.in.token.scope": "false"
-      },
-      "description": "Specific scope for a client enabled for service accounts",
-      "id": "71571078-b017-41b7-b371-1db502fdbd6a",
-      "name": "service_account",
-      "protocol": "openid-connect",
-      "protocolMappers": [
-        {
-          "config": {
-            "access.token.claim": "true",
-            "claim.name": "client_id",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "jsonType.label": "String",
-            "user.session.note": "client_id",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "420dc4c9-d83e-4645-bc7f-edac5ecdfd15",
-          "name": "Client ID",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper"
-        },
-        {
-          "config": {
-            "access.token.claim": "true",
-            "claim.name": "clientAddress",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "jsonType.label": "String",
-            "user.session.note": "clientAddress",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "21dd2d1d-eaa4-48a4-804f-f5de5d0fb802",
-          "name": "Client IP Address",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper"
-        },
-        {
-          "config": {
-            "access.token.claim": "true",
-            "claim.name": "clientHost",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "jsonType.label": "String",
-            "user.session.note": "clientHost",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "ee5d419c-954a-4c2e-94d9-ae7f23cca8d9",
-          "name": "Client Host",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper"
-        }
-      ]
+      "description": "OpenID Connect built-in scope: offline_access",
+      "id": "f73ddea9-b2dd-43a3-a390-1f914471c1a0",
+      "name": "offline_access",
+      "protocol": "openid-connect"
     },
     {
       "attributes": {
@@ -1250,14 +1151,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "account",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1290,14 +1184,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "account-console",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1339,14 +1226,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "admin-cli",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": true,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1376,14 +1256,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "broker",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1403,6 +1276,65 @@
       "webOrigins": []
     },
     {
+      "adminUrl": "",
+      "alwaysDisplayInConsole": true,
+      "attributes": {
+        "access.token.header.type.rfc9068": "false",
+        "acr.loa.map": "{}",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "true",
+        "client.introspection.response.allow.jwt.claim.enabled": "false",
+        "client.secret.creation.time": "1784129327",
+        "client.use.lightweight.access.token.enabled": "false",
+        "client_credentials.use_refresh_token": "false",
+        "display.on.consent.screen": "false",
+        "dpop.bound.access.tokens": "false",
+        "frontchannel.logout.session.required": "true",
+        "id.token.as.detached.signature": "false",
+        "logoUri": "https://raw.githubusercontent.com/sdsc-ordes/modos-api/refs/heads/main/docs/img/modos.svg",
+        "logout.confirmation.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "true",
+        "oauth2.jwt.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+",
+        "realm_client": "false",
+        "request.object.required": "not required",
+        "require.pushed.authorization.requests": "false",
+        "standard.token.exchange.enabled": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "token.response.type.bearer.lower-case": "false",
+        "use.jwks.url": "false",
+        "use.refresh.tokens": "true"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "baseUrl": "",
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
+      "clientId": "modos-cli",
+      "consentRequired": false,
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "description": "Client for modos CLI.",
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": true,
+      "fullScopeAllowed": true,
+      "id": "6154dc38-eada-4b71-b9b1-e33c7f4b996b",
+      "implicitFlowEnabled": false,
+      "name": "modos-cli",
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [],
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "redirectUris": [""],
+      "rootUrl": "",
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": [""]
+    },
+    {
       "alwaysDisplayInConsole": false,
       "attributes": {
         "post.logout.redirect.uris": "+",
@@ -1413,14 +1345,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "realm-management",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1453,14 +1378,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "security-admin-console",
       "consentRequired": false,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
+      "defaultClientScopes": ["roles", "profile", "basic", "email"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1510,6 +1428,24 @@
         "id": "83d2373c-09f4-428f-9119-de3292bb8fb1",
         "name": "aes-generated",
         "providerId": "aes-generated",
+        "subComponents": {}
+      },
+      {
+        "config": {
+          "active": ["true"],
+          "eddsaEllipticCurveKey": ["Ed25519"],
+          "eddsaPrivateKey": [
+            "MC4CAQAwBQYDK2VwBCIEIGaiqDys9Gpq+mGrDeFus9q9WTmrD9x8rJW1Bvdynbix"
+          ],
+          "eddsaPublicKey": [
+            "MCowBQYDK2VwAyEAUW0dVbWhLk1Y/SF8cAE3M9OMUanDoQn1PeG9A5KGdGA="
+          ],
+          "enabled": ["true"],
+          "priority": ["1000"]
+        },
+        "id": "b7cf0ccf-fffa-4751-8144-2c015b254434",
+        "name": "eddsa-generated",
+        "providerId": "eddsa-generated",
         "subComponents": {}
       },
       {
@@ -1572,14 +1508,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
-            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
             "oidc-usermodel-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
+            "oidc-full-name-mapper",
             "oidc-address-mapper",
-            "saml-user-property-mapper",
-            "oidc-usermodel-property-mapper"
+            "saml-user-attribute-mapper"
           ]
         },
         "id": "8a7e7753-b1f7-4ee1-bc5f-5c62ac61679f",
@@ -1610,14 +1546,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-full-name-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-attribute-mapper",
             "saml-user-attribute-mapper",
             "oidc-address-mapper",
             "saml-user-property-mapper",
+            "oidc-full-name-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper"
+            "oidc-usermodel-property-mapper"
           ]
         },
         "id": "74842203-5618-4574-9c8c-910612390d11",
@@ -1686,15 +1622,8 @@
       }
     ]
   },
-  "defaultDefaultClientScopes": [
-    "profile",
-    "email",
-    "roles",
-    "web-origins",
-    "acr",
-    "basic"
-  ],
-  "defaultOptionalClientScopes": [],
+  "defaultDefaultClientScopes": ["profile", "email", "roles", "basic"],
+  "defaultOptionalClientScopes": ["offline_access"],
   "defaultRole": {
     "clientRole": false,
     "composite": true,
@@ -1985,6 +1914,16 @@
           "name": "read-token"
         }
       ],
+      "modos-cli": [
+        {
+          "attributes": {},
+          "clientRole": true,
+          "composite": false,
+          "containerId": "6154dc38-eada-4b71-b9b1-e33c7f4b996b",
+          "id": "0b063485-4eec-430c-b419-263e06997ec1",
+          "name": "uma_protection"
+        }
+      ],
       "realm-management": [
         {
           "attributes": {},
@@ -2225,12 +2164,18 @@
         "composite": false,
         "containerId": "5502f55d-5d96-4c16-9052-55e4ba8f9ef2",
         "description": "${role_offline-access}",
-        "id": "6777f721-fba6-4a93-b2f2-89b925bc1a21",
+        "id": "e3f54c73-588e-41a2-94da-2fe1144676fd",
         "name": "offline_access"
       }
     ]
   },
   "scimApiEnabled": false,
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": ["offline_access"]
+    }
+  ],
   "smtpServer": {
     "allowutf8": "true",
     "auth": "",
@@ -2259,10 +2204,10 @@
       "createdTimestamp": 1784117721190,
       "credentials": [
         {
-          "createdDate": 1784123372212,
+          "createdDate": 1784126839537,
           "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}",
           "id": "b0c4da52-94da-453d-b273-7034c8ac294d",
-          "secretData": "{\"value\":\"O8K7ejcjbJKRiXmal2nLvSoUMkBmV2UWfyH/YD/GBpc=\",\"salt\":\"5cOU/PA0oRIq+DjfYR6sLg==\",\"additionalParameters\":{}}",
+          "secretData": "{\"value\":\"+CWzM8wpLTzXwjDsZd6OdZwxLPT5zaA6iL1m9gYgafo=\",\"salt\":\"5Ri0x6PXbkqM+PGW0y5Aug==\",\"additionalParameters\":{}}",
           "type": "password"
         }
       ],
