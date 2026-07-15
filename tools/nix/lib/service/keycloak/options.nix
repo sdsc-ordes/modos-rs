@@ -144,17 +144,26 @@ in
           options = {
             path = mkOption {
               type = types.nullOr (
-                lib.types.pathWith {
-                  inStore = false;
-                  absolute = false;
-                }
+                # A relative, user-provided path.
+                lib.types.either
+                  (lib.types.pathWith {
+                    inStore = false;
+                    absolute = false;
+                  })
+                  # A nix store path.
+                  (lib.types.pathWith { inStore = true; })
               );
               default = null;
               example = "./realms/a.json";
               description = ''
-                The path (string, relative to `DEVENV_ROOT`) where you want to import (or export) this realm «name» to.
-                If not set and `import` is `true` this realm is not imported.
-                If not set and `export` is `true` its exported to `$DEVENV_STATE/keycloak/realm-export/«name».json`.
+                The path (relative to the `process-compose` working dir or an Nix store path)
+                where you want to import (or export) this realm «name» to.
+                - If not set and `import` is `true` this realm is not imported.
+                - If
+                  - set to an Nix store path
+                  - or not it is not set
+                  and `export` is `true` then
+                  it is exported to `''${config.dataDir}/realm-export/«name».json`.
               '';
             };
 

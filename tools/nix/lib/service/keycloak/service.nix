@@ -74,7 +74,7 @@ let
   realmImport = lib.mapAttrsToList (
     realm: e:
     let
-      f = dataDir + "/" + e.path;
+      f = e.path;
     in
     ''
       echo "Symlinking realm file '${f}' to import path '$KC_HOME_DIR/data/import'."
@@ -89,7 +89,7 @@ let
   # Generate the commands to export realms.
   assertKeycloakStopped = [
     ''
-      if ${keycloak-health}/bin/keycloak-health; then
+      if ${keycloak-health}/bin/keycloak-health &>/dev/null; then
         echo "You must first stop keycloak and then run this command again." >&2
         exit 1
       fi
@@ -113,6 +113,20 @@ let
     )
   );
 
+  realmExportPath =
+    let
+      isInStore =
+        x:
+        lib.path.hasStorePathPrefix (
+          if builtins.isPath x then x else /. + builtins.unsafeDiscardStringContext x
+        );
+    in
+    realm: e:
+    if (e.path == null || isInStore e.path) then
+      (config.dataDir + "/realm-export/${realm}.json")
+    else
+      e.path;
+
   realmsToExport = lib.filterAttrs (_: v: v.export) cfg.realms;
   realmsExport =
     if (!cfg.processes.exportRealms || lib.length (lib.attrNames realmsToExport) == 0) then
@@ -122,7 +136,7 @@ let
       ++ lib.mapAttrsToList (
         realm: e:
         let
-          file = if e.path == null then (dataDir + "/keycloak/realm-export/${realm}.json") else e.path;
+          file = realmExportPath realm e;
         in
         ''
           echo "Exporting realm '${realm}' to '${file}'."
@@ -216,6 +230,7 @@ in
     };
 
     keycloak-realm-export = lib.mkIf cfg.scripts.exportRealm {
+      environment = keycloakEnv;
       command = "${keycloak-realm-export}/bin/keycloak-realm-export";
       disabled = true;
       description = ''
@@ -225,6 +240,7 @@ in
 
     # Export all configured realms.
     keycloak-realm-export-all = lib.mkIf (realmsExport != [ ]) {
+      environment = keycloakEnv;
       command = "${keycloak-realm-export-all}/bin/keycloak-realm-export-all";
       disabled = true;
       description = ''

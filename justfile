@@ -73,10 +73,10 @@ lint: setup
 test: setup
     just quitsh test --components "*" --parallel --fix
 
-# Run process-compose commands.
+# Run the test services.
 [group('general')]
-proc-comp *args:
-    cd ./tools/deploy/process-compose && just proc-comp "$@"
+run-services *args:
+    nix run -L --show-trace "./tools/nix#test-services"
 
 # Update dependencies.
 [group('aux')]
