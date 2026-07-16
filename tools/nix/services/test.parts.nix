@@ -10,7 +10,7 @@
   ];
 
   perSystem =
-    { config, ... }:
+    { config, modos', ... }:
     {
       process-compose."test-services" =
         # Process-compose NixOS module.
@@ -48,6 +48,10 @@
             dataDir = ".output/process-compose/data";
 
             settings.http-port = 8081;
+
+            plugins = [
+              modos'.packages.component.keycloak-mapper.plugin
+            ];
 
             realms = {
               modos = {

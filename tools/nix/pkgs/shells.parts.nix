@@ -8,14 +8,12 @@
 {
   perSystem =
     {
-      config,
       pkgs,
       pkgsStable,
+      modos',
       ...
     }:
     let
-      modos' = config.modos;
-
       # Create a set of devenv modules.
       devenvs = modos.lib.toolchain.createDevenvModules {
         inherit pkgs;

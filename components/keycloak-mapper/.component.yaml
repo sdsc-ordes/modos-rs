@@ -1,0 +1,30 @@
+name: keycloak-mapper
+version: 0.1.0
+language: rust
+
+targets:
+  build:
+    steps:
+      - runner: rust-gen
+        config:
+          binaries:
+            - gen-api
+      - runner: rust
+      - runner: git-diff
+        config:
+          paths:
+            - api
+
+  test:
+    steps:
+      - runner: rust
+
+  lint:
+    steps:
+      - runner: rust
+        config:
+          perEnvs: ["development"]
+
+  image:
+    steps:
+      - runner: nix

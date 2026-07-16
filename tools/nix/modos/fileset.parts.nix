@@ -46,12 +46,15 @@ in
       # Type
 
       ```
-      toSource:: [String or Fileset] -> SourceLike
+      toSource:: { filesets = [String or Fileset...], ... } -> SourceLike
       ```
       :::
     */
     toSource =
-      filesets:
+      {
+        filesets,
+        root ? repo.rootDir,
+      }:
       let
         # Either accept a fileset name (look it up in `compFileSets` or it is a fileset itself.)
         sets = lib.map (arg: if (isFileset arg) then arg else compFileSets."${arg}") filesets;
@@ -64,7 +67,7 @@ in
         final = fs.intersection rootFileset sum;
       in
       fs.toSource {
-        root = repo.rootDir;
+        inherit root;
         fileset = final;
       };
   };

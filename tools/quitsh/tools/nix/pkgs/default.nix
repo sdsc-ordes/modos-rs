@@ -23,9 +23,7 @@ buildGo125Module {
   inherit version;
   pname = compName;
 
-  src = fileset.toSource [
-    compName
-  ];
+  src = fileset.toSource { filesets = [ compName ]; };
 
   modRoot = fileset.getRootPathRel compName;
 

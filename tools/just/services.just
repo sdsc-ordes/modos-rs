@@ -11,24 +11,33 @@ default:
 # Run the test services.
 [group('services')]
 start *args:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
     nix run -L --show-trace "./tools/nix#test-services" -- --detached --detached-with-tui "$@"
 
 # Stop the test services.
 [group('services')]
 stop *args:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
     process-compose -u "{{pc_socket}}" down
 
 # Attach to the running test services.
 [group('services')]
 attach *args:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
     process-compose -u "{{pc_socket}}"  attach
 
 # Delete all data from the services.
 delete-data:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
     just -f "{{source_file()}}" stop
     rm -rf "{{output_dir}}/process-compose"
 
 [group('keycloak')]
 keycloak-export:
+    cd "{{root_dir}}"
     process-compose -u "{{pc_socket}}" process stop keycloak || true
     process-compose -u "{{pc_socket}}" process start keycloak-realm-export-all

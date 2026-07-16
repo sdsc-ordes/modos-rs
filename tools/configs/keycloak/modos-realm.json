@@ -854,6 +854,24 @@
           "name": "permissions",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper"
+        },
+        {
+          "config": {
+            "access.attribute": "permissions",
+            "access.token.claim": "true",
+            "claim.name": "bucket-permissions",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true",
+            "lightweight.claim": "true",
+            "prefix.attribute": "prefix",
+            "userinfo.token.claim": "false",
+            "write.implies.read": "true"
+          },
+          "consentRequired": false,
+          "id": "7a6d2b6d-f22c-42f0-bf46-4702599509aa",
+          "name": "Bucket Permissions Mapper for Modos",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-bucket-permissions-mapper"
         }
       ]
     },
@@ -1093,6 +1111,16 @@
           "protocolMapper": "oidc-usermodel-attribute-mapper"
         }
       ]
+    },
+    {
+      "attributes": {
+        "consent.screen.text": "${offlineAccessScopeConsentText}",
+        "display.on.consent.screen": "true"
+      },
+      "description": "OpenID Connect built-in scope: offline_access",
+      "id": "8d076b5a-c11e-4e2c-b953-5ac128203e51",
+      "name": "offline_access",
+      "protocol": "openid-connect"
     },
     {
       "attributes": {
@@ -1337,7 +1365,8 @@
             "access.token.claim": "true",
             "id.token.claim": "false",
             "introspection.token.claim": "true",
-            "lightweight.claim": "true"
+            "lightweight.claim": "true",
+            "userinfo.token.claim": "false"
           },
           "consentRequired": false,
           "id": "b0b4ffc9-ae05-4a75-b479-b7b29b45a3df",
@@ -1527,14 +1556,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
             "saml-user-property-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "oidc-address-mapper",
-            "saml-user-attribute-mapper"
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-full-name-mapper"
           ]
         },
         "id": "8a7e7753-b1f7-4ee1-bc5f-5c62ac61679f",
@@ -1565,14 +1594,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-address-mapper",
-            "saml-user-property-mapper",
-            "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper"
+            "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-attribute-mapper"
           ]
         },
         "id": "74842203-5618-4574-9c8c-910612390d11",
@@ -1642,7 +1671,7 @@
     ]
   },
   "defaultDefaultClientScopes": ["basic"],
-  "defaultOptionalClientScopes": [],
+  "defaultOptionalClientScopes": ["offline_access"],
   "defaultRole": {
     "clientRole": false,
     "composite": true,
@@ -1664,9 +1693,7 @@
   "firstBrokerLoginFlow": "first broker login",
   "groups": [
     {
-      "attributes": {
-        "prefix": ["bucket-c"]
-      },
+      "attributes": {},
       "clientRoles": {},
       "description": "Permissions for bucket-c",
       "id": "f5d8760b-70f8-49c4-81ef-f757039c6808",
@@ -1675,9 +1702,7 @@
       "realmRoles": [],
       "subGroups": [
         {
-          "attributes": {
-            "permissions": ["bucket-c:read"]
-          },
+          "attributes": {},
           "clientRoles": {},
           "description": "Read permissions for bucket.",
           "id": "95af7641-28d9-4159-8d5f-b0e9e57c31c8",
@@ -1688,9 +1713,7 @@
           "subGroups": []
         },
         {
-          "attributes": {
-            "permissions": ["bucket-c:write"]
-          },
+          "attributes": {},
           "clientRoles": {},
           "description": "Write permissions for bucket.",
           "id": "4e752f65-dada-4e63-b993-ed180080991d",
@@ -1701,6 +1724,19 @@
           "subGroups": []
         }
       ]
+    },
+    {
+      "attributes": {
+        "permissions": ["read"],
+        "prefix": ["bucket-d/banana/b"]
+      },
+      "clientRoles": {},
+      "description": "Permissions for Bucket D",
+      "id": "29459af5-575d-47bc-a7f8-e7e1de33d9e1",
+      "name": "bucket-d",
+      "path": "/bucket-d",
+      "realmRoles": [],
+      "subGroups": []
     }
   ],
   "id": "5502f55d-5d96-4c16-9052-55e4ba8f9ef2",
@@ -2223,12 +2259,18 @@
         "composite": false,
         "containerId": "5502f55d-5d96-4c16-9052-55e4ba8f9ef2",
         "description": "${role_offline-access}",
-        "id": "e3f54c73-588e-41a2-94da-2fe1144676fd",
+        "id": "b77e11cf-14f4-43f3-bce5-2c42b812b95e",
         "name": "offline_access"
       }
     ]
   },
   "scimApiEnabled": false,
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": ["offline_access"]
+    }
+  ],
   "smtpServer": {
     "allowutf8": "true",
     "auth": "",
@@ -2260,9 +2302,9 @@
       "clientConsents": [
         {
           "clientId": "modos-cli",
-          "createdDate": 1784132046163,
+          "createdDate": 1784191229988,
           "grantedClientScopes": ["roles", "permissions", "profile"],
-          "lastUpdatedDate": 1784184152085
+          "lastUpdatedDate": 1784191229994
         }
       ],
       "createdTimestamp": 1784117721190,
@@ -2279,7 +2321,11 @@
       "email": "test@mail.ch",
       "emailVerified": false,
       "enabled": true,
-      "groups": ["/bucket-c/subpath/@read", "/bucket-c/subpath/@write"],
+      "groups": [
+        "/bucket-c/subpath/@read",
+        "/bucket-c/subpath/@write",
+        "/bucket-d"
+      ],
       "id": "81fd14cf-fae8-4d69-9ca1-a3e3b9e03083",
       "notBefore": 0,
       "realmRoles": ["default-roles-modos"],
