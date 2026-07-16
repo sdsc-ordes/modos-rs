@@ -1280,6 +1280,7 @@
       "alwaysDisplayInConsole": true,
       "attributes": {
         "access.token.header.type.rfc9068": "false",
+        "access.token.signed.response.alg": "ES256",
         "acr.loa.map": "{}",
         "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
@@ -1291,6 +1292,7 @@
         "dpop.bound.access.tokens": "false",
         "frontchannel.logout.session.required": "true",
         "id.token.as.detached.signature": "false",
+        "id.token.signed.response.alg": "ES256",
         "logoUri": "https://raw.githubusercontent.com/sdsc-ordes/modos-api/refs/heads/main/docs/img/modos.svg",
         "logout.confirmation.enabled": "false",
         "oauth2.device.authorization.grant.enabled": "true",
@@ -1421,17 +1423,6 @@
     "org.keycloak.keys.KeyProvider": [
       {
         "config": {
-          "kid": ["c42e2b86-c0a6-4d8c-878f-24c2add3839c"],
-          "priority": ["100"],
-          "secret": ["3RCmf0rW4O9KIdrERQHSVQ"]
-        },
-        "id": "83d2373c-09f4-428f-9119-de3292bb8fb1",
-        "name": "aes-generated",
-        "providerId": "aes-generated",
-        "subComponents": {}
-      },
-      {
-        "config": {
           "active": ["true"],
           "eddsaEllipticCurveKey": ["Ed25519"],
           "eddsaPrivateKey": [
@@ -1446,53 +1437,6 @@
         "id": "b7cf0ccf-fffa-4751-8144-2c015b254434",
         "name": "eddsa-generated",
         "providerId": "eddsa-generated",
-        "subComponents": {}
-      },
-      {
-        "config": {
-          "certificate": [
-            "MIICmTCCAYECBgGfZXOkljANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVtb2RvczAeFw0yNjA3MTUxMTAzMjVaFw0zNjA3MTUxMTA1MDVaMBAxDjAMBgNVBAMMBW1vZG9zMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA36T9dzleKW/IvRRUrEHRlAgaL/6e3+Z61yyxaQF7rybJ4fgZ9xjqXa8fq0jubs9l55laBoTfLFoXcLWo9lU+ndNMnQUHytYEEgALTsU25r9BKCvBVW2mXXwkFpWbb1lMV5O37QHgKY4VXIviFrR2AQAihM+0IMedwXKvmLyUtsCj1QdCuXJ+kcfQCKAYK+sh+Gb/DIxQqrDc9jUQE4g5Y8lJxrdQg6go2cou0UjZxfV8g2OppPzD3IlGKwL1yRs84I8jMcpW3dMaK5mWlCr8E9GfnSYWLYkAJdjaHpoHjrsCeRaEii8bh/WP4/oRrkv4/R0LhBuCTH0zCdjI4mQnMwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQC9ZvaSjZfU948/+v6nSgQUPkyXiNB3vrJgrRZpPAOw0zyWTVY1oEXr/ZL9fiiPzDByTPvqAXfQ6ywbewNLfhcl22iaicfEyADor+pfmf0ekYDuf5lkDUyc/pGNyfrR/CSduTjyZ8ekg1hxfBneXn1KXq0Zd3X67j7MrET2YlK2GlzNNogDQXLXhUDBqt8tFjSPit9gkHPYp1/HRWy9bzF+q1SSwdw+Vd3RBCZb6wOLQ632oHEvalq7HgRzNF4cIGJjb6Yruk4FV1md+MjV9n1TNcrpXx9gxDlq1farfrEP0wKK29lyHzgs6UZxpfSfPE2X1m/J8Vg1orhLUugtjdA3"
-          ],
-          "keyUse": ["SIG"],
-          "priority": ["100"],
-          "privateKey": [
-            "MIIEogIBAAKCAQEA36T9dzleKW/IvRRUrEHRlAgaL/6e3+Z61yyxaQF7rybJ4fgZ9xjqXa8fq0jubs9l55laBoTfLFoXcLWo9lU+ndNMnQUHytYEEgALTsU25r9BKCvBVW2mXXwkFpWbb1lMV5O37QHgKY4VXIviFrR2AQAihM+0IMedwXKvmLyUtsCj1QdCuXJ+kcfQCKAYK+sh+Gb/DIxQqrDc9jUQE4g5Y8lJxrdQg6go2cou0UjZxfV8g2OppPzD3IlGKwL1yRs84I8jMcpW3dMaK5mWlCr8E9GfnSYWLYkAJdjaHpoHjrsCeRaEii8bh/WP4/oRrkv4/R0LhBuCTH0zCdjI4mQnMwIDAQABAoIBAG1YsyEW6IYkBKcGCLxMVhcluwAaYz2f6BHK5VctBXdG5NBaSP+6q+RwWnCZ8RI2z2FkZlLnpmJ+DhXqjBkc5set5ziinAO9jjHq2ZyC6mv5uPbWJeoJ+ZydtNth/KR9qcjsDbKRBzPqJ2Gfd0SYqVWl5jq/fxfD4csSsu5fzepn7fWgigM3eR+BahE/W+Ry0Sl4NjZaFPNezcazFPtmxjyXR9Ac2msm3kHpZaMsh8lyNvO09rBKRzPXZs0aG3PLmj8AiZBHgZy7N+kJTw2u/swRL0ddCH/JQBej70HHp7Sfaof7iJw3hC3UMljjTPKgVqoR0X7h/caRQZA2vNy4H0ECgYEA8QjDBK0zdOYl+C8zJmPI5EMHlGdsjv7qbf0TlxVc3z6NxDLlFt/xd4ZjrjSnI0qOv97aYg0cqe5PxFzlfhU8IHp/+ldy91jTSz2sOCYgimz7eiYnZ9lMerKFf20x3fHBHaE44hr/4QZwOGzAU0GcRmIRQLuYSzjJsG8iN7k+cZMCgYEA7YfRjSbIXtomPqJHvs3GyHa3ydMZlBKZUy63RBFu88KVvcdc05/ibj3fQXfW/EznXm0LIk4qrVj24SMS3IUaGGg99MfEBR59h742rXnG0ah/mIu5eJg+N0raDdi2+xLRG4TAv6MW+E/nj24KbLwjI+Xs8vSmPB0cwHAACSPNd+ECgYAfYRiifzn3ug6vZNWv5cW9kcxm0aAcbatvbkcioDFbDvW92TJh6/2vpdtMTqaDva0f5Y9gvHxC0zenRMDLzU/qmogWu1PIR9QaM4k8Nhp+avnCST1QE8YVIzCmCj03u8V8agTRytoNHZ12exH+xMfnkdTVLJcDE/2N7qnxvzgV6QKBgDiHg1KRcUxJpKJxYpvBQ1bAEjthFwxLZNwMGSeE8p/mplZ1FN10hqHv7asaBzsiXkn1r5mperSooJCyFTIQJ0a5wEz6IeeJ+xwMI90jRzLsY/l8/1X4/Y2RLdXvxpR4RPXEoU66VKQh+B0Fdkusdrx7YunrWYii8Q3HWerS73phAoGAGHDjvoE6E7wr3uIFRittEm1MZzNM0zysD5YiKg+SH1lrAH/zBwtJPlNRfnTLObqi/vPCrE8h1snCFcF5cgNQ+xY3/p4VSeOP47Hu5pRipm1rPkN0SAqhoSN3Duc18teBzR/5YYXgzf18iQk9tw2r6U6DbArPBfPPkkesmwtTCIs="
-          ]
-        },
-        "id": "04bbbbab-e23b-4044-9d9f-253c63d062f2",
-        "name": "rsa-generated",
-        "providerId": "rsa-generated",
-        "subComponents": {}
-      },
-      {
-        "config": {
-          "algorithm": ["HS512"],
-          "kid": ["342df003-99c2-4dd0-ab39-98dfe09a9875"],
-          "priority": ["100"],
-          "secret": [
-            "4FOX9oYzg_AaOuUfgOTzCkq2ktL0fv_eCmTOingtkwOOHoCWsvEl2cREEf4GApWEHRmLHF7tXLKYjqd3q7c9YffT7Jk9wSuFyyd-rDBHXoEuXquirbCwOFGeAoPQ9X-JXJWsPXqStJdxzDRAxn09Ao0_2g3yIcq_oj0uBn_8Ks0"
-          ]
-        },
-        "id": "8cee482b-ed9c-40ca-a68b-c2f2751df3a6",
-        "name": "hmac-generated-hs512",
-        "providerId": "hmac-generated",
-        "subComponents": {}
-      },
-      {
-        "config": {
-          "algorithm": ["RSA-OAEP"],
-          "certificate": [
-            "MIICmTCCAYECBgGfZXOkvzANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVtb2RvczAeFw0yNjA3MTUxMTAzMjVaFw0zNjA3MTUxMTA1MDVaMBAxDjAMBgNVBAMMBW1vZG9zMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA20UYis5vurfOPMYZr3Ts3q1zA/E1dPojzrHcu3nVE3scvQKJmAPZ9dxngDcfGnRrRqwNRwZPJ+XJDUyRrzXhCCA183g64kASqGlRobMLmAQMSHI6Y73sRNRfRo88oI9gdvlcRy+4E7zToZK+z8q7JWmt/Pn5ou3c9Hvw1GoNcVjX/Oh1psk+JtzJW14/H9i/mOsOpliOoVUFT6cT3OaP5ZBacl2QTW7y6+yoaUGQCEUzrEaK9IwW9N+/m0gdequVrquunliFrCPJXslfgnxVus2DcrVpL4g3rEPQDZO50RaCP1yLOBQhXU31ouAHCsEqmm/Y69b1kHNW/GpAth3N0wIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAUTMtbKlqf1JOm/RYF52h4IZnJHJmv/4KMTJv89p6742tOLiTWTt6YJU1622oml4+FShDeNJKYwG9Zf/hZT5/u4nbRJISjQi079w1epykjfYw0zIEu4CvN5Hi7yMnf/MVOccm/9x9YCUL+uCU3PVg2uIIlxmlGwAVhoIOkpkXslK4JSNshKl+uKlDuyBq0I+epa5BM3n8q/EeAPwjAXbdlWuQmuWGHiJ8M90nQx0zeeBWzEr3VjeVlnaew0kSr7krZwmsYIA4zLqez5Mi84L7ORswuAjPTWsWx4c1dyFqiiTg8LlnWbIYGh7n/5jpXkH4ff16OTr54SF2A6hPvdbRD"
-          ],
-          "keyUse": ["ENC"],
-          "priority": ["100"],
-          "privateKey": [
-            "MIIEogIBAAKCAQEA20UYis5vurfOPMYZr3Ts3q1zA/E1dPojzrHcu3nVE3scvQKJmAPZ9dxngDcfGnRrRqwNRwZPJ+XJDUyRrzXhCCA183g64kASqGlRobMLmAQMSHI6Y73sRNRfRo88oI9gdvlcRy+4E7zToZK+z8q7JWmt/Pn5ou3c9Hvw1GoNcVjX/Oh1psk+JtzJW14/H9i/mOsOpliOoVUFT6cT3OaP5ZBacl2QTW7y6+yoaUGQCEUzrEaK9IwW9N+/m0gdequVrquunliFrCPJXslfgnxVus2DcrVpL4g3rEPQDZO50RaCP1yLOBQhXU31ouAHCsEqmm/Y69b1kHNW/GpAth3N0wIDAQABAoIBAEgQXm+IR1pDfImmxdxPfmX09X8PMHWAnHIbLKOE+A2OAbTw9425flH6nR2bgCJurq8sbrSwEyXWtIwlZSADgjDsfS7Gjfu7+SXWb1jIgn/0nKDWwe/0BInejm2fN9rBJIAVlkljGomKHrfUhde/FmDGacNh2LS+nkbP0SfOrxpX7+AeJZJcRfNAyYJlWLljZviHZ98THU6IRqhm8KoV/7q6X8H8yzXAdtoTYxhvEqCFSl52kRenW5SYtqxPz76yxrp+5kjQh5Iv7pMC8JwdgVBaIIfNf9MLCCN4EH/hGdSU1FTVGA8V9M32B6fdQb5HbpBILkFNZBlzrnIIMS4B7kECgYEA89Gkh2DiEMa19jX0GubXruO7E+Fg43RwCnbl5OeBVGqwJfbk1+lUcQfVkemKhA/eXOdqN/yqcMW9n72/iFzI7I5oEnsysnmgwLh1a/eTaaKg0Xss27g4Vq/DiTHNUnHCCqqu76ZchJ3W3Uh+C8BcnnEsOAtq9hMD2G40b11UC7MCgYEA5jl65IJUkSKx/nRV4yc1zvhoKDy/tSO5T4KmSTOGRqfQNp4NM9OUq6BK/U3OYIo2hqoJOHkbMhBq+penRRwk2HBLBGM/fi8tjoQOYOxnkXIwgwU2kkj8AFWIRqtDdCcp2+LFrUzURPOJhacRiKxTlsEmpTiRfeGh15q95DHZpWECgYB3Z2C6x9CORLJSDGQqVIil5nL0rnhDi/9esJGvg0yL6d+wB/RUZLlszVhjJ8slF5xfRRl4p61UoxJVS5ikEER5zNfczSarzvLRzsP6hvlTT0iQrlDunY5BrbwF0TTrPji3/pTDWmaOr7nNDrZjzOXO1j/Ahp7wOam1cWsOatdBDwKBgDGB2NB8ykyvhlEumS2Qx/xq5JMKhTshpH7ZnIKPRue4vIiSMkqbzBOgE6Am9CNEdXc951+yg0ufxjF/HSQ6ah30/9zAru2mnYhRE3p6O8dGI/J404Rfl3lG61gvCgFXTqQPPu0GYXs2V7Na+uVGEW+Qt4u9/2NvessPZphEtAXhAoGALp9AIAlb6CtE9YppRtdDshIXaWj08yPjJjWE/rDrgfB4uWEVw38qJqSVkFYqUYmXhsEdEwx2b1prfG1O6BsJCu8bz0gLm4AtNqB+J/UU0fwR163oHukLjzuUNykzrAzAQu023Dwf8dBhrTQ3I2/rNyfMtt1f+nh2n7agFmsC8Ug="
-          ]
-        },
-        "id": "a0dcadf6-06e2-4a64-a0a5-3e838ac35317",
-        "name": "rsa-enc-generated",
-        "providerId": "rsa-enc-generated",
         "subComponents": {}
       }
     ],
@@ -1632,7 +1576,7 @@
     "id": "3f85ad12-1401-450d-806e-3a652a352558",
     "name": "default-roles-modos"
   },
-  "defaultSignatureAlgorithm": "RS256",
+  "defaultSignatureAlgorithm": "ES256",
   "directGrantFlow": "direct grant",
   "dockerAuthenticationFlow": "docker auth",
   "duplicateEmailsAllowed": false,
@@ -1643,7 +1587,18 @@
   "eventsListeners": ["jboss-logging"],
   "failureFactor": 30,
   "firstBrokerLoginFlow": "first broker login",
-  "groups": [],
+  "groups": [
+    {
+      "attributes": {},
+      "clientRoles": {},
+      "description": "bucket-a",
+      "id": "0345fb4c-5145-4282-a2cb-84c35090651c",
+      "name": "bucket-a",
+      "path": "/bucket-a",
+      "realmRoles": [],
+      "subGroups": []
+    }
+  ],
   "id": "5502f55d-5d96-4c16-9052-55e4ba8f9ef2",
   "identityProviderMappers": [],
   "identityProviders": [],
@@ -2201,6 +2156,14 @@
   "userManagedAccessAllowed": false,
   "users": [
     {
+      "clientConsents": [
+        {
+          "clientId": "modos-cli",
+          "createdDate": 1784132046163,
+          "grantedClientScopes": ["roles", "profile", "email"],
+          "lastUpdatedDate": 1784132046175
+        }
+      ],
       "createdTimestamp": 1784117721190,
       "credentials": [
         {
@@ -2215,7 +2178,7 @@
       "email": "test@mail.ch",
       "emailVerified": false,
       "enabled": true,
-      "groups": [],
+      "groups": ["/bucket-a"],
       "id": "81fd14cf-fae8-4d69-9ca1-a3e3b9e03083",
       "notBefore": 0,
       "realmRoles": ["default-roles-modos"],

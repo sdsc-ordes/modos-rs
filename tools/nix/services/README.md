@@ -42,9 +42,14 @@ Once you made changes in the UI you can stop keycloak and export the realm
 just service-keycloak-export
 ```
 
-### Keycloak Setup
+### Realm Settings
 
-### Client `modos-cli`
+- Tokens -> Default Signature Algorithm: `ES256`.
+- Keys -> Providers -> `eddsa-generated` -> `Ed25519` + Priority: `1000`.
+
+### Client `modos-cli` Settings
+
+#### General
 
 - _Client Authentication_: `off` ← makes it a public client (device flow needs
   no secret; this is what lets KMS verify via JWKS instead of a shared secret)
@@ -55,6 +60,11 @@ just service-keycloak-export
 - _Service accounts roles_: `off`
 - _OAuth 2.0 Device Authorization Grant_: **`on`** ← the device code flow modos
   login uses.
+
+#### Advanced
+
+- Access Token Signature Algorithm: `ES256`.
+- ID Token Signature Algorighm: `ES256`.
 
 # OAuth2 / OIDC Flows: Standard vs Device Code
 
