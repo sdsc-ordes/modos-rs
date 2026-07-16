@@ -208,9 +208,9 @@ let
         }
       ];
 
-      default =
+      # Default shell with no Git hooks (for agent mounts where the .git folder is read only).
+      default-nogh =
         ci
-        ++ git-hooks
         ++ build-go
         ++ dev-go
         ++ manifest-ytt
@@ -251,6 +251,8 @@ let
             }
           )
         ];
+
+      default = git-hooks ++ default-nogh;
 
       ci = [
         {
