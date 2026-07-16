@@ -809,6 +809,56 @@
     },
     {
       "attributes": {
+        "consent.screen.text": "",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "include.in.openid.provider.metadata": "true",
+        "include.in.token.scope": "true"
+      },
+      "description": "The S3 bucket permissions for modos.",
+      "id": "c369b4b8-5b6a-47d3-b026-dccb4d8159df",
+      "name": "permissions",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "full.path": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true",
+            "lightweight.claim": "true",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "c04eec69-e05a-46ed-af56-5569f26e401a",
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "aggregate.attrs": "true",
+            "claim.name": "permissions",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true",
+            "jsonType.label": "String",
+            "lightweight.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "permission",
+            "userinfo.token.claim": "false"
+          },
+          "consentRequired": false,
+          "id": "81097bb4-9e6a-4c32-928d-7f963c4df73b",
+          "name": "permissions",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
+        }
+      ]
+    },
+    {
+      "attributes": {
         "consent.screen.text": "${profileScopeConsentText}",
         "display.on.consent.screen": "true",
         "include.in.token.scope": "true"
@@ -853,10 +903,13 @@
         {
           "config": {
             "access.token.claim": "true",
-            "claim.name": "preferred_username",
+            "aggregate.attrs": "false",
+            "claim.name": "username",
             "id.token.claim": "true",
             "introspection.token.claim": "true",
             "jsonType.label": "String",
+            "lightweight.claim": "false",
+            "multivalued": "false",
             "user.attribute": "username",
             "userinfo.token.claim": "true"
           },
@@ -1044,6 +1097,8 @@
     {
       "attributes": {
         "display.on.consent.screen": "false",
+        "gui.order": "",
+        "include.in.openid.provider.metadata": "true",
         "include.in.token.scope": "false"
       },
       "description": "OpenID Connect scope for add all basic claims to the token",
@@ -1054,18 +1109,21 @@
         {
           "config": {
             "access.token.claim": "true",
-            "claim.name": "auth_time",
+            "aggregate.attrs": "false",
+            "claim.name": "username",
             "id.token.claim": "true",
             "introspection.token.claim": "true",
-            "jsonType.label": "long",
-            "user.session.note": "AUTH_TIME",
+            "jsonType.label": "String",
+            "lightweight.claim": "false",
+            "multivalued": "false",
+            "user.attribute": "username",
             "userinfo.token.claim": "true"
           },
           "consentRequired": false,
-          "id": "e787cbfb-6c9d-446f-8193-2662ee66d08e",
-          "name": "auth_time",
+          "id": "9c35d6ae-ea4c-40c3-bf6f-b809d88d6e87",
+          "name": "username",
           "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
         },
         {
           "config": {
@@ -1077,61 +1135,6 @@
           "name": "sub",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-sub-mapper"
-        }
-      ]
-    },
-    {
-      "attributes": {
-        "consent.screen.text": "${offlineAccessScopeConsentText}",
-        "display.on.consent.screen": "true"
-      },
-      "description": "OpenID Connect built-in scope: offline_access",
-      "id": "f73ddea9-b2dd-43a3-a390-1f914471c1a0",
-      "name": "offline_access",
-      "protocol": "openid-connect"
-    },
-    {
-      "attributes": {
-        "consent.screen.text": "${emailScopeConsentText}",
-        "display.on.consent.screen": "true",
-        "include.in.token.scope": "true"
-      },
-      "description": "OpenID Connect built-in scope: email",
-      "id": "94efe8ec-52ee-42ee-84fa-a9971863b52e",
-      "name": "email",
-      "protocol": "openid-connect",
-      "protocolMappers": [
-        {
-          "config": {
-            "access.token.claim": "true",
-            "claim.name": "email_verified",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "jsonType.label": "boolean",
-            "user.attribute": "emailVerified",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "6df70e1e-f439-457f-9c3b-2643af0a1e1c",
-          "name": "email verified",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper"
-        },
-        {
-          "config": {
-            "access.token.claim": "true",
-            "claim.name": "email",
-            "id.token.claim": "true",
-            "introspection.token.claim": "true",
-            "jsonType.label": "String",
-            "user.attribute": "email",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "bf37093c-d46c-4ca2-abd1-5544360a5739",
-          "name": "email",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-attribute-mapper"
         }
       ]
     }
@@ -1151,7 +1154,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "account",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1184,7 +1187,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "account-console",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1226,7 +1229,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "admin-cli",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": true,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1256,7 +1259,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "broker",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1315,7 +1318,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "modos-cli",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["permissions", "basic"],
       "description": "Client for modos CLI.",
       "directAccessGrantsEnabled": false,
       "enabled": true,
@@ -1328,6 +1331,21 @@
       "notBefore": 0,
       "optionalClientScopes": [],
       "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true",
+            "lightweight.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "b0b4ffc9-ae05-4a75-b479-b7b29b45a3df",
+          "name": "Add `modos-api` as audience.",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ],
       "publicClient": true,
       "redirectUris": [""],
       "rootUrl": "",
@@ -1347,7 +1365,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "realm-management",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1380,7 +1398,7 @@
       "clientAuthenticatorType": "client-secret",
       "clientId": "security-admin-console",
       "consentRequired": false,
-      "defaultClientScopes": ["roles", "profile", "basic", "email"],
+      "defaultClientScopes": ["roles", "profile", "basic"],
       "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
@@ -1437,6 +1455,63 @@
         "id": "b7cf0ccf-fffa-4751-8144-2c015b254434",
         "name": "eddsa-generated",
         "providerId": "eddsa-generated",
+        "subComponents": {}
+      },
+      {
+        "config": {
+          "ecdsaEllipticCurveKey": ["P-256"],
+          "ecdsaPrivateKey": [
+            "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAyfH5nj4OinkwqtE4xtmd/pLNwPvZf/ZwBID4maiFWkA=="
+          ],
+          "ecdsaPublicKey": [
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESZZFvhgqAQIxARfowz8tji5XG5hXsRoPh8Q8F5VH6qK1fe6Mvcz6pPQTWK/6gtoSefcGnkBu0f1lHlbDEAGPHw=="
+          ],
+          "priority": ["-100"]
+        },
+        "id": "6870681d-340f-4e25-b4fe-5e4223c8ca74",
+        "name": "fallback-ES256",
+        "providerId": "ecdsa-generated",
+        "subComponents": {}
+      },
+      {
+        "config": {
+          "algorithm": ["HS512"],
+          "kid": ["e8ac714c-5121-43e4-b314-1c96050e58aa"],
+          "priority": ["-100"],
+          "secret": [
+            "mX_GZCHTNpV5XPmIhAGrxJCa_Ol2LYnSxQ8D3iqzi5adpWwmNbOOAdBL6vcYj6__rZ7k8uzfGf1S1GRp8JNuhMZckHgns9pACQi42biLi2LYPEYg4mvG2XMvI1DRdY0G8YK5p7Oo7utBo9Z-ofF4EwxhSu_w6Kb31dhHPl292co"
+          ]
+        },
+        "id": "cbfbbd0b-c13d-47bb-ac16-03f307bf0f37",
+        "name": "fallback-HS512",
+        "providerId": "hmac-generated",
+        "subComponents": {}
+      },
+      {
+        "config": {
+          "algorithm": ["RS256"],
+          "certificate": [
+            "MIICmTCCAYECBgGfaaVEKDANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVtb2RvczAeFw0yNjA3MTYwNjM2MDZaFw0zNjA3MTYwNjM3NDZaMBAxDjAMBgNVBAMMBW1vZG9zMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuDOw8cwKBIZeetZwx0wPJHyslSl4XnKI5kKkH/2AyyBce57eUz+6UD/YYwRSDHAopULcj1rRirgOIH8EbDM6tKuo3arrbMEBu2ttwNP9TLTXN6bm2H9QvZkYU2j5jyRsoSSVYcDAXHMB2RaJcSvB1XKt/2tis38yIBH6+C7KkS43lEk2aoEcm/8jFuGcQNkEkmwsYHt2+Gwb3FRa9Zw8DTlEjXQjPoIbV3FRYeJeMoIhOOeS7VO/oo2cUPvDVWo9BRQHOneHMAviOTFV6yn5qYaFbsMtwiSDKmLnmysiYSroOEpJqm9lD7AmDy0dYHXZog6IFOVzmX5Heb4429pM2QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBNFxzdzfPgTmL+7+NmpCB6EXSV4lzV/VE+AIcj+s97R7n68vEXc3lO1WgEMEtKgT4yyS6dA1mvhpM/C/X8cxq9xgLSEv4n+LFfOGiWPnvt+rW5fyH7QVp9StZVFf+vb1SqDDFJ7vpZW96KrdZM3VrGvW2/Xkia3GduVyD25gAX2EbzOBUzvtsX94KZNnoQemda+EqDz3Kjh07BvWSXH3Wg8+U3RGRukhYpfL8wLy2eVpPElTR1Mfkl36p28DqPAlE1+51qzzkcX9vet2lmZrCLR/HX7DCTWCh43nYY7UP1yRM5E5iMUnAG2D6A2/oaq+lWarDNBJy+wTq55va7tKqm"
+          ],
+          "priority": ["-100"],
+          "privateKey": [
+            "MIIEowIBAAKCAQEAuDOw8cwKBIZeetZwx0wPJHyslSl4XnKI5kKkH/2AyyBce57eUz+6UD/YYwRSDHAopULcj1rRirgOIH8EbDM6tKuo3arrbMEBu2ttwNP9TLTXN6bm2H9QvZkYU2j5jyRsoSSVYcDAXHMB2RaJcSvB1XKt/2tis38yIBH6+C7KkS43lEk2aoEcm/8jFuGcQNkEkmwsYHt2+Gwb3FRa9Zw8DTlEjXQjPoIbV3FRYeJeMoIhOOeS7VO/oo2cUPvDVWo9BRQHOneHMAviOTFV6yn5qYaFbsMtwiSDKmLnmysiYSroOEpJqm9lD7AmDy0dYHXZog6IFOVzmX5Heb4429pM2QIDAQABAoIBAFggbu74AfDxQmF9l95ZvsLjnQQOH6b8IBAd4PznIUfNV0HTm6Vzj1VWflW9Gu4VePS7/N7fAfJepW+ZpUmI5vTKTdOjstfIrWX3+z3ujji1KmRXRwlcPApBpRg+2GrJ7+jWoltuxvlUEpXEiQQqfaV7pNBXFZUv7RDX2V0EsehrxlEa+I+j1mzgBfmIElCetLTFrk859sgVQZIpCfHXZ3SYB+2kdwK08YjUj3psV2ZbCHEYBoR2rRY2OtoIaWjgVebJJPt08vZJkRFPI4Z7j//8ojo4x44bvCDo6M8rRVKLe05KMJ7KKrTV0nBrYzUdhgJxYv9NM/VU5KjPtV+7JuMCgYEA6fj6hrwAJoS6FocEiuhpRD891SedoDNO+Ak6waFMUrjb8CqEoGA7drJAC2ydhxPL80WNc+4pkXpMY5r4Zd2wU0Mb9O/bi39jLp4MLORWdRd95O9vS3zHKWfukoCovkYXW2/F0B9Rk1meSEOMdb/ZfthoKw1an2rhzTaHrNefdo8CgYEAyYsuA4xryinAPT9jSM13DUswTsfVDsiTSj6Ixc64/RmyftM83+IX497WqsestHJswYr0U6nH5sQbq+u/OAvozgZ6h2SNnjf8CjKfg4C1R7CiRtFI66Ymk2jKFqrfbpIBRC0uGNt0awcjB8nfodSW5DU+vdtuTrOEc/pnzIjR+hcCgYAEBRkY04YVI1anKG61jESyvXtsfB/DLt5+eHof9YuAKFjvCWv57W1YHrvm9ljGh1qLtXg2s7LXIwjI9VKrPWHYLGEAllZpUSj9Fg4Tf2DU5jBtjIeW/m/VkEmTDs7XZhDkq0j0yHT4WSPVDgQNydwMx98STkpuTsHOas9t8s50lQKBgBJCzA6CQJn2onZqMeK8yxanQ18/9+v4/G9zrwzNKDG2jFe1aASZBbUd0bFzmhBXdccrgeu6rGQaTK+NEqxPV+6i46M01ygIxotd/tn5ZXNza6CjAcpoKYKdsgHPxaLNE9RLi6uw5qFz6hagkeSl0G4o7OBi62GyHkQr4g/ELdJNAoGBAJTys0P4+RxTD6haP6urYv9Rp/YyMc8HgQTL3vxth6V1ShqN/LBeUvJSG7FHVMkKExkSNeV9uPZHibr2V0u/S1tcZZYOrTZcUWh4WR5qD4Kin/PlXmkcKhNjkoBA6vNyqHsRJ/EfwppFwAsXDeuTUa4bRrkUqL5EYrntVdB+elob"
+          ]
+        },
+        "id": "17516252-0762-484c-a871-89d60c6f38c9",
+        "name": "fallback-RS256",
+        "providerId": "rsa-generated",
+        "subComponents": {}
+      },
+      {
+        "config": {
+          "kid": ["6b84c71a-1cb1-46b8-9d35-6e02605fdee8"],
+          "priority": ["-100"],
+          "secret": ["8V21Oed41FENVlzUq7eGtw"]
+        },
+        "id": "ac3b1f2b-91ce-4c81-bb63-908d9efa8b50",
+        "name": "fallback-AES",
+        "providerId": "aes-generated",
         "subComponents": {}
       }
     ],
@@ -1557,7 +1632,7 @@
       {
         "config": {
           "kc.user.profile.config": [
-            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"permission\",\"displayName\":\"\",\"validations\":{},\"annotations\":{},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":true}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
           ]
         },
         "id": "a1109477-22c1-4f5d-837e-e0af3dadaf30",
@@ -1566,8 +1641,8 @@
       }
     ]
   },
-  "defaultDefaultClientScopes": ["profile", "email", "roles", "basic"],
-  "defaultOptionalClientScopes": ["offline_access"],
+  "defaultDefaultClientScopes": ["basic"],
+  "defaultOptionalClientScopes": [],
   "defaultRole": {
     "clientRole": false,
     "composite": true,
@@ -1589,14 +1664,43 @@
   "firstBrokerLoginFlow": "first broker login",
   "groups": [
     {
-      "attributes": {},
+      "attributes": {
+        "prefix": ["bucket-c"]
+      },
       "clientRoles": {},
-      "description": "bucket-a",
-      "id": "0345fb4c-5145-4282-a2cb-84c35090651c",
-      "name": "bucket-a",
-      "path": "/bucket-a",
+      "description": "Permissions for bucket-c",
+      "id": "f5d8760b-70f8-49c4-81ef-f757039c6808",
+      "name": "bucket-c/subpath",
+      "path": "/bucket-c/subpath",
       "realmRoles": [],
-      "subGroups": []
+      "subGroups": [
+        {
+          "attributes": {
+            "permissions": ["bucket-c:read"]
+          },
+          "clientRoles": {},
+          "description": "Read permissions for bucket.",
+          "id": "95af7641-28d9-4159-8d5f-b0e9e57c31c8",
+          "name": "@read",
+          "parentId": "f5d8760b-70f8-49c4-81ef-f757039c6808",
+          "path": "/bucket-c/subpath/@read",
+          "realmRoles": [],
+          "subGroups": []
+        },
+        {
+          "attributes": {
+            "permissions": ["bucket-c:write"]
+          },
+          "clientRoles": {},
+          "description": "Write permissions for bucket.",
+          "id": "4e752f65-dada-4e63-b993-ed180080991d",
+          "name": "@write",
+          "parentId": "f5d8760b-70f8-49c4-81ef-f757039c6808",
+          "path": "/bucket-c/subpath/@write",
+          "realmRoles": [],
+          "subGroups": []
+        }
+      ]
     }
   ],
   "id": "5502f55d-5d96-4c16-9052-55e4ba8f9ef2",
@@ -2125,12 +2229,6 @@
     ]
   },
   "scimApiEnabled": false,
-  "scopeMappings": [
-    {
-      "clientScope": "offline_access",
-      "roles": ["offline_access"]
-    }
-  ],
   "smtpServer": {
     "allowutf8": "true",
     "auth": "",
@@ -2156,12 +2254,15 @@
   "userManagedAccessAllowed": false,
   "users": [
     {
+      "attributes": {
+        "permission": ["bucket-a/mypath/@read", "bucket-a/mypath/b/@read"]
+      },
       "clientConsents": [
         {
           "clientId": "modos-cli",
           "createdDate": 1784132046163,
-          "grantedClientScopes": ["roles", "profile", "email"],
-          "lastUpdatedDate": 1784132046175
+          "grantedClientScopes": ["roles", "permissions", "profile"],
+          "lastUpdatedDate": 1784184152085
         }
       ],
       "createdTimestamp": 1784117721190,
@@ -2178,7 +2279,7 @@
       "email": "test@mail.ch",
       "emailVerified": false,
       "enabled": true,
-      "groups": ["/bucket-a"],
+      "groups": ["/bucket-c/subpath/@read", "/bucket-c/subpath/@write"],
       "id": "81fd14cf-fae8-4d69-9ca1-a3e3b9e03083",
       "notBefore": 0,
       "realmRoles": ["default-roles-modos"],

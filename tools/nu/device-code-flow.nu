@@ -11,10 +11,10 @@
 #   nu flow.nu --host http://localhost:8081 --realm modos --client modos-cli --scope "openid profile"
 
 def main [
-    --host: string = "http://localhost:8081"   # Keycloak base URL
-    --realm: string = "modos"                   # Realm name
-    --client: string = "modos-cli"              # Public client id
-    --scope: string = "openid"                  # Requested scope(s)
+    --host: string = "http://localhost:8081"
+    --realm: string = "modos"
+    --client: string = "modos-cli"
+    --scope: string = "openid"
 ] {
     let base = $"($host)/realms/($realm)/protocol/openid-connect"
     let device_endpoint = $"($base)/auth/device"
@@ -23,6 +23,7 @@ def main [
     print $"(ansi cyan)Keycloak     :(ansi reset) ($host)"
     print $"(ansi cyan)Realm        :(ansi reset) ($realm)"
     print $"(ansi cyan)Client       :(ansi reset) ($client)"
+    print $"(ansi cyan)Client       :(ansi reset) ($scope)"
     print ""
 
     # --- Step 1: request a device code + user code --------------------------
@@ -120,7 +121,7 @@ def main [
                     | from json
                 )
                 print $"(ansi cyan)Access-token claims:(ansi reset)"
-                print ($claims | select preferred_username? azp? scope? exp? aud?)
+                print ($claims | table --expand)
             } catch {
                 print $"(ansi dark_gray)\(JWT payload not decoded on this nushell version\)(ansi reset)"
             }
