@@ -13,7 +13,7 @@ default:
 start *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    nix run -L --show-trace "./tools/nix#test-services" -- --detached --detached-with-tui "$@"
+    nix run -L --show-trace "./tools/nix#test-services" -- "$@"
 
 # Stop the test services.
 [group('services')]

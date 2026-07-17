@@ -14,7 +14,7 @@ let
   rust = requireComponent "rust";
   rawMigrate = requireComponent "migrate";
   pythonEnv = requireComponent "pythonEnv";
-  staticWorkdirDeps = requireComponent "staticWorkdirDeps";
+  rawStaticWorkdirDeps = requireComponent "staticWorkdirDeps";
 
   requireComponent =
     attr:
@@ -38,6 +38,14 @@ let
     substituteInPlace $out/bin/migrate.py \
       --replace-fail '${rawMigrate}/bin/.migrate.py-wrapped' "$out/bin/.migrate.py-wrapped"
     chmod +x "$out/bin/.migrate.py-wrapped" "$out/bin/migrate.py"
+  '';
+
+  # Fix upstream `except` syntax in upstream worker_process.py so it parses under Python 3.
+  staticWorkdirDeps = pkgs.runCommand "authentik-static-workdir-deps-patched" { } ''
+    cp -LR --no-preserve=mode,ownership ${rawStaticWorkdirDeps} $out
+    # chmod +w -R $out/lifecycle
+    substituteInPlace $out/lifecycle/worker_process.py \
+      --replace-fail 'except OSError, FileNotFoundError:' 'except (OSError, FileNotFoundError):'
   '';
 
   # HTTP port for the readiness probe, parsed from `listen.listen_http` (e.g. "0.0.0.0:9000").
@@ -105,6 +113,13 @@ let
     export AUTHENTIK_BLUEPRINTS_DIR="$dataDir/blueprints"
     export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
     export AUTHENTIK_TEMPLATE_DIR="$dataDir/templates";
+
+    export PATH="${pythonEnv}/bin:$PATH"
+    export PYTHONPATH="${dataDir}";
+
+    export TMPDIR="$dataDir/.temp"
+    export TEMPDIR="$TMPDIR"
+    mkdir -p "$TMPDIR"
 
     cd "$dataDir"
   '';
@@ -209,7 +224,8 @@ in
 
     "${name}-worker" = {
       description = "Authentik background worker: processes tasks and applies blueprints.";
-      environment = baseEnv;
+      environment = baseEnv // {
+      };
       command = "${lib.getExe authentik-worker}";
       depends_on."${name}-migrate".condition = "process_completed_successfully";
     };
