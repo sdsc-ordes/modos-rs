@@ -45,6 +45,9 @@ let
   # Fix upstream `except` syntax in upstream worker_process.py so it parses under Python 3.
   staticWorkdirDeps = pkgs.runCommand "authentik-static-workdir-deps-patched" { } ''
     cp -LR --no-preserve=mode,ownership ${rawStaticWorkdirDeps} $out
+
+
+
     # chmod +w -R $out/lifecycle
     substituteInPlace $out/lifecycle/worker_process.py \
       --replace-fail 'except OSError, FileNotFoundError:' 'except (OSError, FileNotFoundError):'
@@ -106,11 +109,19 @@ let
 
       mkdir -p "$dataDir/data" "$dataDir/media" "$dataDir/certs" "$dataDir/prometheus"
 
-      export AUTHENTIK_CERT_DISCOVERY_DIR="$dataDir/certs"
       export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
 
+      # The server's Python imports `authentik` from a read-only store path and
+      # loads its config relative to that (`__file__`-based base_dir in
+      # authentik/lib/config.py), so it never reads the merged default.yml in the
+      # data dir. Force the blueprints dir via env var, which config loading
+      # applies last (overrides the file value) regardless of which store the
+      # Python was imported from. Points at the read-only, patched blueprints
+      # (contains system/bootstrap.yaml); custom blueprint import is not supported.
+      export AUTHENTIK_BLUEPRINTS_DIR="${staticWorkdirDeps}/blueprints"
+      echo "Bluepints directory: $AUTHENTIK_BLUEPRINTS_DIR"
+
       export PATH="${pythonEnv}/bin:$PATH"
-      export PYTHONPATH="$dataDir";
 
       export TMPDIR="$dataDir/.temp"
       export TEMPDIR="$TMPDIR"
@@ -134,6 +145,7 @@ let
       # (authentik/, templates/, static assets, ...).
       cp -R --no-preserve=mode,ownership "${staticWorkdirDeps}/." ./
       ${builtins.concatStringsSep "\n" blueprintImport}
+      chmod -R -w ./blueprints
 
       src="$dataDir/authentik/lib/default.yml"
       echo "Merging settings file into '$src'."
@@ -203,6 +215,8 @@ in
     blueprints_dir = lib.mkDefault "${dataDir}/blueprints";
 
     templates_dir = lib.mkDefault "${staticWorkdirDeps}/templates";
+
+    cert_discovery_dir = lib.mkDefault "${dataDir}/certs";
 
     postgresql = {
       user = lib.mkDefault cfg.postgres.user;
