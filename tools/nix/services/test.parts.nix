@@ -10,15 +10,29 @@
   ];
 
   perSystem =
-    { config, modos', ... }:
+    {
+      config,
+      inputs',
+      modos',
+      ...
+    }:
+    let
+      servicesCfg = config.process-compose.test-services;
+      ak = servicesCfg.services.authentik;
+    in
     {
       process-compose."test-services" =
         # Process-compose NixOS module.
-        { pkgs, pkgsStable, ... }:
+        {
+          pkgs,
+          pkgsStable,
+          ...
+        }:
         {
           imports = [
             inputs.services-flake.processComposeModules.default
             self.processComposeModules.keycloak
+            self.processComposeModules.authentik
             self.processComposeModules.mailhog
           ];
 
@@ -37,11 +51,35 @@
           defaults.processSettings =
             { name, ... }:
             {
-              namespace = lib.mkDefault "services-test";
               availability.restart = lib.mkDefault "on_failure";
               availability.max_restarts = lib.mkDefault 3;
               log_location = ".output/process-compose/log/${name}.log";
             };
+
+          services.postgres = ak.services.postgres;
+          services.redis = ak.services.redis;
+
+          services.authentik = {
+            enable = true;
+
+            components = inputs'.authentik-nix.packages;
+            secretKey = "test";
+
+            # These match the companion instances above; shown explicitly for clarity even
+            # though they are also the module defaults.
+            settings = {
+              logLevel = "info";
+              listen.http = "0.0.0.0:8082";
+              postgres = {
+                port = 5433;
+                user = "authentik";
+                name = "authentik";
+                password = "authentik";
+              };
+
+              redis.port = 6378;
+            };
+          };
 
           services.keycloak = {
             enable = true;
@@ -69,7 +107,7 @@
         };
 
       modos.services.config = {
-        test = config.process-compose.test-services;
+        test = servicesCfg;
       };
     };
 }

@@ -20,24 +20,28 @@ start *args:
 stop *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    process-compose -u "{{pc_socket}}" down
+    just -f "{{source_file()}}" pc down
 
 # Attach to the running test services.
 [group('services')]
 attach *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    process-compose -u "{{pc_socket}}"  attach
+    just -f "{{source_file()}}" pc attach
 
 # Delete all data from the services.
 delete-data:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    just -f "{{source_file()}}" stop
+    just -f "{{source_file()}}" stop || true
     rm -rf "{{output_dir}}/process-compose"
 
 [group('keycloak')]
 keycloak-export:
     cd "{{root_dir}}"
-    process-compose -u "{{pc_socket}}" process stop keycloak || true
-    process-compose -u "{{pc_socket}}" process start keycloak-realm-export-all
+    process-compose  process stop keycloak || true
+    just -f "{{source_file()}}" pc process start keycloak-realm-export-all
+
+[group('process-compose')]
+pc *args:
+    process-compose -u "{{pc_socket}}" "$@"

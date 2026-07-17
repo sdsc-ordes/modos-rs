@@ -6,6 +6,7 @@
 }:
 let
   cfg = config.services.keycloak;
+  dataDir = cfg.dataDir + "/keycloak";
 
   isSecret = v: lib.isAttrs v && v ? _secret && lib.isString v._secret;
 
@@ -161,11 +162,12 @@ let
     ${pkgs.curl}/bin/curl -k --head -fsS "https://localhost:${toString cfg.settings.http-management-port}${lib.removeSuffix "/" cfg.settings.http-management-relative-path}/health/ready"
   '';
 
-  dataDir = "./" + cfg.dataDir;
   keycloakEnv = {
-    KC_HOME_DIR = dataDir + "/keycloak";
-    KC_CONF_DIR = dataDir + "/keycloak/conf";
-    KC_TMP_DIR = dataDir + "/keycloak/tmp";
+    # Note: we add "./" cause keycloak's database url
+    # does not allow implicitly relative paths.
+    KC_HOME_DIR = "./" + cfg.dataDir;
+    KC_CONF_DIR = dataDir + "/conf";
+    KC_TMP_DIR = dataDir + "/tmp";
 
     KC_BOOTSTRAP_ADMIN_USERNAME = "admin";
     KC_BOOTSTRAP_ADMIN_PASSWORD = "${lib.escapeShellArg cfg.initialAdminPassword}";
