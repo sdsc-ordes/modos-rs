@@ -80,7 +80,6 @@
             # though they are also the module defaults.
             settings = {
               logLevel = "info";
-              listen.http = "0.0.0.0:8082";
               postgres = {
                 port = 5433;
                 user = "authentik";
@@ -93,7 +92,7 @@
           };
 
           services.keycloak = {
-            enable = true;
+            enable = false;
             dataDir = ".output/process-compose/data";
 
             settings.http-port = 8081;

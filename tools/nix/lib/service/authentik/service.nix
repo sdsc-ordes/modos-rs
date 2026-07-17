@@ -48,9 +48,6 @@ let
       --replace-fail 'except OSError, FileNotFoundError:' 'except (OSError, FileNotFoundError):'
   '';
 
-  # HTTP port for the readiness probe, parsed from `listen.listen_http` (e.g. "0.0.0.0:9000").
-  httpPort = lib.last (lib.splitString ":" cfg.settings.listen.http);
-
   # NOTE: We would rather set a config.yaml,
   # but documentation is pretty bad and not sufficient for certain stuff
   # Therefore we set env variables as described.
@@ -64,16 +61,25 @@ let
     AUTHENTIK_REDIS__HOST = cfg.settings.redis.host;
     AUTHENTIK_REDIS__PORT = toString cfg.settings.redis.port;
 
-    AUTHENTIK_LISTEN__HTTP = cfg.settings.listen.http;
-    AUTHENTIK_LISTEN__HTTPS = cfg.settings.listen.https;
     AUTHENTIK_LOG_LEVEL = cfg.settings.logLevel;
-  };
 
-  baseEnv = connEnv // {
     AUTHENTIK_SECRET_KEY = cfg.secretKey;
     AUTHENTIK_BOOTSTRAP_PASSWORD = cfg.initialAdminPassword;
     AUTHENTIK_BOOTSTRAP_EMAIL = cfg.initialAdminEmail;
   };
+
+  listenEnv =
+    type:
+    let
+      c = cfg.settings.${type};
+    in
+    {
+      AUTHENTIK_LISTEN__HTTP = "${c.http.host}:${toString c.http.port}";
+      AUTHENTIK_LISTEN__METRICS = "${c.metrics.host}:${toString c.metrics.port}";
+    }
+    // lib.optionalAttrs (c ? https) {
+      AUTHENTIK_LISTEN__HTTPS = "${c.https.host}:${toString c.https.port}";
+    };
 
   # Copy the enabled blueprints into the Authentik blueprints dir.
   # Copied (not symlinked) for the same reason as the built-in
@@ -111,8 +117,8 @@ let
     export AUTHENTIK_STORAGE__MEDIA__FILE__PATH="$dataDir/media"
     export AUTHENTIK_CERT_DISCOVERY_DIR="$dataDir/certs"
     export AUTHENTIK_BLUEPRINTS_DIR="$dataDir/blueprints"
-    export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
     export AUTHENTIK_TEMPLATE_DIR="$dataDir/templates";
+    export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
 
     export PATH="${pythonEnv}/bin:$PATH"
     export PYTHONPATH="${dataDir}";
@@ -186,7 +192,7 @@ let
     pkgs.writeShellScriptBin "authentik-health"
       # Bash
       ''
-        ${pkgs.curl}/bin/curl -fsS "http://localhost:${httpPort}/-/health/ready/"
+        ${pkgs.curl}/bin/curl -fsS "http://${cfg.settings.server.http.host}:${toString cfg.settings.server.http.port}/-/health/ready/"
       '';
 in
 {
@@ -213,7 +219,7 @@ in
   settings.processes = lib.mkIf cfg.enable {
     "${name}-migrate" = {
       description = "Authentik database migrations: a prerequisite that creates the schema.";
-      environment = baseEnv;
+      environment = connEnv;
       command = "${lib.getExe authentik-migrate}";
 
       depends_on = {
@@ -224,15 +230,14 @@ in
 
     "${name}-worker" = {
       description = "Authentik background worker: processes tasks and applies blueprints.";
-      environment = baseEnv // {
-      };
+      environment = connEnv // listenEnv "worker";
       command = "${lib.getExe authentik-worker}";
       depends_on."${name}-migrate".condition = "process_completed_successfully";
     };
 
     "${name}" = {
       description = "Authentik HTTP/API server.";
-      environment = baseEnv;
+      environment = connEnv // listenEnv "server";
       command = "${lib.getExe authentik-server}";
 
       depends_on = {
