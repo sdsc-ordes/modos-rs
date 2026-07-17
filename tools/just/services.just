@@ -34,6 +34,7 @@ delete-data:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
     just -f "{{source_file()}}" stop || true
+    echo "Delete output."
     rm -rf "{{output_dir}}/process-compose"
 
 [group('keycloak')]

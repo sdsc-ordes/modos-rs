@@ -165,7 +165,7 @@ let
   keycloakEnv = {
     # Note: we add "./" cause keycloak's database url
     # does not allow implicitly relative paths.
-    KC_HOME_DIR = "./" + cfg.dataDir;
+    KC_HOME_DIR = "./" + dataDir;
     KC_CONF_DIR = dataDir + "/conf";
     KC_TMP_DIR = dataDir + "/tmp";
 

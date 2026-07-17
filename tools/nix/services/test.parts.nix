@@ -19,6 +19,16 @@
     let
       servicesCfg = config.process-compose.test-services;
       ak = servicesCfg.services.authentik;
+
+      setDataDir =
+        procs:
+        lib.mapAttrs (
+          k: v:
+          v
+          // {
+            dataDir = ".output/process-compose/data/${k}";
+          }
+        ) procs;
     in
     {
       process-compose."test-services" =
@@ -56,11 +66,12 @@
               log_location = ".output/process-compose/log/${name}.log";
             };
 
-          services.postgres = ak.services.postgres;
-          services.redis = ak.services.redis;
+          services.postgres = setDataDir ak.services.postgres;
+          services.redis = setDataDir ak.services.redis;
 
           services.authentik = {
             enable = true;
+            dataDir = ".output/process-compose/data";
 
             components = inputs'.authentik-nix.packages;
             secretKey = "test";
