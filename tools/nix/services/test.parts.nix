@@ -67,7 +67,6 @@
             };
 
           services.postgres = setDataDir ak.services.postgres;
-          services.redis = setDataDir ak.services.redis;
 
           services.authentik = {
             enable = true;
@@ -75,20 +74,6 @@
 
             components = inputs'.authentik-nix.packages;
             secretKey = "test";
-
-            # These match the companion instances above; shown explicitly for clarity even
-            # though they are also the module defaults.
-            settings = {
-              logLevel = "info";
-              postgres = {
-                port = 5433;
-                user = "authentik";
-                name = "authentik";
-                password = "authentik";
-              };
-
-              redis.port = 6378;
-            };
           };
 
           services.keycloak = {

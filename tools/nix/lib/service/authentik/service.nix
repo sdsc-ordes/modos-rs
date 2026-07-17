@@ -9,6 +9,8 @@ let
   cfg = config.services.authentik;
   dataDir = cfg.dataDir + "/authentik";
 
+  settingsFormat = pkgs.formats.yaml { };
+
   # The authentik components.
   gopkgs = requireComponent "gopkgs";
   rust = requireComponent "rust";
@@ -48,21 +50,7 @@ let
       --replace-fail 'except OSError, FileNotFoundError:' 'except (OSError, FileNotFoundError):'
   '';
 
-  # NOTE: We would rather set a config.yaml,
-  # but documentation is pretty bad and not sufficient for certain stuff
-  # Therefore we set env variables as described.
   connEnv = {
-    AUTHENTIK_POSTGRESQL__HOST = cfg.settings.postgres.host;
-    AUTHENTIK_POSTGRESQL__PORT = toString cfg.settings.postgres.port;
-    AUTHENTIK_POSTGRESQL__NAME = cfg.settings.postgres.name;
-    AUTHENTIK_POSTGRESQL__USER = cfg.settings.postgres.user;
-    AUTHENTIK_POSTGRESQL__PASSWORD = cfg.settings.postgres.password;
-
-    AUTHENTIK_REDIS__HOST = cfg.settings.redis.host;
-    AUTHENTIK_REDIS__PORT = toString cfg.settings.redis.port;
-
-    AUTHENTIK_LOG_LEVEL = cfg.settings.logLevel;
-
     AUTHENTIK_SECRET_KEY = cfg.secretKey;
     AUTHENTIK_BOOTSTRAP_PASSWORD = cfg.initialAdminPassword;
     AUTHENTIK_BOOTSTRAP_EMAIL = cfg.initialAdminEmail;
@@ -71,7 +59,7 @@ let
   listenEnv =
     type:
     let
-      c = cfg.settings.${type};
+      c = cfg.${type};
     in
     {
       AUTHENTIK_LISTEN__HTTP = "${c.http.host}:${toString c.http.port}";
@@ -97,67 +85,67 @@ let
       cp -L "$f" "./blueprints/"
       chmod u+w "./blueprints/$(basename "$f")"
       unset f
-    '') (lib.filterAttrs (_: v: v.import && v.path != null) cfg.settings.blueprints);
+    '') (lib.filterAttrs (_: v: v.import && v.path != null) cfg.blueprints);
 
-  loadEnvFile = lib.optionalString (cfg.environmentFile != null) ''
-    echo "Load extra authentic environment file '${cfg.environmentFile}'."
-    set -a
-    # shellcheck disable=SC1091
-    . "${cfg.environmentFile}"
-    set +a
-  '';
+  loadEnvFile =
+    lib.optionalString (cfg.environmentFile != null)
+      # Bash
+      ''
+        echo "Load extra authentic environment file '${cfg.environmentFile}'."
+        set -a
+        # shellcheck disable=SC1091
+        . "${cfg.environmentFile}"
+        set +a
+      '';
 
-  runtimeEnv = ''
-    dataDir="$(realpath ${dataDir})"
-    echo "Authentik data dir: '$dataDir'."
+  runtimeEnv =
+    # Bash
+    ''
+      dataDir="$(realpath ${dataDir})"
+      echo "Authentik data dir: '$dataDir'."
 
-    mkdir -p "$dataDir/media" "$dataDir/certs" "$dataDir/prometheus"
+      mkdir -p "$dataDir/data" "$dataDir/media" "$dataDir/certs" "$dataDir/prometheus"
 
-    export AUTHENTIK_STORAGE__FILE__PATH="$dataDir"
-    export AUTHENTIK_STORAGE__MEDIA__FILE__PATH="$dataDir/media"
-    export AUTHENTIK_CERT_DISCOVERY_DIR="$dataDir/certs"
-    export AUTHENTIK_BLUEPRINTS_DIR="$dataDir/blueprints"
-    export AUTHENTIK_TEMPLATE_DIR="$dataDir/templates";
-    export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
+      export AUTHENTIK_CERT_DISCOVERY_DIR="$dataDir/certs"
+      export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
 
-    export PATH="${pythonEnv}/bin:$PATH"
-    export PYTHONPATH="${dataDir}";
+      export PATH="${pythonEnv}/bin:$PATH"
+      export PYTHONPATH="$dataDir";
 
-    export TMPDIR="$dataDir/.temp"
-    export TEMPDIR="$TMPDIR"
-    mkdir -p "$TMPDIR"
+      export TMPDIR="$dataDir/.temp"
+      export TEMPDIR="$TMPDIR"
+      mkdir -p "$TMPDIR"
 
-    cd "$dataDir"
-  '';
+      cd "$dataDir"
+    '';
 
-  setup = ''
-    set -euo pipefail
-    ${runtimeEnv}
-    ${loadEnvFile}
+  settingsFile = settingsFormat.generate "authentik.yml" cfg.settings;
 
-    echo "Working dir: $(pwd)"
+  setup =
+    # Bash
+    ''
+      set -euo pipefail
+      ${runtimeEnv}
+      ${loadEnvFile}
 
-    # Bring in Authentik's working-directory dependencies (authentik/, templates/, static
-    # assets, ...) but manage `blueprints/` ourselves so we can add user blueprints.
-    for dep in ${staticWorkdirDeps}/*; do
-      base=$(basename "$dep")
-      [ "$base" = "blueprints" ] && continue
+      echo "Working dir: $(pwd)"
 
-      echo "Symlinking '$dep' -> '$base'"
-      ln -sfn "$dep" "./$base"
-    done
+      # Bring in Authentik's working-directory dependencies
+      # (authentik/, templates/, static assets, ...).
+      cp -R --no-preserve=mode,ownership "${staticWorkdirDeps}/." ./
+      ${builtins.concatStringsSep "\n" blueprintImport}
 
-    # Combined blueprints dir: Authentik's built-in blueprints + user-provided ones.
-    # These must be COPIED (not symlinked): A symlink into the nix store resolves
-    # outside the dir and is rejected, which crashes the server's bootstrap worker.
-    rm -rf ./blueprints
-    mkdir -p ./blueprints
-    if [ -d "${staticWorkdirDeps}/blueprints" ]; then
-      cp -rL "${staticWorkdirDeps}/blueprints/." ./blueprints/
-    fi
-    chmod -R u+w ./blueprints
-    ${builtins.concatStringsSep "\n" blueprintImport}
-  '';
+      src="$dataDir/authentik/lib/default.yml"
+      echo "Merging settings file into '$src'."
+      ${lib.getExe pkgs.yq-go} eval-all '. as $item ireduce ({}; . *+ $item)' \
+        "$src" "${settingsFile}" > $dataDir/.merged.yml
+      mv "$src" "$src.original"
+      mv "$dataDir/.merged.yml" "$src"
+      echo "Settings file '$src':"
+      echo "====================="
+      cat "$src"
+      echo "====================="
+    '';
 
   authentik-migrate =
     pkgs.writeShellScriptBin "authentik-migrate"
@@ -192,7 +180,7 @@ let
     pkgs.writeShellScriptBin "authentik-health"
       # Bash
       ''
-        ${pkgs.curl}/bin/curl -fsS "http://${cfg.settings.server.http.host}:${toString cfg.settings.server.http.port}/-/health/ready/"
+        ${pkgs.curl}/bin/curl -fsS "http://${cfg.server.http.host}:${toString cfg.server.http.port}/-/health/ready/"
       '';
 in
 {
@@ -200,18 +188,39 @@ in
     postgres = {
       "${name}-pg-db" = {
         enable = true;
-        port = cfg.settings.postgres.port;
+        port = cfg.postgres.port;
         initialScript.before = ''
-          CREATE USER \"${cfg.settings.postgres.user}\" WITH PASSWORD '${cfg.settings.postgres.password}' CREATEDB;
-          CREATE DATABASE \"${cfg.settings.postgres.name}\" OWNER \"${cfg.settings.postgres.user}\"
+          CREATE USER \"${cfg.postgres.user}\" WITH PASSWORD '${cfg.postgres.password}' CREATEDB;
+          CREATE DATABASE \"${cfg.postgres.name}\" OWNER \"${cfg.postgres.user}\"
         '';
       };
     };
+  };
 
-    redis = {
-      "${name}-redis-db" = {
-        enable = true;
-        port = cfg.settings.redis.port;
+  services.authentik.settings = {
+    log_level = lib.mkDefault cfg.logLevel;
+
+    blueprints_dir = lib.mkDefault "${dataDir}/blueprints";
+
+    templates_dir = lib.mkDefault "${staticWorkdirDeps}/templates";
+
+    postgresql = {
+      user = lib.mkDefault cfg.postgres.user;
+      name = lib.mkDefault cfg.postgres.name;
+      host = lib.mkDefault cfg.postgres.host;
+      port = lib.mkDefault cfg.postgres.port;
+    };
+
+    storage = {
+      file = lib.mkDefault {
+        path = "${dataDir}/data";
+      };
+
+      media = {
+        backend = lib.mkDefault "file";
+        file = lib.mkDefault {
+          path = "${dataDir}/media";
+        };
       };
     };
   };
@@ -224,7 +233,6 @@ in
 
       depends_on = {
         "${name}-pg-db".condition = "process_healthy";
-        "${name}-redis-db".condition = "process_healthy";
       };
     };
 
