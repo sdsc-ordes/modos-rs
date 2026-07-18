@@ -10,15 +10,39 @@
   ];
 
   perSystem =
-    { config, modos', ... }:
+    {
+      config,
+      inputs',
+      modos',
+      ...
+    }:
+    let
+      servicesCfg = config.process-compose.test-services;
+      ak = servicesCfg.services.authentik;
+
+      setDataDir =
+        procs:
+        lib.mapAttrs (
+          k: v:
+          v
+          // {
+            dataDir = ".output/process-compose/data/${k}";
+          }
+        ) procs;
+    in
     {
       process-compose."test-services" =
         # Process-compose NixOS module.
-        { pkgs, pkgsStable, ... }:
+        {
+          pkgs,
+          pkgsStable,
+          ...
+        }:
         {
           imports = [
             inputs.services-flake.processComposeModules.default
             self.processComposeModules.keycloak
+            self.processComposeModules.authentik
             self.processComposeModules.mailhog
           ];
 
@@ -37,11 +61,20 @@
           defaults.processSettings =
             { name, ... }:
             {
-              namespace = lib.mkDefault "services-test";
               availability.restart = lib.mkDefault "on_failure";
               availability.max_restarts = lib.mkDefault 3;
               log_location = ".output/process-compose/log/${name}.log";
             };
+
+          services.postgres = setDataDir ak.services.postgres;
+
+          services.authentik = {
+            enable = true;
+            dataDir = ".output/process-compose/data";
+
+            components = inputs'.authentik-nix.packages;
+            secretKey = "test";
+          };
 
           services.keycloak = {
             enable = true;
@@ -69,7 +102,7 @@
         };
 
       modos.services.config = {
-        test = config.process-compose.test-services;
+        test = servicesCfg;
       };
     };
 }

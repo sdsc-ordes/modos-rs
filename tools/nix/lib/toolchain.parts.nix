@@ -276,6 +276,8 @@ let
     {
       # Main shells:
       default = addSetup default;
+      default-nogh = addSetup default-nogh;
+
       ci = addSetup ci;
 
       # Toolchains:
