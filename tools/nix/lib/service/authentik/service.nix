@@ -218,7 +218,7 @@ in
   services.authentik.settings = {
     log_level = lib.mkDefault cfg.logLevel;
 
-    blueprints_dir = lib.mkDefault "${dataDir}/blueprints";
+    # blueprints_dir = lib.mkDefault "${dataDir}/blueprints";
 
     templates_dir = lib.mkDefault "${staticWorkdirDeps}/templates";
 
