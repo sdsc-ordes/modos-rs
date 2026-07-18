@@ -13,14 +13,6 @@ let
 
   settingsFormat = pkgs.formats.yaml { };
 
-  # A relative user-provided path, or a Nix store path (same pattern as keycloak realms).
-  blueprintPath = types.nullOr (
-    types.either (types.pathWith {
-      inStore = false;
-      absolute = false;
-    }) (types.pathWith { inStore = true; })
-  );
-
   hostAndPort = name: port: {
     host = mkOption {
       type = types.str;
@@ -52,22 +44,13 @@ in
         Base directory where keycloak stores its data `<dataDir>/keycloak`.
       '';
     };
-    # Authentik is not in nixpkgs, so the package set has to be provided by the user
-    # from their own `authentik-nix` flake input. This keeps services-flake input-free.
-    components = mkOption {
-      type = types.attrsOf types.package;
-      example = lib.literalExpression "inputs.authentik-nix.packages.\${system}";
-      description = ''
-        The Authentik component packages, typically
-        `inputs.authentik-nix.packages.''${system}`.
 
-        Must provide at least the following attributes:
-        - `gopkgs`            – provides `bin/server`
-        - `rust`              – provides `bin/authentik` (the `worker` subcommand)
-        - `migrate`           – provides `bin/migrate.py`
-        - `staticWorkdirDeps` – the working-directory dependencies
-                                (`authentik/`, `blueprints/`, `templates/`, static assets)
-        - `manage`            – the management CLI (optional, for blueprint tooling)
+    components = mkOption {
+      type = types.raw;
+      example = lib.literalExpression "inputs.authentik-nix.legacyPackages.\${system}.authentikComponents";
+      description = ''
+        The Authentik component set, typically
+        `inputs.authentik-nix.legacyPackages.''${system}.authentikComponents`.
       '';
     };
 
@@ -178,12 +161,12 @@ in
         types.submodule {
           options = {
             path = mkOption {
-              type = blueprintPath;
+              type = types.pathWith {
+                inStore = true;
+              };
               default = null;
-              example = "./blueprints/my-blueprint.yaml";
               description = ''
-                Path (relative to the `process-compose` working dir, or a Nix store
-                path) of a blueprint YAML file to make available for import.
+                Path of a blueprint YAML file to make available for import.
               '';
             };
 

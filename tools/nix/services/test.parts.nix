@@ -56,14 +56,23 @@
           settings = {
             log_level = "debug";
             ordered_shutdown = true;
+            log_configuration = {
+              disable_json = true;
+              no_color = true;
+              no_metadata = true;
+            };
           };
 
           defaults.processSettings =
             { name, ... }:
             {
-              availability.restart = lib.mkDefault "on_failure";
-              availability.max_restarts = lib.mkDefault 3;
+              availability.restart = lib.mkDefault "no";
+              availability.max_restarts = lib.mkDefault 0;
               log_location = ".output/process-compose/log/${name}.log";
+              log_configuration = {
+                disable_json = true;
+                no_color = true;
+              };
             };
 
           services.postgres = setDataDir ak.services.postgres;
@@ -72,12 +81,15 @@
             enable = true;
             dataDir = ".output/process-compose/data";
 
-            components = inputs'.authentik-nix.packages;
+            components = inputs'.authentik-nix.legacyPackages.authentikComponents;
             secretKey = "test";
+
+            server.http.port = 9001;
+            worker.http.port = 9002;
           };
 
           services.keycloak = {
-            enable = true;
+            enable = false;
             dataDir = ".output/process-compose/data";
 
             settings.http-port = 8081;

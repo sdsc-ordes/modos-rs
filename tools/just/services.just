@@ -35,6 +35,7 @@ delete-data:
     cd "{{root_dir}}"
     just -f "{{source_file()}}" stop || true
     echo "Delete output."
+    chmod -R +w "{{output_dir}}/process-compose"
     rm -rf "{{output_dir}}/process-compose"
 
 [group('keycloak')]

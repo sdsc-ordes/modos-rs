@@ -11,53 +11,100 @@ let
 
   settingsFormat = pkgs.formats.yaml { };
 
-  # The authentik components.
-  gopkgs = requireComponent "gopkgs";
-  rust = requireComponent "rust";
-  rawMigrate = requireComponent "migrate";
-  pythonEnv = requireComponent "pythonEnv";
-  rawStaticWorkdirDeps = requireComponent "staticWorkdirDeps";
-
-  requireComponent =
-    attr:
-    if cfg.components ? ${attr} then
-      cfg.components.${attr}
-    else
-      throw ''
-        services.authentik.${name}.authentikComponents is missing the `${attr}` attribute.
-        (see the module docs).
-      '';
-
   # NOTE: Workaround -> authentik-nix's `migrate` ships `bin/migrate.py`, a shell wrapper that execs an inner
   # `bin/.migrate.py-wrapped` whose shebang is `#!/usr/bin/env python`.
   # `/usr/bin/env` does not exist in the Nix build sandbox that
   # `nix build .#checks…` (`just test`) runs the process-compose stack in,
   # so the migration crashes with "bad interpreter".
-  migrate = pkgs.runCommand "authentik-migrate-sandbox-safe" { } ''
-    cp -R --no-preserve=mode,ownership ${rawMigrate} $out
-    substituteInPlace $out/bin/.migrate.py-wrapped \
-      --replace-fail '#!/usr/bin/env python' '#!${pythonEnv}/bin/python'
-    substituteInPlace $out/bin/migrate.py \
-      --replace-fail '${rawMigrate}/bin/.migrate.py-wrapped' "$out/bin/.migrate.py-wrapped"
-    chmod +x "$out/bin/.migrate.py-wrapped" "$out/bin/migrate.py"
-  '';
+  modMigrate =
+    prev: pythonEnv:
+    pkgs.runCommand "authentik-migrate-sandbox-safe" { }
+      # Bash
+      ''
+        cp -R --no-preserve=mode,ownership ${prev} $out
 
-  # Fix upstream `except` syntax in upstream worker_process.py so it parses under Python 3.
-  staticWorkdirDeps = pkgs.runCommand "authentik-static-workdir-deps-patched" { } ''
-    cp -LR --no-preserve=mode,ownership ${rawStaticWorkdirDeps} $out
+        substituteInPlace $out/bin/.migrate.py-wrapped \
+          --replace-fail '#!/usr/bin/env python' '#!${pythonEnv}/bin/python'
+        substituteInPlace $out/bin/migrate.py \
+          --replace-fail '${prev}/bin/.migrate.py-wrapped' "$out/bin/.migrate.py-wrapped"
+        chmod +x "$out/bin/.migrate.py-wrapped" "$out/bin/migrate.py"
+      '';
 
+  settingsFile = settingsFormat.generate "authentik.yml" cfg.settings;
 
+  modStaticWorkdirDeps =
+    prev: authentik-src:
+    prev.overrideAttrs (oA: {
+      buildCommand =
+        oA.buildCommand
+        +
+        # Bash
+        ''
+          rm -v $out/authentik
+          cp -r --no-preserve=mode,ownership ${authentik-src}/authentik $out/authentik
+          src="authentik/lib/default.yml"
+          echo "Merging settings file into '$src'."
+          ${lib.getExe pkgs.yq-go} eval-all '. as $item ireduce ({}; . *+ $item)' \
+            "${authentik-src}/$src" "${settingsFile}" > "$out/$src"
 
-    # chmod +w -R $out/lifecycle
-    substituteInPlace $out/lifecycle/worker_process.py \
-      --replace-fail 'except OSError, FileNotFoundError:' 'except (OSError, FileNotFoundError):'
-  '';
+          # Set blueprints_dir, template_dir.
+          ${lib.getExe pkgs.yq-go} -i ".blueprints_dir = \"$out/blueprints\"" "$out/$src"
+          ${lib.getExe pkgs.yq-go} -i ".templates_dir = \"$out/templates\"" "$out/$src"
 
-  connEnv = {
-    AUTHENTIK_SECRET_KEY = cfg.secretKey;
-    AUTHENTIK_BOOTSTRAP_PASSWORD = cfg.initialAdminPassword;
-    AUTHENTIK_BOOTSTRAP_EMAIL = cfg.initialAdminEmail;
-  };
+          cat "$src" | grep -v "/blueprints" || {
+            echo "Blueprints directory must not anymore point to /blueprints."
+            exit 1
+          }
+          chmod -R -w $out/authentik
+
+          echo "Placing blueprints."
+          rm -v $out/blueprints
+          cp -vr ${authentik-src}/blueprints $out/blueprints
+          cd "$out"
+          ${lib.concatStringsSep "\n" blueprintImport}
+        '';
+    });
+
+  finalComponents = cfg.components.overrideScope (
+    final: prev:
+    let
+      prevComps = prev.authentikComponents;
+    in
+    {
+      authentikComponents = prevComps // {
+        migrate = modMigrate prevComps.migrate prevComps.pythonEnv;
+        staticWorkdirDeps = modStaticWorkdirDeps prevComps.staticWorkdirDeps prev.authentik-src;
+      };
+    }
+  );
+
+  # The authentik components.
+  inherit (finalComponents.authentikComponents) gopkgs;
+  inherit (finalComponents.authentikComponents) rust;
+  inherit (finalComponents.authentikComponents) migrate;
+  inherit (finalComponents.authentikComponents) pythonEnv;
+  inherit (finalComponents.authentikComponents) staticWorkdirDeps;
+
+  connEnv =
+    assert allPortsUnique;
+    {
+      AUTHENTIK_SECRET_KEY = cfg.secretKey;
+      AUTHENTIK_BOOTSTRAP_PASSWORD = cfg.initialAdminPassword;
+      AUTHENTIK_BOOTSTRAP_EMAIL = cfg.initialAdminEmail;
+    };
+
+  allPortsUnique =
+    let
+      allPorts = [
+        cfg.server.http.port
+        cfg.server.https.port
+        cfg.server.metrics.port
+
+        cfg.worker.http.port
+        cfg.worker.metrics.port
+      ];
+    in
+    lib.assertMsg (lib.allUnique allPorts) "Some ports in `authentik.server`, `authentik.worker` are identical: ${toString allPorts}.";
 
   listenEnv =
     type:
@@ -79,15 +126,11 @@ let
     bp: e:
     # Bash
     ''
-      f=$(realpath "${e.path}")
-      echo "Copying blueprint '${bp}' from '$f' into './blueprints'."
-      if [ ! -f "$f" ]; then
-        echo "Blueprint file '$f' does not exist!" >&2
-        exit 1
-      fi
-      cp -L "$f" "./blueprints/"
-      chmod u+w "./blueprints/$(basename "$f")"
-      unset f
+      filename="${bp}.yaml"
+      f="${e.path}"
+      echo "Copying blueprint '${bp}' from '$f' into './additional/${bp}'."
+      mkdir -p ./additional
+      cp -L "$f" "./additional/${bp}"
     '') (lib.filterAttrs (_: v: v.import && v.path != null) cfg.blueprints);
 
   loadEnvFile =
@@ -105,65 +148,51 @@ let
     # Bash
     ''
       dataDir="$(realpath ${dataDir})"
-      echo "Authentik data dir: '$dataDir'."
+      staticDir="$dataDir/static"
 
-      mkdir -p "$dataDir/data" "$dataDir/media" "$dataDir/certs" "$dataDir/prometheus"
+      echo "Authentik data dir: '$dataDir'."
+      echo "Authentik static dir: '$staticDir'."
+
+      mkdir -p "$dataDir/data" \
+               "$dataDir/media" \
+               "$dataDir/certs" \
+               "$dataDir/prometheus"
+
+      # Set temp. dir.
+      if [ ! -L "$dataDir/temp" ]; then
+        tmpDir=$(mktemp -d)
+        mkdir -p "$tmpDir"
+        ln -s "$tmpDir" "$dataDir/temp"
+      fi
+      export TMPDIR="$dataDir/temp"
+      export TEMPDIR="$TMPDIR"
 
       export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"
 
-      # The server's Python imports `authentik` from a read-only store path and
-      # loads its config relative to that (`__file__`-based base_dir in
-      # authentik/lib/config.py), so it never reads the merged default.yml in the
-      # data dir. Force the blueprints dir via env var, which config loading
-      # applies last (overrides the file value) regardless of which store the
-      # Python was imported from. Points at the read-only, patched blueprints
-      # (contains system/bootstrap.yaml); custom blueprint import is not supported.
-      # FIXME: pointing to dataDir does not work, ???
-      # permissions?
-      export AUTHENTIK_BLUEPRINTS_DIR="${staticWorkdirDeps}/blueprints"
-
-      export TMPDIR="$dataDir/.temp"
-      export TEMPDIR="$TMPDIR"
-
       export PATH="${pythonEnv}/bin:$PATH"
 
+      # Bring in Authentik's working-directory dependencies
+      # (authentik/, templates/, static assets, ...).
+      if [ ! -d "$staticDir" ]; then
+        ln -s "${staticWorkdirDeps}" "$staticDir"
+      fi
+      ls -al "$staticDir"
 
-      cd "$dataDir"
+      echo "Settings file '$staticDir/authentik/lib/default.yml':"
+      echo "====================="
+      cat "$staticDir/authentik/lib/default.yml"
+      echo "====================="
+
+      cd "$staticDir"
+      echo "Working dir: $(pwd)"
     '';
-
-  settingsFile = settingsFormat.generate "authentik.yml" cfg.settings;
 
   setup =
     # Bash
     ''
       set -euo pipefail
-
-      dataDir="$(realpath ${dataDir})"
-      export CUSTOM_TMPDIR=$(mktemp -d)
-      mkdir -p "$CUSTOM_TMPDIR" "$dataDir"
-      ln -s "$CUSTOM_TMPDIR" "$dataDir/.temp"
-
       ${runtimeEnv}
       ${loadEnvFile}
-
-      echo "Working dir: $(pwd)"
-
-      # Bring in Authentik's working-directory dependencies
-      # (authentik/, templates/, static assets, ...).
-      cp -R --no-preserve=mode,ownership "${staticWorkdirDeps}/." ./
-      ${builtins.concatStringsSep "\n" blueprintImport}
-      # chmod -R -w ./blueprints
-
-      src="$dataDir/authentik/lib/default.yml"
-      echo "Merging settings file into '$src'."
-      ${lib.getExe pkgs.yq-go} eval-all '. as $item ireduce ({}; . *+ $item)' \
-        "$src" "${settingsFile}" > $dataDir/.merged.yml
-      mv "$src" "$src.original"
-      mv "$dataDir/.merged.yml" "$src"
-      echo "Settings file '$src':"
-      echo "====================="
-      cat "$src"
-      echo "====================="
     '';
 
   authentik-migrate =
@@ -179,8 +208,7 @@ let
     pkgs.writeShellScriptBin "authentik-worker"
       # Bash
       ''
-        ${runtimeEnv}
-        ${loadEnvFile}
+        ${setup}
         echo "Starting authentik worker ..."
         exec ${rust}/bin/authentik worker
       '';
@@ -189,8 +217,7 @@ let
     pkgs.writeShellScriptBin "authentik-server"
       # Bash
       ''
-        ${runtimeEnv}
-        ${loadEnvFile}
+        ${setup}
         echo "Starting authentik server ..."
         exec ${gopkgs}/bin/server
       '';
@@ -218,10 +245,6 @@ in
 
   services.authentik.settings = {
     log_level = lib.mkDefault cfg.logLevel;
-
-    # blueprints_dir = lib.mkDefault "${dataDir}/blueprints";
-
-    templates_dir = lib.mkDefault "${staticWorkdirDeps}/templates";
 
     cert_discovery_dir = lib.mkDefault "${dataDir}/certs";
 
