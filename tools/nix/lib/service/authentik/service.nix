@@ -121,11 +121,11 @@ let
       export AUTHENTIK_BLUEPRINTS_DIR="${staticWorkdirDeps}/blueprints"
       echo "Bluepints directory: $AUTHENTIK_BLUEPRINTS_DIR"
 
-      export PATH="${pythonEnv}/bin:$PATH"
-
       export TMPDIR="$dataDir/.temp"
       export TEMPDIR="$TMPDIR"
-      mkdir -p "$TMPDIR"
+
+      export PATH="${pythonEnv}/bin:$PATH"
+
 
       cd "$dataDir"
     '';
@@ -136,6 +136,12 @@ let
     # Bash
     ''
       set -euo pipefail
+
+      dataDir="$(realpath ${dataDir})"
+      export CUSTOM_TMPDIR=$(mktemp -d)
+      mkdir -p "$CUSTOM_TMPDIR" "$dataDir"
+      ln -s "$CUSTOM_TMPDIR" "$dataDir/.temp"
+
       ${runtimeEnv}
       ${loadEnvFile}
 
@@ -145,7 +151,7 @@ let
       # (authentik/, templates/, static assets, ...).
       cp -R --no-preserve=mode,ownership "${staticWorkdirDeps}/." ./
       ${builtins.concatStringsSep "\n" blueprintImport}
-      chmod -R -w ./blueprints
+      # chmod -R -w ./blueprints
 
       src="$dataDir/authentik/lib/default.yml"
       echo "Merging settings file into '$src'."
