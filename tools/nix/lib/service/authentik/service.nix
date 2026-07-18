@@ -118,8 +118,9 @@ let
       # applies last (overrides the file value) regardless of which store the
       # Python was imported from. Points at the read-only, patched blueprints
       # (contains system/bootstrap.yaml); custom blueprint import is not supported.
+      # FIXME: pointing to dataDir does not work, ???
+      # permissions?
       export AUTHENTIK_BLUEPRINTS_DIR="${staticWorkdirDeps}/blueprints"
-      echo "Bluepints directory: $AUTHENTIK_BLUEPRINTS_DIR"
 
       export TMPDIR="$dataDir/.temp"
       export TEMPDIR="$TMPDIR"
