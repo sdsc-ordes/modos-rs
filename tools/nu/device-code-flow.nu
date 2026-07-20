@@ -1,37 +1,79 @@
 #!/usr/bin/env nu
 # Tests the OAuth 2.0 Device Authorization Grant (a.k.a. "device code flow")
-# against a local Keycloak instance.
+# against a local Keycloak *or* Authentik instance.
 #
-#   Keycloak : http://localhost:8081
-#   Realm    : modos
-#   Client   : modos-cli
+#   Keycloak : http://localhost:8081  realm `modos`, client `modos-cli`
+#   Authentik: http://localhost:9001  client `modos-cli` (no realm concept)
 #
 # Usage:
-#   nu flow.nu
-#   nu flow.nu --host http://localhost:8081 --realm modos --client modos-cli --scope "openid profile"
+#   nu device-code-flow.nu                        # keycloak (default)
+#   nu device-code-flow.nu --provider authentik
+#   nu device-code-flow.nu --provider authentik --scope "openid permissions"
+#   nu device-code-flow.nu --host http://localhost:8081 --realm modos --client modos-cli
+#
+# Notes:
+#   * `--realm` only applies to Keycloak.
+#   * PKCE is always used for Keycloak (the `modos-cli` client requires S256).
+#     For Authentik it is off by default; pass `--pkce` to force it.
+#   * To obtain the `bucket-permissions` claim from Authentik, request it
+#     explicitly: `--scope "openid permissions"` (Authentik scopes are opt-in).
 
 def main [
-    --host: string = "http://localhost:8081"
-    --realm: string = "modos"
+    --provider: string = "keycloak" # identity provider: keycloak | authentik
+    --host: string = "" # base URL; defaults per provider if empty
+    --realm: string = "modos" # Keycloak realm (ignored for authentik)
     --client: string = "modos-cli"
-    --scope: string = ""
+    --scope: string = "permissions"
+    --pkce # force PKCE (already implied for keycloak)
 ] {
-    let base = $"($host)/realms/($realm)/protocol/openid-connect"
-    let device_endpoint = $"($base)/auth/device"
-    let token_endpoint = $"($base)/token"
+    let host = if ($host | is-empty) {
+        match $provider {
+            keycloak => "http://localhost:8081"
+            authentik => "http://localhost:9001"
+            _ => {
+                print $"(ansi red)Unknown provider '($provider)'. Use 'keycloak' or 'authentik'.(ansi reset)"
+                exit 1
+            }
+        }
+    } else {
+        $host
+    }
 
-    print $"(ansi cyan)Keycloak     :(ansi reset) ($host)"
-    print $"(ansi cyan)Realm        :(ansi reset) ($realm)"
+    let ep = match $provider {
+        "keycloak" => ({
+            device: $"($host)/realms/($realm)/protocol/openid-connect/auth/device"
+            token: $"($host)/realms/($realm)/protocol/openid-connect/token"
+        })
+        "authentik" => ({
+            device: $"($host)/application/o/device/",
+            token: $"($host)/application/o/token/"
+        })
+        _ => {
+            print $"(ansi red)Unknown provider '($provider)'. Use 'keycloak' or 'authentik'.(ansi reset)"
+            exit 1
+        }
+    }
+    let device_endpoint = $ep.device
+    let token_endpoint = $ep.token
+
+    # Keycloak's `modos-cli` mandates PKCE; for authentik it is optional.
+    let use_pkce = ($provider == "keycloak") or $pkce
+
+    print $"(ansi cyan)Provider     :(ansi reset) ($provider)"
+    print $"(ansi cyan)Host         :(ansi reset) ($host)"
+    if $provider == "keycloak" {
+        print $"(ansi cyan)Realm        :(ansi reset) ($realm)"
+    }
     print $"(ansi cyan)Client       :(ansi reset) ($client)"
     print $"(ansi cyan)Scopes       :(ansi reset) ($scope)"
+    print $"(ansi cyan)PKCE         :(ansi reset) ($use_pkce)"
     print ""
 
     # --- Step 1: request a device code + user code --------------------------
     print $"(ansi cyan)→ POST ($device_endpoint)(ansi reset)"
 
-    # PKCE: modos-cli requires a code_challenge (S256). Generate a random
-    # verifier and derive its SHA-256, base64url-encoded challenge. The
-    # verifier itself is presented later at the token-polling step.
+    # PKCE: generate a random verifier and derive its SHA-256, base64url-encoded
+    # challenge. The verifier itself is presented later at the token-polling step.
     let verifier = $"(random uuid)(random uuid)"
     let challenge = (
         $verifier
@@ -42,12 +84,14 @@ def main [
         | str replace --all "=" ""
     )
 
-    let init_body = {
-        client_id: $client
-        scope: $scope
-        code_challenge: $challenge
-        code_challenge_method: "S256"
+    mut init_body = {client_id: $client, scope: $scope}
+    if $use_pkce {
+        $init_body = ($init_body | merge {
+            code_challenge: $challenge
+            code_challenge_method: "S256"
+        })
     }
+
     let init = (
         http post $device_endpoint --full --allow-errors --content-type "application/x-www-form-urlencoded" $init_body
     )
@@ -57,6 +101,9 @@ def main [
         print ($init.body | to json)
         print ""
         print $"(ansi yellow)Hint: ensure the client is public and the Device Authorization Grant is enabled.(ansi reset)"
+        if $provider == "authentik" {
+            print $"(ansi yellow)For authentik, the default brand must have `flow_device_code` set \(see modos-blueprint.yaml\).(ansi reset)"
+        }
         exit 1
     }
 
@@ -74,11 +121,9 @@ def main [
     print ""
 
     # --- Step 3: poll the token endpoint ------------------------------------
-    let poll_body = {
-        grant_type: "urn:ietf:params:oauth:grant-type:device_code"
-        device_code: $dev.device_code
-        client_id: $client
-        code_verifier: $verifier
+    mut poll_body = {grant_type: "urn:ietf:params:oauth:grant-type:device_code", device_code: $dev.device_code, client_id: $client}
+    if $use_pkce {
+        $poll_body = ($poll_body | merge { code_verifier: $verifier })
     }
 
     mut wait = $interval

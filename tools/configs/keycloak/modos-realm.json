@@ -866,7 +866,7 @@
             "jsonType.label": "String",
             "lightweight.claim": "true",
             "multivalued": "true",
-            "user.attribute": "permissions",
+            "user.attribute": "bucket-permissions",
             "userinfo.token.claim": "false"
           },
           "consentRequired": false,
@@ -1664,7 +1664,7 @@
       {
         "config": {
           "kc.user.profile.config": [
-            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"permissions\",\"displayName\":\"Permissions\",\"validations\":{},\"annotations\":{},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":true}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"bucket-permissions\",\"displayName\":\"Bucket Permission\",\"validations\":{},\"annotations\":{},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":true}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
           ]
         },
         "id": "a1109477-22c1-4f5d-837e-e0af3dadaf30",
@@ -1698,7 +1698,7 @@
     {
       "attributes": {},
       "clientRoles": {},
-      "description": "Permissions for bucket-c",
+      "description": "Group aud subgroups with encoded permissions.",
       "id": "f5d8760b-70f8-49c4-81ef-f757039c6808",
       "name": "bucket-c/subpath",
       "path": "/bucket-c/subpath",
@@ -1730,27 +1730,27 @@
     },
     {
       "attributes": {
-        "bucket-path": ["bucket-d/banana/b"],
+        "bucket-path": ["bucket-d/d"],
         "bucket-permission": ["read"]
       },
       "clientRoles": {},
       "description": "Permissions for Bucket D",
       "id": "29459af5-575d-47bc-a7f8-e7e1de33d9e1",
-      "name": "bucket-d",
-      "path": "/bucket-d",
+      "name": "group-bucket-d",
+      "path": "/group-bucket-d",
       "realmRoles": [],
       "subGroups": [
         {
           "attributes": {
-            "bucket-path": ["banana/a/b/c"],
+            "bucket-path": ["bucket-d/d/subpath"],
             "bucket-permission": ["write"]
           },
           "clientRoles": {},
           "description": "",
           "id": "4cfe447b-1e0f-4df4-9002-40c95584ca9c",
-          "name": "banana",
+          "name": "group-bucket-d-partial",
           "parentId": "29459af5-575d-47bc-a7f8-e7e1de33d9e1",
-          "path": "/bucket-d/banana",
+          "path": "/group-bucket-d/group-bucket-d-partial",
           "realmRoles": [],
           "subGroups": []
         }
@@ -1758,14 +1758,14 @@
     },
     {
       "attributes": {
-        "bucket-path": ["bucket-e/a/b/c"],
+        "bucket-path": ["bucket-e/e/subpath"],
         "bucket-permission": ["read"]
       },
       "clientRoles": {},
       "description": "",
       "id": "b315913d-b098-43d0-988e-fa458ed0e0aa",
-      "name": "bucket-e",
-      "path": "/bucket-e",
+      "name": "group-bucket-e",
+      "path": "/group-bucket-e",
       "realmRoles": [],
       "subGroups": []
     }
@@ -2328,6 +2328,7 @@
   "users": [
     {
       "attributes": {
+        "bucket-permissions": ["bucket-a/a/b/@read", "bucket-b/b/@write"],
         "permission": ["bucket-a/mypath/@read", "bucket-a/mypath/b/@read"],
         "permissions": ["/myuserbucket/ab/c/@read", "/myuserbucket/a/b/@write"]
       },
@@ -2356,9 +2357,9 @@
       "groups": [
         "/bucket-c/subpath/@read",
         "/bucket-c/subpath/@write",
-        "/bucket-d/banana",
-        "/bucket-d",
-        "/bucket-e"
+        "/group-bucket-d",
+        "/group-bucket-d/group-bucket-d-partial",
+        "/group-bucket-e"
       ],
       "id": "81fd14cf-fae8-4d69-9ca1-a3e3b9e03083",
       "notBefore": 0,

@@ -59,8 +59,8 @@ let
 
           echo "Placing blueprints."
           rm -v $out/blueprints
-          cp -vr ${authentik-src}/blueprints $out/blueprints
-          cd "$out"
+          cp -vr --no-preserve=mode,ownership ${authentik-src}/blueprints $out/blueprints
+          cd "$out/blueprints"
           ${lib.concatStringsSep "\n" blueprintImport}
         '';
     });
@@ -130,7 +130,7 @@ let
       f="${e.path}"
       echo "Copying blueprint '${bp}' from '$f' into './additional/${bp}'."
       mkdir -p ./additional
-      cp -L "$f" "./additional/${bp}"
+      cp -L "$f" "./additional/$filename"
     '') (lib.filterAttrs (_: v: v.import && v.path != null) cfg.blueprints);
 
   loadEnvFile =
