@@ -14,7 +14,7 @@ def main [
     --host: string = "http://localhost:8081"
     --realm: string = "modos"
     --client: string = "modos-cli"
-    --scope: string = "openid"
+    --scope: string = ""
 ] {
     let base = $"($host)/realms/($realm)/protocol/openid-connect"
     let device_endpoint = $"($base)/auth/device"
@@ -23,7 +23,7 @@ def main [
     print $"(ansi cyan)Keycloak     :(ansi reset) ($host)"
     print $"(ansi cyan)Realm        :(ansi reset) ($realm)"
     print $"(ansi cyan)Client       :(ansi reset) ($client)"
-    print $"(ansi cyan)Client       :(ansi reset) ($scope)"
+    print $"(ansi cyan)Scopes       :(ansi reset) ($scope)"
     print ""
 
     # --- Step 1: request a device code + user code --------------------------

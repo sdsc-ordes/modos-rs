@@ -815,7 +815,7 @@
         "include.in.openid.provider.metadata": "true",
         "include.in.token.scope": "true"
       },
-      "description": "The S3 bucket permissions for modos.",
+      "description": "The S3 bucket permissions for modos. Scope `bp-user`, `bp-groups`, `bp-mapper`",
       "id": "c369b4b8-5b6a-47d3-b026-dccb4d8159df",
       "name": "permissions",
       "protocol": "openid-connect",
@@ -823,55 +823,57 @@
         {
           "config": {
             "access.token.claim": "true",
-            "claim.name": "groups",
+            "claim.name": "bp-groups",
             "full.path": "true",
             "id.token.claim": "false",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
-            "userinfo.token.claim": "true"
+            "userinfo.token.claim": "false"
           },
           "consentRequired": false,
-          "id": "c04eec69-e05a-46ed-af56-5569f26e401a",
-          "name": "groups",
+          "id": "7b9d80b1-1c69-4c70-aad2-d584bd6496e6",
+          "name": "Add group memberships.",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-group-membership-mapper"
         },
         {
           "config": {
-            "access.token.claim": "true",
-            "aggregate.attrs": "true",
-            "claim.name": "permissions",
-            "id.token.claim": "false",
-            "introspection.token.claim": "true",
-            "jsonType.label": "String",
-            "lightweight.claim": "true",
-            "multivalued": "true",
-            "user.attribute": "permission",
-            "userinfo.token.claim": "false"
-          },
-          "consentRequired": false,
-          "id": "81097bb4-9e6a-4c32-928d-7f963c4df73b",
-          "name": "permissions",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-attribute-mapper"
-        },
-        {
-          "config": {
             "access.attribute": "permissions",
             "access.token.claim": "true",
-            "claim.name": "bucket-permissions",
+            "claim.name": "bp-mapper",
             "id.token.claim": "false",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
+            "path.attribute": "bucket-path",
+            "permission.attribute": "bucket-permission",
             "prefix.attribute": "prefix",
             "userinfo.token.claim": "false",
             "write.implies.read": "true"
           },
           "consentRequired": false,
-          "id": "7a6d2b6d-f22c-42f0-bf46-4702599509aa",
-          "name": "Bucket Permissions Mapper for Modos",
+          "id": "9d37b776-0853-4690-89ca-48fed8a630bc",
+          "name": "Map bucket permissions for Modos",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-bucket-permissions-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "aggregate.attrs": "false",
+            "claim.name": "bp-user",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true",
+            "jsonType.label": "String",
+            "lightweight.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "permissions",
+            "userinfo.token.claim": "false"
+          },
+          "consentRequired": false,
+          "id": "da670be6-d0f1-40a4-940a-3132f614606b",
+          "name": "Add user `permission` attribute.",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
         }
       ]
     },
@@ -1127,7 +1129,7 @@
         "display.on.consent.screen": "false",
         "gui.order": "",
         "include.in.openid.provider.metadata": "true",
-        "include.in.token.scope": "false"
+        "include.in.token.scope": "true"
       },
       "description": "OpenID Connect scope for add all basic claims to the token",
       "id": "646b9f4f-a708-4aea-acc0-14af898f7c34",
@@ -1311,7 +1313,7 @@
       "alwaysDisplayInConsole": true,
       "attributes": {
         "access.token.header.type.rfc9068": "false",
-        "access.token.signed.response.alg": "ES256",
+        "access.token.signed.response.alg": "EdDSA",
         "acr.loa.map": "{}",
         "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
@@ -1323,7 +1325,7 @@
         "dpop.bound.access.tokens": "false",
         "frontchannel.logout.session.required": "true",
         "id.token.as.detached.signature": "false",
-        "id.token.signed.response.alg": "ES256",
+        "id.token.signed.response.alg": "EdDSA",
         "logoUri": "https://raw.githubusercontent.com/sdsc-ordes/modos-api/refs/heads/main/docs/img/modos.svg",
         "logout.confirmation.enabled": "false",
         "oauth2.device.authorization.grant.enabled": "true",
@@ -1364,6 +1366,7 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
+            "included.custom.audience": "modos-api",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
             "userinfo.token.claim": "false"
@@ -1556,14 +1559,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
+            "saml-user-attribute-mapper",
             "saml-user-property-mapper",
-            "saml-role-list-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-usermodel-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper"
+            "saml-role-list-mapper"
           ]
         },
         "id": "8a7e7753-b1f7-4ee1-bc5f-5c62ac61679f",
@@ -1594,14 +1597,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-attribute-mapper",
+            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
             "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "saml-user-attribute-mapper"
+            "saml-user-attribute-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper"
           ]
         },
         "id": "74842203-5618-4574-9c8c-910612390d11",
@@ -1661,7 +1664,7 @@
       {
         "config": {
           "kc.user.profile.config": [
-            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"permission\",\"displayName\":\"\",\"validations\":{},\"annotations\":{},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":true}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"permissions\",\"displayName\":\"Permissions\",\"validations\":{},\"annotations\":{},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":true}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
           ]
         },
         "id": "a1109477-22c1-4f5d-837e-e0af3dadaf30",
@@ -1727,14 +1730,42 @@
     },
     {
       "attributes": {
-        "permissions": ["read"],
-        "prefix": ["bucket-d/banana/b"]
+        "bucket-path": ["bucket-d/banana/b"],
+        "bucket-permission": ["read"]
       },
       "clientRoles": {},
       "description": "Permissions for Bucket D",
       "id": "29459af5-575d-47bc-a7f8-e7e1de33d9e1",
       "name": "bucket-d",
       "path": "/bucket-d",
+      "realmRoles": [],
+      "subGroups": [
+        {
+          "attributes": {
+            "bucket-path": ["banana/a/b/c"],
+            "bucket-permission": ["write"]
+          },
+          "clientRoles": {},
+          "description": "",
+          "id": "4cfe447b-1e0f-4df4-9002-40c95584ca9c",
+          "name": "banana",
+          "parentId": "29459af5-575d-47bc-a7f8-e7e1de33d9e1",
+          "path": "/bucket-d/banana",
+          "realmRoles": [],
+          "subGroups": []
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "bucket-path": ["bucket-e/a/b/c"],
+        "bucket-permission": ["read"]
+      },
+      "clientRoles": {},
+      "description": "",
+      "id": "b315913d-b098-43d0-988e-fa458ed0e0aa",
+      "name": "bucket-e",
+      "path": "/bucket-e",
       "realmRoles": [],
       "subGroups": []
     }
@@ -2297,14 +2328,15 @@
   "users": [
     {
       "attributes": {
-        "permission": ["bucket-a/mypath/@read", "bucket-a/mypath/b/@read"]
+        "permission": ["bucket-a/mypath/@read", "bucket-a/mypath/b/@read"],
+        "permissions": ["/myuserbucket/ab/c/@read", "/myuserbucket/a/b/@write"]
       },
       "clientConsents": [
         {
           "clientId": "modos-cli",
-          "createdDate": 1784191229988,
+          "createdDate": 1784543312733,
           "grantedClientScopes": ["roles", "permissions", "profile"],
-          "lastUpdatedDate": 1784191229994
+          "lastUpdatedDate": 1784543312737
         }
       ],
       "createdTimestamp": 1784117721190,
@@ -2324,7 +2356,9 @@
       "groups": [
         "/bucket-c/subpath/@read",
         "/bucket-c/subpath/@write",
-        "/bucket-d"
+        "/bucket-d/banana",
+        "/bucket-d",
+        "/bucket-e"
       ],
       "id": "81fd14cf-fae8-4d69-9ca1-a3e3b9e03083",
       "notBefore": 0,
