@@ -1,7 +1,6 @@
+# yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
 # Authentik blueprint mirroring the Keycloak `modos` realm
 # (tools/configs/keycloak/modos-realm.json).
-#
-# Ref: https://version-2026-5.goauthentik.io/blueprints/schema.json
 #
 # Scope of this blueprint:
 #   * the same test user and groups,

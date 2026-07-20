@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Self Registration enrollment flow
+
+entries:
+  # ---------------------------------------------------------------
+  # Enrollment flow
+  # ---------------------------------------------------------------
+  - model: authentik_flows.flow
+    id: enrollment-flow
+    identifiers:
+      slug: self-enroll
+    attrs:
+      name: Self Registration
+      title: Sign Up
+      designation: enrollment
+      authentication: require_unauthenticated
+
+  # ---------------------------------------------------------------
+  # Prompt fields (one entry per field)
+  # ---------------------------------------------------------------
+  - model: authentik_stages_prompt.prompt
+    id: field-username
+    identifiers:
+      name: Username
+    attrs:
+      field_key: username
+      label: Username
+      type: username
+      order: 0
+
+  - model: authentik_stages_prompt.prompt
+    id: field-email
+    identifiers:
+      name: Email
+    attrs:
+      field_key: email
+      label: Email
+      type: email
+      order: 1
+
+  - model: authentik_stages_prompt.prompt
+    id: field-password
+    identifiers:
+      name: Password
+    attrs:
+      field_key: password
+      label: Password
+      type: password
+      order: 2
+
+  # ---------------------------------------------------------------
+  # Prompt stage (the signup form) — references the fields above
+  # ---------------------------------------------------------------
+  - model: authentik_stages_prompt.promptstage
+    id: signup-prompt
+    identifiers:
+      name: Signup Prompt
+    attrs:
+      fields:
+        - !KeyOf field-username
+        - !KeyOf field-email
+        - !KeyOf field-password
+
+  # ---------------------------------------------------------------
+  # User write stage — create the (inactive) user
+  # ---------------------------------------------------------------
+  - model: authentik_stages_user_write.userwritestage
+    id: create-user
+    identifiers:
+      name: Create User
+    attrs:
+      create_users_as_inactive: true
+      user_creation_mode: always_create
+
+  # ---------------------------------------------------------------
+  # Stage bindings — attach the stages to the flow, in order
+  # ---------------------------------------------------------------
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf enrollment-flow
+      stage: !KeyOf signup-prompt
+      order: 0
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf enrollment-flow
+      stage: !KeyOf create-user
+      order: 1

@@ -89,10 +89,18 @@
             server.http.port = 9001;
             worker.http.port = 9002;
 
-            blueprints.modos = {
-              path = ../../configs/authentik/modos-blueprint.yaml;
-              import = true;
+            blueprints = {
+              modos = {
+                path = ../../configs/authentik/modos-blueprint.yaml;
+                import = true;
+              };
+              enrollment = {
+                path = ../../configs/authentik/modos-enrollment-blueprint.yaml;
+                import = true;
+              };
             };
+
+            path = ../../configs/authentik/modos-enrollment-blueprint.yaml;
           };
 
           services.keycloak = {
