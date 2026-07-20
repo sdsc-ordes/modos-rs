@@ -8,9 +8,6 @@ repo = "builtin"
   id = "check-merge-conflict"
 
   [[repos.hooks]]
-  id = "detect-private-key"
-
-  [[repos.hooks]]
   id = "end-of-file-fixer"
 
   [[repos.hooks]]
