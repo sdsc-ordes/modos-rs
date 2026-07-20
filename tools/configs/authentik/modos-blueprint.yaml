@@ -113,24 +113,24 @@ entries:
   # # `stage_configuration`. `require_authenticated` gates the user through the
   # # normal browser login first; the (empty) flow then completes the device
   # # authorization. Add stage bindings here later if you want an explicit consent.
-  # - model: authentik_flow.flow
-  #   id: flow-device-code
-  #   identifiers:
-  #     slug: modos-device-code
-  #   attrs:
-  #     name: modos-device-code
-  #     title: Device code flow
-  #     designation: stage_configuration
-  #     authentication: require_authenticated
-  #
-  # # Bind the device-code flow to the default brand so `/application/o/device/`
-  # # is served. The shipped default brand has domain `authentik-default`.
-  # - model: authentik_brands.brand
-  #   identifiers:
-  #     domain: authentik-default
-  #   attrs:
-  #     flow_device_code: !KeyOf flow-device-code
-  # # ==============================================
+  - model: authentik_flows.flow
+    id: flow-device-code
+    identifiers:
+      slug: modos-device-code
+    attrs:
+      name: modos-device-code
+      title: Device code flow
+      designation: stage_configuration
+      authentication: require_authenticated
+
+  # Bind the device-code flow to the default brand so `/application/o/device/`
+  # is served. The shipped default brand has domain `authentik-default`.
+  - model: authentik_brands.brand
+    identifiers:
+      domain: authentik-default
+    attrs:
+      flow_device_code: !KeyOf flow-device-code
+  # ==============================================
 
   # Signing key
   # ==============================================
@@ -183,12 +183,12 @@ entries:
   #
   #     authorization_flow:
   #       !Find [
-  #         authentik_flow.flow,
+  #         authentik_flows.flow,
   #         [slug, default-provider-authorization-implicit-consent],
   #       ]
   #
   #     invalidation_flow:
-  #       !Find [authentik_flow.flow, [slug, default-provider-invalidation-flow]]
+  #       !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
   #
   #     property_mappings:
   #       - !Find [
