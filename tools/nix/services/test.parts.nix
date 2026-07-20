@@ -31,6 +31,8 @@
         ) procs;
     in
     {
+
+      # Note: This `test-services` package is exposed on `packages` outputs in the flake.
       process-compose."test-services" =
         # Process-compose NixOS module.
         {
@@ -89,7 +91,7 @@
           };
 
           services.keycloak = {
-            enable = false;
+            enable = true;
             dataDir = ".output/process-compose/data";
 
             settings.http-port = 8081;
@@ -114,7 +116,7 @@
         };
 
       modos.services.config = {
-        test = servicesCfg;
+        test-services = servicesCfg;
       };
     };
 }

@@ -9,7 +9,6 @@ in
   perSystem =
     {
       pkgs,
-      modos',
       ...
     }:
     let
@@ -18,8 +17,6 @@ in
       args = {
         inherit modos;
         compName = comp.name;
-        build = modos'.build;
-        etcGroupAndPasswd = modos'.packages.image.etcGroupAndPasswd;
       };
 
       plugin = pkgs.callPackage ./plugin args;

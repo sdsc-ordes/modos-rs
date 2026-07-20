@@ -233,7 +233,7 @@ in
   services.authentik.services = {
     postgres = {
       "${name}-pg-db" = {
-        enable = true;
+        enable = cfg.enable;
         port = cfg.postgres.port;
         initialScript.before = ''
           CREATE USER \"${cfg.postgres.user}\" WITH PASSWORD '${cfg.postgres.password}' CREATEDB;

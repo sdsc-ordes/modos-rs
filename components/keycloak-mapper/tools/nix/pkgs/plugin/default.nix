@@ -1,16 +1,18 @@
 {
-  modos,
-  compName,
   lib,
   maven,
+  # Our arguments.
+  modos,
+  compName,
   ...
 }:
 let
   inherit (modos.lib) component fileset;
-in
-maven.buildMavenPackage rec {
-  pname = compName;
   version = component.readVersion compName;
+  pname = compName;
+in
+maven.buildMavenPackage {
+  inherit pname version;
 
   src = fileset.toSource {
     filesets = [ compName ];
