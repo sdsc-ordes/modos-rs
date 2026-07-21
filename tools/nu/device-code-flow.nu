@@ -23,7 +23,7 @@ def main [
     --host: string = "" # base URL; defaults per provider if empty
     --realm: string = "modos" # Keycloak realm (ignored for authentik)
     --client: string = "modos-cli"
-    --scope: string = "permissions"
+    --scope: string = "openid permissions"
     --pkce # force PKCE (already implied for keycloak)
 ] {
     let host = if ($host | is-empty) {

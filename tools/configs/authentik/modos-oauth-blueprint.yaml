@@ -26,9 +26,7 @@ entries:
       authentication: require_authenticated
 
   # The device-code flow needs at least one stage that renders and then
-  # completes the flow. With no stages the flow executor returns nothing, the
-  # browser shows a blank page, and the device is never authorized (the CLI
-  # then polls `authorization_pending` until the code expires). A consent stage
+  # completes the flow.  A consent stage
   # shows the "authorize this device?" prompt and finalizes the grant.
   - model: authentik_stages_consent.consentstage
     id: modos-device-consent
