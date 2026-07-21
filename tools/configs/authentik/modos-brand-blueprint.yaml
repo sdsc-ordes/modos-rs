@@ -15,5 +15,6 @@ entries:
     identifiers:
       domain: authentik-default
     attrs:
+      default: true
       branding_title: Modos
       branding_logo: "https://raw.githubusercontent.com/sdsc-ordes/modos-api/refs/heads/main/docs/img/modos.svg"

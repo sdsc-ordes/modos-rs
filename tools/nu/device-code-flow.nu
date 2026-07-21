@@ -96,6 +96,9 @@ def main [
         http post $device_endpoint --full --allow-errors --content-type "application/x-www-form-urlencoded" $init_body
     )
 
+    print "Initiating response:"
+    print ($init | table --expand)
+
     if $init.status != 200 {
         print $"(ansi red)Device authorization request failed \(HTTP ($init.status)\):(ansi reset)"
         print ($init.body | to json)
@@ -125,6 +128,8 @@ def main [
     if $use_pkce {
         $poll_body = ($poll_body | merge { code_verifier: $verifier })
     }
+    print "Polling request:"
+    print ($poll_body | table --expand)
 
     mut wait = $interval
     let start = (date now)

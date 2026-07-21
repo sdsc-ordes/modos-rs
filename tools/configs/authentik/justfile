@@ -14,5 +14,6 @@ lint:
 
     for f in *.yaml; do
         echo "Validating file '$f'"
+        # Doesnt work due to authentik crap...
         jsonschema validate schema.json <(yq ". | to_json" "$f")
     done
