@@ -24,24 +24,6 @@ entries:
       designation: stage_configuration
       authentication: require_authenticated
 
-  # The device-code flow needs at least one stage that renders and then
-  # completes the flow.  A consent stage
-  # shows the "authorize this device?" prompt and finalizes the grant.
-  - model: authentik_stages_consent.consentstage
-    id: modos-device-consent
-    identifiers:
-      name: Modos Device Consent
-    attrs:
-      mode: always_require
-
-  - model: authentik_flows.flowstagebinding
-    id: modos-device-consent-binding
-    identifiers:
-      target: !KeyOf modos-device-code-flow
-      order: 0
-    attrs:
-      stage: !KeyOf modos-device-consent
-
   # Bind the device-code flow to the default brand so `/application/o/device/`
   # is served.
   # The shipped default brand has domain `authentik-default`.
@@ -79,9 +61,9 @@ entries:
         nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
         -----END PRIVATE KEY-----
 
-  # OAuth2 scope mapping: surface the
-  # user's `bucket-permissions` attribute as a
+  # Property Mapping
   # ==============================================
+  # surface the user's `bucket-permissions` attribute as a
   # `bp-user` claim in the issued JWT (access token + id_token + userinfo).
   #
   # The user object stores these under `attributes.bucket-permissions`, e.g.
@@ -91,18 +73,76 @@ entries:
   #       - bucket-a/a/b/@read
   #       - bucket-b/b/@write
   - model: authentik_providers_oauth2.scopemapping
-    id: modos-scope-bucket-permissions-user
+    id: modos-scopemapping-bp-user
     identifiers:
       name: "Modos Bucket-Permissions (bp-user)"
     attrs:
-      slug: modos-scope-bucket-permissions-user
+      slug: modos-scopemapping-bp-user
       scope_name: permissions
       description: "Modos bucket permissions from the user's attributes."
       expression: |
         return {
-            "bp-user": request.user.attributes.get("bucket-permissions", [])        }
+            "bp-user": request.user.attributes.get("bucket-permissions", [])
+        }
 
-  # OIDC application + provider
+  # Property Mapping
+  # ==============================================
+  # Assemble the user's bucket permissions from the groups they belong to, as a
+  # `bp-groups` claim: a list of {p: <bucket-path>, bp: read|write}, one entry
+  # per group that carries both `bucket-path` and `bucket-permission`
+  # attributes. Groups without those attributes (e.g. structural parents) are
+  # skipped.
+  - model: authentik_providers_oauth2.scopemapping
+    id: modos-scopemapping-bp-mapper
+    identifiers:
+      name: "Modos Bucket Permissions (bp-mapper)"
+    attrs:
+      slug: modos-scopemapping-bp-mapper
+      scope_name: permissions
+      description: "Bucket permissions from the user's groups and their parents."
+      expression: |
+        perms = []
+        seen_paths = set()   # child-wins: first time we see a path, keep it
+        visited = set()      # avoid re-processing / cycles in the parent graph (its possible wtf...)
+
+        # BFS upward through the group graph (a group can have multiple parents).
+        queue = list(request.user.ak_groups.all())
+        while queue:
+            g = queue.pop(0)
+            if g.pk in visited:
+                continue
+            visited.add(g.pk)
+
+            attrs = g.attributes or {}
+            for perm in attrs.get("bucket-permissions", []):
+                p = perm.get("path")
+                bp = perm.get("permission")
+
+                if p and bp and p not in seen_paths:
+                    seen_paths.add(p)
+                    perms.append({"p": p, "bp": bp})
+
+            queue.extend(g.parents.all())
+
+        return {"bp-mapper": perms}
+
+  # Property Mapping
+  # ==============================================
+  # All groups the user is a member of, as a `groups` claim.
+  - model: authentik_providers_oauth2.scopemapping
+    id: modos-scopemapping-bp-groups
+    identifiers:
+      name: "Modos Bucket Permissions (bp-groups)"
+    attrs:
+      slug: modos-scopemapping-bp-groups
+      scope_name: permissions
+      description: "Bucket permissions driven by group names only."
+      expression: |
+        return {
+            "bp-groups": [group.name for group in request.user.ak_groups.all()],
+        }
+
+  # OIDC Application + Provider
   # ==============================================
   # Public client `modos-cli`, equivalent to the Keycloak client. The device
   # grant is enabled via the brand binding above. `authorization_flow` is
@@ -151,8 +191,10 @@ entries:
             authentik_providers_oauth2.scopemapping,
             [managed, goauthentik.io/providers/oauth2/scope-email],
           ]
-        # Custom Mapper
-        - !KeyOf modos-scope-bucket-permissions-user
+        # Custom Mappers
+        - !KeyOf modos-scopemapping-bp-groups
+        - !KeyOf modos-scopemapping-bp-user
+        - !KeyOf modos-scopemapping-bp-mapper
 
   # The modos application.
   - model: authentik_core.application

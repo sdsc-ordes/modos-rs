@@ -12,8 +12,9 @@ entries:
       name: group-bucket-d
     attrs:
       attributes:
-        bucket-path: bucket-d/d
-        bucket-permission: read
+        bucket-permissions:
+          - path: bucket-d/d
+            permission: read
 
   - model: authentik_core.group
     id: group-bucket-d-partial
@@ -23,8 +24,12 @@ entries:
       parents:
         - !KeyOf group-bucket-d
       attributes:
-        bucket-path: bucket-d/d/subpath
-        bucket-permission: write
+        bucket-permissions:
+          - path: bucket-d/d/subpath
+            permission: write
+          # Test if that overwrites.
+          - path: bucket-d/d
+            permission: write
 
   - model: authentik_core.group
     id: group-bucket-e
@@ -32,8 +37,9 @@ entries:
       name: group-bucket-e
     attrs:
       attributes:
-        bucket-path: bucket-e/e/subpath
-        bucket-permission: read
+        bucket-permissions:
+          - path: bucket-e/e/subpath
+            permission: read
 
   - model: authentik_core.group
     id: bucket-c-subpath
