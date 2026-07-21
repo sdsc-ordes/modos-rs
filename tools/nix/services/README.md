@@ -66,6 +66,45 @@ just service-keycloak-export
 - Access Token Signature Algorithm: `ES256`.
 - ID Token Signature Algorighm: `ES256`.
 
+## Authentik
+
+All blueprints which are imported and steer the DB objects authentik holds are
+stored in `./tools/configs/blueprints`.
+
+### Device Code Flow
+
+This diagram answers the question: Why the device code flow lives on the brand
+object.
+
+```mermaid
+sequenceDiagram
+    actor CLI as CLI (modos-cli)
+    participant Auth as authentik /application/o/*
+    actor User as User's browser
+    participant Flow as Brand device flow
+
+    CLI->>Auth: POST /device/  client_id=modos-cli
+    Note over Auth: Resolve provider by client_id,<br/>check grant_types includes device_code
+    Auth-->>CLI: device_code, user_code,<br/>verification_uri, interval
+
+    CLI->>User: Show / open verification_uri_complete
+
+    loop every interval sec
+        CLI->>Auth: POST /token/  device_code=...
+        Auth-->>CLI: authorization_pending
+    end
+
+    User->>Flow: GET /device  (Host header resolves Brand)
+    Note over Flow: Brand.flow_device_code points to<br/>modos-device-code-flow
+    Flow->>User: login (authentication: require_authenticated)
+    User->>Flow: submit user_code
+    Flow->>Auth: attach user+session to<br/>DeviceToken by user_code
+
+    CLI->>Auth: POST /token/  device_code=... (poll)
+    Note over Auth: DeviceToken now has a user -><br/>resolve provider, mint tokens
+    Auth-->>CLI: access_token, id_token
+```
+
 # OAuth2 / OIDC Flows: Standard vs Device Code
 
 Plain-language explanation of the three login flows relevant to Keycloak, with

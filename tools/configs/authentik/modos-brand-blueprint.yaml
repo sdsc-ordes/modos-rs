@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Modos Brand Settings
+
+entries:
+  # Brands are a mechanism to select behavior on different `domains`.
+  # We do not create here a new brand, because we use the default
+  # for testing since we use `localhost:<port>` which is harder to match.
+  #
+  # NOTE: If you change to an specific new `modos` brand
+  # (served under a domain: <domain>),
+  # you must search for all `authentik-default` usage and replace it
+  - model: authentik_brands.brand
+    identifiers:
+      domain: authentik-default
+    attrs:
+      branding_title: Modos
+      branding_logo: "https://raw.githubusercontent.com/sdsc-ordes/modos-api/refs/heads/main/docs/img/modos.svg"

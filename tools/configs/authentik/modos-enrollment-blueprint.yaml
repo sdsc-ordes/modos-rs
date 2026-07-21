@@ -1,90 +1,97 @@
 # yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
 version: 1
 metadata:
-  name: Self Registration enrollment flow
+  name: Self Registration Enrollment Flow
 
 entries:
-  # ---------------------------------------------------------------
-  # Enrollment flow
+  # Enrollment Flow
   # ---------------------------------------------------------------
   - model: authentik_flows.flow
-    id: enrollment-flow
+    id: modos-enrollment-flow
     identifiers:
-      slug: self-enroll
+      pk: d91d13fe-6a57-4505-a12e-60ec61d138d3
     attrs:
-      name: Self Registration
+      slug: modos-self-enroll
+      name: Modos Self Registration
       title: Sign Up
       designation: enrollment
       authentication: require_unauthenticated
 
-  # ---------------------------------------------------------------
   # Prompt fields (one entry per field)
   # ---------------------------------------------------------------
   - model: authentik_stages_prompt.prompt
-    id: field-username
+    id: modos-enroll-field-username
     identifiers:
-      name: Username
+      pk: d263dbdc-392a-4290-8f77-17e4e165cfb0
     attrs:
+      name: Modos Enroll Field Username
       field_key: username
       label: Username
       type: username
       order: 0
 
   - model: authentik_stages_prompt.prompt
-    id: field-email
+    id: modos-enroll-field-email
     identifiers:
-      name: Email
+      pk: 4dd795d0-145a-4965-be24-98d38bf98404
     attrs:
+      name: Modos Enroll Field Email
       field_key: email
       label: Email
       type: email
       order: 1
 
   - model: authentik_stages_prompt.prompt
-    id: field-password
+    id: modos-enroll-field-password
     identifiers:
-      name: Password
+      pk: 6d182095-8473-4a31-8e65-2dd1af7c2e86
     attrs:
+      name: Modos Enroll Field Password
       field_key: password
       label: Password
       type: password
       order: 2
 
-  # ---------------------------------------------------------------
   # Prompt stage (the signup form) — references the fields above
   # ---------------------------------------------------------------
   - model: authentik_stages_prompt.promptstage
-    id: signup-prompt
+    id: modos-signup-prompt
     identifiers:
-      name: Signup Prompt
+      pk: c4032fa7-0af4-44d6-84cf-7844085319dc
     attrs:
+      name: Modos Signup Prompt
       fields:
-        - !KeyOf field-username
-        - !KeyOf field-email
-        - !KeyOf field-password
+        - !KeyOf modos-enroll-field-username
+        - !KeyOf modos-enroll-field-email
+        - !KeyOf modos-enroll-field-password
 
-  # ---------------------------------------------------------------
   # User write stage — create the (inactive) user
   # ---------------------------------------------------------------
   - model: authentik_stages_user_write.userwritestage
-    id: create-user
+    id: modos-create-user
     identifiers:
-      name: Create User
+      pk: 1ef8d57c-ca78-4ceb-9b9c-0413fa291cef
     attrs:
+      name: Modos Create User
       create_users_as_inactive: true
       user_creation_mode: always_create
 
-  # ---------------------------------------------------------------
   # Stage bindings — attach the stages to the flow, in order
   # ---------------------------------------------------------------
   - model: authentik_flows.flowstagebinding
+    id: modos-binding-signup
     identifiers:
-      target: !KeyOf enrollment-flow
-      stage: !KeyOf signup-prompt
+      pk: e1984c17-788c-4c7d-bce2-982d69f544f4
+    attrs:
+      target: !KeyOf modos-enrollment-flow
+      stage: !KeyOf modos-signup-prompt
       order: 0
 
   - model: authentik_flows.flowstagebinding
+    id: modos-binding-create-user
     identifiers:
-      target: !KeyOf enrollment-flow
-      stage: !KeyOf create-user
+      pk: f38dff44-9071-488c-ab69-b2a77bcc11a8
+    attrs:
+      target: !KeyOf modos-enrollment-flow
+      stage: !KeyOf modos-create-user
       order: 1

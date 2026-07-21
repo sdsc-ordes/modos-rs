@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Modos OAuth
+
+entries:
+  # Device Code flow
+  # ==============================================
+  # Enables the OAuth2 Device Authorization Grant (RFC 8628)
+  #
+  # It is turned on by pointing the Brand's `flow_device_code` at a flow whose
+  # designation is `stage_configuration`.
+  # The `require_authenticated` gates the user through the
+  # normal browser login first; the (empty) flow then completes the device
+  # authorization.
+  # NOTE: Add stage bindings here later if you want an explicit consent.
+  - model: authentik_flows.flow
+    id: modos-device-code-flow
+    identifiers:
+      pk: 8a3804de-fea1-452d-8c03-ce82af82a79b
+    attrs:
+      slug: modos-device-code-flow
+      name: Modos Device Code Flow
+      title: Modos Device Code Flow
+      designation: stage_configuration
+      authentication: require_authenticated
+
+  # Bind the device-code flow to the default brand so `/application/o/device/`
+  # is served.
+  # The shipped default brand has domain `authentik-default`.
+  - model: authentik_brands.brand
+    identifiers:
+      domain: authentik-default
+    attrs:
+      flow_device_code: !KeyOf modos-device-code-flow
+  # ==============================================
+
+  # Signing key
+  # ==============================================
+  # ES256 (P-256) self-signed keypair used to sign modos-cli JWTs.
+  - model: authentik_crypto.certificatekeypair
+    id: cert-modos-es256
+    identifiers:
+      pk: ad0731d3-9c1e-4650-bc5b-bf4b1dbb4037
+    attrs:
+      name: Modos ES256
+      certificate_data: |
+        -----BEGIN CERTIFICATE-----
+        MIIBfjCCASOgAwIBAgIUCikUqtXQZfOwclfEneLmb0YTfZ4wCgYIKoZIzj0EAwIw
+        FDESMBAGA1UEAwwJbW9kb3MtY2xpMB4XDTI2MDcyMDE0NDA0M1oXDTM2MDcxNzE0
+        NDA0M1owFDESMBAGA1UEAwwJbW9kb3MtY2xpMFkwEwYHKoZIzj0CAQYIKoZIzj0D
+        AQcDQgAEtqrpRyMk89oaGyd3gcc4XePoh9isY58ivk29eTowiISBU6pJ2GjMkHLL
+        vtW7XKb0fRPCpTLE7+2sFaAOfvfu86NTMFEwHQYDVR0OBBYEFIf29TLtHhiTfyqF
+        fXYz3dhyb3AzMB8GA1UdIwQYMBaAFIf29TLtHhiTfyqFfXYz3dhyb3AzMA8GA1Ud
+        EwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhAMVVq0Ij5Y185HQDziotdjbh
+        MdDnXtj4bJ/8lLhQf0xJAiEA4to9toElrcKaiuUXSCGduPVeoakds3+Z4qFl/IMZ
+        ecE=
+        -----END CERTIFICATE-----
+      key_data: |
+        -----BEGIN PRIVATE KEY-----
+        MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE2rYNDdsy50q8Z+c
+        FJRWAy7ZXtn8EOYpYhrLH3P425+hRANCAAS2qulHIyTz2hobJ3eBxzhd4+iH2Kxj
+        nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
+        -----END PRIVATE KEY-----
+
+  # OIDC application + provider
+  # ==============================================
+  # Public client `modos-cli`, equivalent to the Keycloak client. The device
+  # grant is enabled via the brand binding above. `authorization_flow` is
+  # required by the provider model; implicit consent mirrors Keycloak's
+  # `consentRequired: false`. No redirect URIs are needed for a device-only CLI.
+  - model: authentik_providers_oauth2.oauth2provider
+    id: modos-oauth-provider
+    identifiers:
+      pk: d7c67b05-91fc-40c4-9fd3-4b18ffaab4c2
+    attrs:
+      name: Modos CLI
+
+      client_type: public
+      client_id: modos-cli
+      sub_mode: user_username
+
+      grant_types:
+        - urn:ietf:params:oauth:grant-type:device_code
+        - refresh_token
+
+      # Sign tokens with the ES256 (P-256) keypair defined above.
+      # The provider only supports RS256 and ES256/384/512.
+      # EdDSA with ed25119 is not supported.
+      signing_key: !KeyOf cert-modos-es256
+
+      authorization_flow: "!Find [ authentik_flows.flow, [slug, default-provider-authorization-implicit-consent] ]"
+
+      invalidation_flow: "!Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]"
+
+      property_mappings:
+        - "!Find [ authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid] ]"
+        - "!Find [ authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile] ]"
+        - "!Find [ authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email] ]"
+  #
+  # # The modos application.
+  # - model: authentik_core.application
+  #   id: modos-cli-app
+  #   identifiers:
+  #     pk: d6de3d01-5e99-493c-8c16-5a8fc681ed43
+  #   attrs:
+  #     name: Modos CLI
+  #     slug: modos-cli-app
+  #     provider: !KeyOf modos-oauth-provider

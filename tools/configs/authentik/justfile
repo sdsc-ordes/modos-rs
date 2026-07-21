@@ -1,0 +1,18 @@
+set positional-arguments
+set shell := ["bash", "-cue"]
+set dotenv-load := true
+root_dir := `git rev-parse --show-toplevel`
+
+# Default target if you do not specify a target.
+default:
+    just --list
+
+lint:
+    #!/usr/bin/env bash
+    set -eu
+    curl https://version-2026-5.goauthentik.io/blueprints/schema.json | sed -E 's/\$defs/definitions/g' > schema.json
+
+    for f in *.yaml; do
+        echo "Validating file '$f'"
+        jsonschema validate schema.json <(yq ". | to_json" "$f")
+    done

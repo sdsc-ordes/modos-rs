@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://version-2026-5.goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Modos Groups and Users
+
+entries:
+  # Groups
+  # ==============================================
+  - model: authentik_core.group
+    id: group-bucket-d
+    identifiers:
+      pk: 5ca45d3f-4dd4-4be1-888e-d489b236daa4
+    attrs:
+      name: group-bucket-d
+      attributes:
+        bucket-path: bucket-d/d
+        bucket-permission: read
+
+  - model: authentik_core.group
+    id: group-bucket-d-partial
+    identifiers:
+      pk: e692dd5d-f8ae-4161-ba91-b91034adeadb
+    attrs:
+      name: group-bucket-d-partial
+      parents:
+        - !KeyOf group-bucket-d
+      attributes:
+        bucket-path: bucket-d/d/subpath
+        bucket-permission: write
+
+  - model: authentik_core.group
+    id: group-bucket-e
+    identifiers:
+      pk: f955757c-5be0-4738-b003-cfe272db7061
+    attrs:
+      name: group-bucket-e
+      attributes:
+        bucket-path: bucket-e/e/subpath
+        bucket-permission: read
+
+  - model: authentik_core.group
+    id: bucket-c-subpath
+    identifiers:
+      pk: cc97ca58-7e87-4f12-9e1e-4477a50a6fd4
+    attrs:
+      name: bucket-c-subpath
+
+  - model: authentik_core.group
+    id: bucket-c-subpath-read
+    identifiers:
+      pk: 7f931e8f-c9eb-4fa8-8d5d-1124cd670e63
+    attrs:
+      name: "bucket-c/subpath/@read"
+      parents:
+        - !KeyOf bucket-c-subpath
+
+  - model: authentik_core.group
+    id: bucket-c-subpath-write
+    identifiers:
+      pk: db37a62c-a35d-4fac-bd10-f73aa82e9729
+    attrs:
+      name: "bucket-c/subpath/@write"
+      parents:
+        - !KeyOf bucket-c-subpath
+  # ==============================================
+
+  # User
+  # ==============================================
+  - model: authentik_core.user
+    id: user-test
+    identifiers:
+      username: test@example.com
+    attrs:
+      username: test@example.com
+      email: test@example.com
+      name: test
+      is_active: true
+      password: test
+      attributes:
+        bucket-permissions:
+          - bucket-a/a/b/@read
+          - bucket-b/b/@write
+      groups:
+        - !KeyOf group-bucket-d
+        - !KeyOf group-bucket-d-partial
+        - !KeyOf group-bucket-e
+        - !KeyOf bucket-c-subpath-read
+        - !KeyOf bucket-c-subpath-write
+  # ==============================================

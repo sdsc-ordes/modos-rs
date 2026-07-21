@@ -174,7 +174,7 @@ let
       # Bring in Authentik's working-directory dependencies
       # (authentik/, templates/, static assets, ...).
       if [ ! -d "$staticDir" ]; then
-        ln -s "${staticWorkdirDeps}" "$staticDir"
+        ln -sf "${staticWorkdirDeps}" "$staticDir"
       fi
       ls -al "$staticDir"
 
