@@ -17,9 +17,8 @@ entries:
   - model: authentik_flows.flow
     id: modos-device-code-flow
     identifiers:
-      pk: 8a3804de-fea1-452d-8c03-ce82af82a79b
-    attrs:
       slug: modos-device-code-flow
+    attrs:
       name: Modos Device Code Flow
       title: Modos Device Code Flow
       designation: stage_configuration
@@ -31,19 +30,17 @@ entries:
   - model: authentik_stages_consent.consentstage
     id: modos-device-consent
     identifiers:
-      pk: 58f66acd-4777-4988-bf7a-208e0a7456b7
-    attrs:
       name: Modos Device Consent
+    attrs:
       mode: always_require
 
   - model: authentik_flows.flowstagebinding
     id: modos-device-consent-binding
     identifiers:
-      pk: 5915a4b0-a5bb-4a7d-ae2c-63b5b6909991
-    attrs:
       target: !KeyOf modos-device-code-flow
-      stage: !KeyOf modos-device-consent
       order: 0
+    attrs:
+      stage: !KeyOf modos-device-consent
 
   # Bind the device-code flow to the default brand so `/application/o/device/`
   # is served.
@@ -61,9 +58,8 @@ entries:
   - model: authentik_crypto.certificatekeypair
     id: cert-modos-es256
     identifiers:
-      pk: ad0731d3-9c1e-4650-bc5b-bf4b1dbb4037
-    attrs:
       name: Modos ES256
+    attrs:
       certificate_data: |
         -----BEGIN CERTIFICATE-----
         MIIBfjCCASOgAwIBAgIUCikUqtXQZfOwclfEneLmb0YTfZ4wCgYIKoZIzj0EAwIw
@@ -82,6 +78,29 @@ entries:
         FJRWAy7ZXtn8EOYpYhrLH3P425+hRANCAAS2qulHIyTz2hobJ3eBxzhd4+iH2Kxj
         nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
         -----END PRIVATE KEY-----
+
+  # OAuth2 scope mapping: surface the
+  # user's `bucket-permissions` attribute as a
+  # ==============================================
+  # `bp-user` claim in the issued JWT (access token + id_token + userinfo).
+  #
+  # The user object stores these under `attributes.bucket-permissions`, e.g.
+  # (see modos-groups-users-blueprint.yaml):
+  #   attributes:
+  #     bucket-permissions:
+  #       - bucket-a/a/b/@read
+  #       - bucket-b/b/@write
+  - model: authentik_providers_oauth2.scopemapping
+    id: modos-scope-bucket-permissions-user
+    identifiers:
+      name: "Modos Bucket-Permissions (bp-user)"
+    attrs:
+      slug: modos-scope-bucket-permissions-user
+      scope_name: permissions
+      description: "Modos bucket permissions from the user's attributes."
+      expression: |
+        return {
+            "bp-user": request.user.attributes.get("bucket-permissions", [])        }
 
   # OIDC application + provider
   # ==============================================
@@ -132,13 +151,14 @@ entries:
             authentik_providers_oauth2.scopemapping,
             [managed, goauthentik.io/providers/oauth2/scope-email],
           ]
+        # Custom Mapper
+        - !KeyOf modos-scope-bucket-permissions-user
 
   # The modos application.
   - model: authentik_core.application
     id: modos-cli-app
     identifiers:
-      pk: d6de3d01-5e99-493c-8c16-5a8fc681ed43
+      slug: modos-cli-app
     attrs:
       name: Modos CLI
-      slug: modos-cli-app
       provider: !KeyOf modos-oauth-provider

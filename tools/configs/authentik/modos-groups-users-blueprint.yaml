@@ -9,9 +9,8 @@ entries:
   - model: authentik_core.group
     id: group-bucket-d
     identifiers:
-      pk: 5ca45d3f-4dd4-4be1-888e-d489b236daa4
-    attrs:
       name: group-bucket-d
+    attrs:
       attributes:
         bucket-path: bucket-d/d
         bucket-permission: read
@@ -19,9 +18,8 @@ entries:
   - model: authentik_core.group
     id: group-bucket-d-partial
     identifiers:
-      pk: e692dd5d-f8ae-4161-ba91-b91034adeadb
-    attrs:
       name: group-bucket-d-partial
+    attrs:
       parents:
         - !KeyOf group-bucket-d
       attributes:
@@ -31,9 +29,8 @@ entries:
   - model: authentik_core.group
     id: group-bucket-e
     identifiers:
-      pk: f955757c-5be0-4738-b003-cfe272db7061
-    attrs:
       name: group-bucket-e
+    attrs:
       attributes:
         bucket-path: bucket-e/e/subpath
         bucket-permission: read
@@ -41,25 +38,21 @@ entries:
   - model: authentik_core.group
     id: bucket-c-subpath
     identifiers:
-      pk: cc97ca58-7e87-4f12-9e1e-4477a50a6fd4
-    attrs:
       name: bucket-c-subpath
 
   - model: authentik_core.group
     id: bucket-c-subpath-read
     identifiers:
-      pk: 7f931e8f-c9eb-4fa8-8d5d-1124cd670e63
-    attrs:
       name: "bucket-c/subpath/@read"
+    attrs:
       parents:
         - !KeyOf bucket-c-subpath
 
   - model: authentik_core.group
     id: bucket-c-subpath-write
     identifiers:
-      pk: db37a62c-a35d-4fac-bd10-f73aa82e9729
-    attrs:
       name: "bucket-c/subpath/@write"
+    attrs:
       parents:
         - !KeyOf bucket-c-subpath
   # ==============================================

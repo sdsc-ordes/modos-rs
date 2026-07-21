@@ -9,9 +9,8 @@ entries:
   - model: authentik_flows.flow
     id: modos-enrollment-flow
     identifiers:
-      pk: d91d13fe-6a57-4505-a12e-60ec61d138d3
-    attrs:
       slug: modos-self-enroll
+    attrs:
       name: Modos Self Registration
       title: Sign Up
       designation: enrollment
@@ -22,9 +21,8 @@ entries:
   - model: authentik_stages_prompt.prompt
     id: modos-enroll-field-username
     identifiers:
-      pk: d263dbdc-392a-4290-8f77-17e4e165cfb0
-    attrs:
       name: Modos Enroll Field Username
+    attrs:
       field_key: username
       label: Username
       type: username
@@ -33,9 +31,8 @@ entries:
   - model: authentik_stages_prompt.prompt
     id: modos-enroll-field-email
     identifiers:
-      pk: 4dd795d0-145a-4965-be24-98d38bf98404
-    attrs:
       name: Modos Enroll Field Email
+    attrs:
       field_key: email
       label: Email
       type: email
@@ -44,9 +41,8 @@ entries:
   - model: authentik_stages_prompt.prompt
     id: modos-enroll-field-password
     identifiers:
-      pk: 6d182095-8473-4a31-8e65-2dd1af7c2e86
-    attrs:
       name: Modos Enroll Field Password
+    attrs:
       field_key: password
       label: Password
       type: password
@@ -57,9 +53,8 @@ entries:
   - model: authentik_stages_prompt.promptstage
     id: modos-signup-prompt
     identifiers:
-      pk: c4032fa7-0af4-44d6-84cf-7844085319dc
-    attrs:
       name: Modos Signup Prompt
+    attrs:
       fields:
         - !KeyOf modos-enroll-field-username
         - !KeyOf modos-enroll-field-email
@@ -70,9 +65,8 @@ entries:
   - model: authentik_stages_user_write.userwritestage
     id: modos-create-user
     identifiers:
-      pk: 1ef8d57c-ca78-4ceb-9b9c-0413fa291cef
-    attrs:
       name: Modos Create User
+    attrs:
       create_users_as_inactive: true
       user_creation_mode: always_create
 
@@ -81,17 +75,15 @@ entries:
   - model: authentik_flows.flowstagebinding
     id: modos-binding-signup
     identifiers:
-      pk: e1984c17-788c-4c7d-bce2-982d69f544f4
-    attrs:
       target: !KeyOf modos-enrollment-flow
-      stage: !KeyOf modos-signup-prompt
       order: 0
+    attrs:
+      stage: !KeyOf modos-signup-prompt
 
   - model: authentik_flows.flowstagebinding
     id: modos-binding-create-user
     identifiers:
-      pk: f38dff44-9071-488c-ab69-b2a77bcc11a8
-    attrs:
       target: !KeyOf modos-enrollment-flow
-      stage: !KeyOf modos-create-user
       order: 1
+    attrs:
+      stage: !KeyOf modos-create-user
