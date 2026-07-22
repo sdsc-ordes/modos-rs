@@ -1,0 +1,4 @@
+{
+  "alice@example.com": { "secretKey": "testtest", "status": "enabled" },
+  "bob@example.com": { "secretKey": "testtest", "status": "enabled" }
+}

@@ -1,0 +1,8 @@
+{
+  "Bucket-A": {
+    "version": 1,
+    "status": "enabled",
+    "members": ["bob@example.com", "alice@example.com"],
+    "updatedAt": "2026-07-22T13:10:46.343356639Z"
+  }
+}

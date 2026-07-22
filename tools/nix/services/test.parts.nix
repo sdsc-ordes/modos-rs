@@ -142,6 +142,16 @@
             };
 
             logLevel = "debug";
+
+            buckets = [
+              "bucket-a"
+              "bucket-b"
+            ];
+            iam.import.path = "tools/configs/rustfs/iam-export";
+            iam.export = {
+              enable = true;
+              path = "tools/configs/rustfs/iam-export";
+            };
           };
         };
 
