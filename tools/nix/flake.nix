@@ -23,7 +23,6 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
 
     # Pinning some packages:
-    rustfs.url = "github:rustfs/rustfs/5d737eaeb7fcab5d40c655ba60a494e93dd98922";
     # ref: commit points to nixpkgs-unstable
     process-compose.url = "github:nixos/nixpkgs/b5aa0fbd538984f6e3d201be0005b4463d8b09f8";
 
@@ -60,6 +59,7 @@
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     services-flake.url = "github:juspay/services-flake";
     authentik-nix.url = "github:gabyx/authentik-nix/version/2026.5.4";
+    rustfs-flake.url = "github:rustfs/rustfs-flake?rev=f5222f68c19bed705c619412827c4c0d3a33dcd6";
 
     # Importing flake-parts modules recursively.
     import-tree = {

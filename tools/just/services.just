@@ -24,7 +24,7 @@ stop *args:
 
 # Attach to the running test services.
 [group('services')]
-attach *args:
+attach *args: check-started
     #!/usr/bin/env bash
     cd "{{root_dir}}"
     just -f "{{source_file()}}" pc attach
@@ -39,11 +39,30 @@ delete-data:
     rm -rf "{{output_dir}}/process-compose"
 
 [group('keycloak')]
-keycloak-export:
+keycloak-export: check-started
+    #!/usr/bin/env bash
     cd "{{root_dir}}"
-    process-compose  process stop keycloak || true
+    if process-compose process list | grep keycloak; then
+        process-compose process stop keycloak || true
+    fi
     just -f "{{source_file()}}" pc process start keycloak-realm-export-all
+
+[group('authentik')]
+authentik-export: check-started
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
+    just -f "{{source_file()}}" pc process start authentik-export
 
 [group('process-compose')]
 pc *args:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
     process-compose -u "{{pc_socket}}" "$@"
+
+[private]
+check-started:
+    #!/usr/bin/env bash
+    [ -f "{{pc_socket}}" ] || {
+        echo "Process compose is not started.";
+        exit 1
+    }

@@ -1804,16 +1804,16 @@
     },
     "nixpkgs_13": {
       "locked": {
-        "lastModified": 1770843696,
-        "narHash": "sha256-LovWTGDwXhkfCOmbgLVA10bvsi/P8eDDpRudgk68HA8=",
+        "lastModified": 1767379071,
+        "narHash": "sha256-EgE0pxsrW9jp9YFMkHL9JMXxcqi/OoumPJYwf+Okucw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2343bbb58f99267223bc2aac4fc9ea301a155a16",
+        "rev": "fb7944c166a3b630f177938e478f0378e64ce108",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -2182,7 +2182,7 @@
         "process-compose-flake": "process-compose-flake",
         "quitsh": "quitsh",
         "rust-overlay": "rust-overlay_3",
-        "rustfs": "rustfs",
+        "rustfs-flake": "rustfs-flake",
         "services-flake": "services-flake",
         "systems": "systems_5",
         "treefmt-nix": "treefmt-nix_4"
@@ -2251,44 +2251,22 @@
         "type": "github"
       }
     },
-    "rust-overlay_4": {
+    "rustfs-flake": {
       "inputs": {
-        "nixpkgs": [
-          "rustfs",
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_13"
       },
       "locked": {
-        "lastModified": 1771125043,
-        "narHash": "sha256-ldf/s49n6rOAxl7pYLJGGS1N/assoHkCOWdEdLyNZkc=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "4912f951a26dc8142b176be2c2ad834319dc06e8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rustfs": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_13",
-        "rust-overlay": "rust-overlay_4"
-      },
-      "locked": {
-        "lastModified": 1771598865,
-        "narHash": "sha256-blQSQ5OpXMDHL8Nm8SSLxtoDjf899bcuS+jDK0E8XoY=",
+        "lastModified": 1784250516,
+        "narHash": "sha256-cf2DfGyHKwwnfb6I836u6delfuwtubIcj4WPO/VPG74=",
         "owner": "rustfs",
-        "repo": "rustfs",
-        "rev": "5d737eaeb7fcab5d40c655ba60a494e93dd98922",
+        "repo": "rustfs-flake",
+        "rev": "f5222f68c19bed705c619412827c4c0d3a33dcd6",
         "type": "github"
       },
       "original": {
         "owner": "rustfs",
-        "repo": "rustfs",
-        "rev": "5d737eaeb7fcab5d40c655ba60a494e93dd98922",
+        "repo": "rustfs-flake",
+        "rev": "f5222f68c19bed705c619412827c4c0d3a33dcd6",
         "type": "github"
       }
     },

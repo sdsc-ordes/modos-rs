@@ -33,15 +33,8 @@ let
 in
 {
   options.services.authentik = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = ''
-        Whether to enable the Keycloak identity and access management
-        server.
-      '';
-    };
+    enable = mkEnableOption "keycloak";
+
     dataDir = mkOption {
       type = types.str;
       default = "./data";

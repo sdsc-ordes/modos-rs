@@ -11,14 +11,7 @@ let
 in
 {
   options.services.mailhog = {
-    enable = lib.mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = ''
-        Whether to enable the mailhog service.
-      '';
-    };
+    enable = lib.mkEnableOption "mailhog";
 
     package = lib.mkOption {
       type = types.package;

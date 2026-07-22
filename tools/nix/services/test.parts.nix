@@ -45,6 +45,7 @@
             inputs.services-flake.processComposeModules.default
             self.processComposeModules.keycloak
             self.processComposeModules.authentik
+            self.processComposeModules.rustfs
             self.processComposeModules.mailhog
           ];
 
@@ -126,6 +127,21 @@
           services.mailhog = {
             smtp.port = 1026;
             enable = true;
+          };
+
+          services.rustfs = {
+            enable = true;
+            dataDir = ".output/process-compose/data";
+
+            package = inputs'.rustfs-flake.packages.default;
+            server.port = 9010;
+
+            console = {
+              enable = true;
+              port = 9011;
+            };
+
+            logLevel = "debug";
           };
         };
 
