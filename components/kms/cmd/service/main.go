@@ -1,12 +1,16 @@
 package main
 
 import (
-	"time"
+	"context"
 
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
+	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/signal"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
+	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 )
 
 func loadConfigs(configDir string, dataDir string) (conf config.Config) {
@@ -19,6 +23,10 @@ func loadConfigs(configDir string, dataDir string) (conf config.Config) {
 	return
 }
 
+type Service struct {
+	storage st.Client
+}
+
 func main() {
 	args := parseArgs()
 	conf := loadConfigs(args.ConfigDir, args.DataDir)
@@ -26,6 +34,13 @@ func main() {
 		log.WithFileLogs(args.LogToFile),
 		log.WithForceDevLog(conf.Log.ForceDevLog))
 
+	ctx, stop := signal.WithSignal(clog.Context(context.Background()))
+	defer stop()
+
 	log.Infof("Starting KMS server.")
-	time.Sleep(100000 * time.Second) //nolint:mnd
+
+	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
+	log.PanicEf(err, "Could not create S3 storage.")
+
+	_ = Service{client}
 }

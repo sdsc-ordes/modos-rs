@@ -1,6 +1,11 @@
 server:
   hostname: localhost
-  port: 3020
+  port: 3000
+
+storage:
+  connection:
+    endpoint: http://localhost:9010
+    usePathStyle: true
 
 log:
   forceDevLog: true

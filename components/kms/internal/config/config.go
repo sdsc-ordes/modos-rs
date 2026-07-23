@@ -1,11 +1,15 @@
 package config
 
+import "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+
 type Config struct {
 	// Some log settings.
 	Log Log `yaml:"log"`
 
 	// The server information.
 	Server Server `yaml:"server"`
+
+	Storage StorageS3 `yaml:"storage"`
 }
 
 type (
@@ -15,6 +19,10 @@ type (
 
 		// The port for the portal endpoints.
 		Port int `yaml:"port" default:"3020"`
+	}
+
+	StorageS3 struct {
+		Connection types.S3Connection `yaml:"connection"`
 	}
 
 	Log struct {
