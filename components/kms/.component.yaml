@@ -13,6 +13,9 @@ targets:
 
   build:
     steps:
+      - runner: buf
+        config:
+          config: ./tools/config/buf/buf.yaml
       - runner: go
       - runner: git-diff
         config:
