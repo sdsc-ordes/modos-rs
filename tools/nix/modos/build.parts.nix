@@ -45,9 +45,6 @@
 
         inherit codecov-cli;
         inherit rust;
-
-        garage = pkgs.garage_2;
-        rustfs = inputs'.rustfs.packages.default;
       };
     in
     {
