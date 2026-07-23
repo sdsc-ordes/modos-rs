@@ -188,7 +188,6 @@ let
   setup =
     # Bash
     ''
-      set -euo pipefail
       ${runtimeEnv}
       ${loadEnvFile}
     '';
@@ -209,19 +208,8 @@ let
       ''
         ${setup}
         cd "$staticDir"
-        echo "Starting authentik migrate ..."
         echo "Starting authentik worker ..."
         exec ${rust}/bin/authentik worker
-      '';
-
-  authentik-blueprint-export =
-    pkgs.writeShellScriptBin "authentik-blueprint-export"
-      # Bash
-      ''
-        ${setup}
-        echo "Starting authentik blueprint export to '${cfg.blueprints.export.path}'..."
-        mkdir -p "$(dirname "${cfg.blueprints.export.path}")"
-        exec ${manage}/bin/manage.py export_blueprint > "${cfg.blueprints.export.path}"
       '';
 
   authentik-server =
@@ -232,6 +220,16 @@ let
         cd "$staticDir"
         echo "Starting authentik server ..."
         exec ${gopkgs}/bin/server
+      '';
+
+  authentik-blueprint-export =
+    pkgs.writeShellScriptBin "authentik-blueprint-export"
+      # Bash
+      ''
+        ${setup}
+        echo "Starting authentik blueprint export to '${cfg.blueprints.export.path}'..."
+        mkdir -p "$(dirname "${cfg.blueprints.export.path}")"
+        exec ${manage}/bin/manage.py export_blueprint > "${cfg.blueprints.export.path}"
       '';
 
   authentik-health =

@@ -33,13 +33,13 @@ let
 in
 {
   options.services.authentik = {
-    enable = mkEnableOption "keycloak";
+    enable = mkEnableOption "authentik";
 
     dataDir = mkOption {
       type = types.str;
       default = "./data";
       description = ''
-        Base directory where keycloak stores its data `<dataDir>/keycloak`.
+        Base directory where keycloak stores its data `<dataDir>/authentik`.
       '';
     };
 
