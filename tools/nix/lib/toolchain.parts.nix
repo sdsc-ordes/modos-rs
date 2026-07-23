@@ -100,6 +100,16 @@ let
         }
       ];
 
+      build-buf = [
+        {
+          quitsh.toolchains = [ "build-buf" ];
+
+          packages = [
+            pkgs.buf
+          ];
+        }
+      ];
+
       # Go development.
       dev-go = [
         {

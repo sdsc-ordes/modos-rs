@@ -1,0 +1,20 @@
+version: v2
+plugins:
+  - local: protoc-gen-doc
+    strategy: all
+    out: api/proto
+    opt:
+      - markdown,API.md
+
+  - local: protoc-gen-go
+    out: components/backend/internal/proto
+    opt:
+      - paths=source_relative
+
+  - local: protoc-gen-go-grpc
+    out: components/backend/internal/proto
+    opt:
+      - paths=source_relative
+
+inputs:
+  - directory: api/proto
