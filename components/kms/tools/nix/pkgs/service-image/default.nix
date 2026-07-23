@@ -12,6 +12,8 @@ dockerTools.buildLayeredImage {
 
   contents = [
     etcGroupAndPasswd
+    cacert
+    service
   ];
 
   fakeRootCommands = ''
@@ -31,7 +33,7 @@ dockerTools.buildLayeredImage {
       "SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt"
     ];
     Labels = {
-      "org.opencontainers.image.source" = "https://github.com/sdsc-ordes/modos-rs";
+      "org.opencontainers.image.source" = "https://gitlab.com/data-custodian/dac-portal";
       "org.opencontainers.image.description" = service.meta.description;
       "org.opencontainers.image.license" = service.meta.license.shortName;
       "org.opencontainers.image.version" = service.version;

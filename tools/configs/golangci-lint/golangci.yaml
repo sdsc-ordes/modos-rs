@@ -109,6 +109,7 @@ linters:
           list-mode: lax
           files:
             - "**/components/*/**/*"
+            - "!**/components/kms/**/*"
           deny:
             - &no-quitsh
               pkg: "github.com/sdsc-ordes/modos-rs/tools/quitsh"
@@ -119,8 +120,7 @@ linters:
             - &no-quitsh-core
               pkg: "github.com/sdsc-ordes/quitsh"
               desc: should not include quitsh core
-
-            - &no-other-component-dac-portal
+            - &no-other-components
               pkg: "github.com/sdsc-ordes/modos-rs/components"
               desc: should not include any other component - if the dependency is needed, add a rule to the 'gitlabci-lint' configuration
 
@@ -129,7 +129,19 @@ linters:
           files:
             - "**/tools/quitsh/**/*"
           deny:
-            - *no-other-component-dac-portal
+            - *no-other-components
+
+        kms:
+          list-mode: lax
+          files:
+            - "**/components/kms/**/*"
+          deny:
+            - *no-quitsh
+            - *no-quitsh-custodian
+            - *no-quitsh-core
+            - *no-other-components
+          allow:
+            - "github.com/sdsc-ordes/modos-rs/components/kms"
 
     errcheck:
       check-type-assertions: true

@@ -1,6 +1,5 @@
 {
   lib,
-  makeWrapper,
   # Own arguments.
   modos,
   build,
@@ -10,41 +9,29 @@
   ...
 }:
 let
-  inherit (modos.lib) component fileset;
-  target = "service";
-
-  # Specify some more runtime dependencies if needed.
-  # Dependencies should be added on the `service`.
-  runtimeDeps = [ ];
+  inherit (modos.lib) fileset component;
 in
-build.buildRustPackage {
-  inherit
-    compName
-    buildType
-    environmentType
-    target
-    ;
-  pname = compName;
+build.buildGoModule {
+  inherit buildType environmentType;
+  inherit compName;
 
+  pname = compName;
   version = component.readVersion compName;
 
-  src = fileset.toSource { filesets = [ compName ]; };
+  src = fileset.toSource {
+    filesets = [
+      compName
+    ];
+  };
 
-  vendorHash = "sha256-ugPJchw4qIT05+aMFaQ2a4oO757/XSUkyUJwwnf6VQA=";
+  target = "service";
+  vendorHash = "sha256-KTq/NAjeKJxoR7UTY3KxGGoSVcuUWhzJ/IedVcgOqjk=";
 
   doCheck = false;
 
-  buildInputs = [ makeWrapper ];
-
-  # Add runtime dependencies.
-  postInstall = ''
-    wrapProgram "$out/bin/${target}" \
-      --prefix PATH : ${lib.makeBinPath runtimeDeps}
-  '';
-
   meta = {
     description = compName;
-    homepage = "https://github.com/sdsc-ordes/modos-rs";
+    homepage = "https://gitlab.com/data-custodian/dac-portal";
     license = lib.licenses.apsl20;
     maintainers = [ "sdcs-ordes" ];
     mainProgram = compName;

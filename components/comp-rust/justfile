@@ -1,0 +1,70 @@
+set positional-arguments
+set fallback := true
+set shell := ["bash", "-cue"]
+root_dir := `git rev-parse --show-toplevel`
+flake_dir := root_dir / "tools/nix"
+output_dir := root_dir / ".output"
+build_dir := output_dir / "pdf-renderer/build"
+comp_dir := justfile_directory()
+
+env := "development"
+build_type := "debug"
+export CARGO_TARGET := "{{build_dir}}"
+
+# Default target if you do not specify a target.
+default:
+    just --list --unsorted
+
+# Enter the default Nix development shell and execute the command `"$@`.
+develop *args:
+    just nix::develop "kms" "$@"
+
+# Lint the project.
+[group('general')]
+lint *args:
+    just quitsh lint --component-dir "$(pwd)"
+
+# Build the project.
+[group('general')]
+build *args:
+    just quitsh build --component-dir "$(pwd)"
+
+# Test the project.
+[group('general')]
+test *args:
+    just quitsh test --component-dir "$(pwd)"
+
+# Watch commands with `just watch build|run|test`
+[group('general')]
+watch *args:
+    #!/usr/bin/env bash
+    set -eu
+    cmd=("just" "$@")
+    c=$(printf "'%s' " "${cmd[@]}")
+    cargo watch --shell "$c{[@]}" --ignore "api/*"
+
+# Run an executable.
+[group('general')]
+run *args:
+    #!/usr/bin/env bash
+    set -eu
+    just build --env-type "{{env}}" \
+        --build-type "{{build_type}}" \
+        "$@"
+    build_dir=$(quitsh list --component-dir "." --format "{{{{ (index . 0).OutBuildDir }}")
+    just run-service "$build_dir/bin/service"
+
+# Run the Nix build.
+[group('general')]
+run-nix *args:
+    # Stage everything to be current.
+    git -C "{{root_dir}}" add .
+    just nix::package kms-service-dev
+    just run-service "{{root_dir}}/.output/package/kms-service-dev/bin/service"
+
+# Run the executable `service`.
+[group('ci')]
+run-service service:
+    "{{service}}" \
+        --config-dir data/config \
+        --data-dir data

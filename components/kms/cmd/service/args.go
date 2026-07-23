@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/build"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
-	"gitlab.com/data-custodian/dac-portal/components/nats-server/internal/build"
 
 	"github.com/alexflint/go-arg"
 	"github.com/creasty/defaults"
