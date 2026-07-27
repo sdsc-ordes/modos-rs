@@ -20,7 +20,8 @@ start *args:
 stop *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    just -f "{{source_file()}}" pc down
+    just -f "{{source_file()}}" check-started &&
+        just -f "{{source_file()}}" pc down || true
 
 # Attach to the running test services.
 [group('services')]
@@ -34,9 +35,12 @@ delete-data:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
     just -f "{{source_file()}}" stop || true
-    echo "Delete output."
-    chmod -R +w "{{output_dir}}/process-compose"
-    rm -rf "{{output_dir}}/process-compose"
+
+    if [ -d "{{output_dir}}/process-compose" ]; then
+        echo "Delete output."
+        chmod -R +w "{{output_dir}}/process-compose"
+        rm -rf "{{output_dir}}/process-compose"
+    fi
 
 [group('keycloak')]
 keycloak-export: check-started

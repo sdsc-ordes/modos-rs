@@ -1,1 +1,18 @@
-{}
+{
+  "kms-access-key": {
+    "parent": "rustfsadmin",
+    "accessKey": "kms-access-key",
+    "secretKey": "ce1a85b4-642a-4d67-9860-14fa32686ac1",
+    "groups": [],
+    "claims": {
+      "parent": "rustfsadmin",
+      "sa-policy": "inherited-policy",
+      "exp": 253370764800
+    },
+    "sessionPolicy": null,
+    "status": "on",
+    "name": "kms",
+    "description": "",
+    "expiration": "9999-01-01T00:00:00Z"
+  }
+}

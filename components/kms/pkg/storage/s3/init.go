@@ -6,7 +6,6 @@ import (
 	bst "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -31,6 +30,7 @@ func NewClient(
 
 	cfg, err := awsconfig.LoadDefaultConfig(
 		ctx,
+		awsconfig.WithBaseEndpoint(conf.Endpoint.String()),
 		awsconfig.WithRegion(conf.Region),
 		awsconfig.WithCredentialsProvider(
 			credentials.NewStaticCredentialsProvider(
@@ -44,11 +44,10 @@ func NewClient(
 	}
 
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(conf.Endpoint.String())
 		o.UsePathStyle = conf.UsePathStyle
 
-		// We upload only encrypted data with `age` which provides integrity.
-		o.ResponseChecksumValidation = aws.ResponseChecksumValidationUnset
+		// // We upload only encrypted data with `age` which provides integrity.
+		// o.ResponseChecksumValidation = aws.ResponseChecksumValidationUnset
 	})
 
 	return &clientS3{client, nil}, nil

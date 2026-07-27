@@ -1,1 +1,7 @@
-{}
+{
+  "test@example.com": {
+    "version": 1,
+    "policy": "readwrite",
+    "updatedAt": "2026-07-27T09:31:42.76020894Z"
+  }
+}
