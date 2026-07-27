@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
@@ -41,6 +42,8 @@ func main() {
 
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
+
+	client.NewCredentials(ctx, "bucket-a", nil, time.Now().Add(1*time.Hour))
 
 	_ = Service{client}
 }
