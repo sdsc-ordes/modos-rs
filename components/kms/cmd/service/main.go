@@ -10,6 +10,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/signal"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 )
@@ -22,10 +23,6 @@ func loadConfigs(configDir string, dataDir string) (conf config.Config) {
 	log.Info("Config file", "config", conf)
 
 	return
-}
-
-type Service struct {
-	storage st.Client
 }
 
 func main() {
@@ -57,5 +54,5 @@ func main() {
 	}
 	clog.Info(ctx, "Credentials created.", "creds", c)
 
-	_ = Service{client}
+	_ = service.Service{Storage: client}
 }

@@ -9,16 +9,23 @@ import (
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 )
 
-type policyDoc struct {
-	Version   string            `json:"Version"`
-	Statement []policyStatement `json:"Statement"`
-}
+const s3GetObject = "s3:GetObject"
+const s3PutObject = "s3:PutObject"
+const s3ListBucket = "s3:ListBucket"
 
-type policyStatement struct {
-	Effect   string   `json:"Effect"`
-	Action   []string `json:"Action"`
-	Resource []string `json:"Resource"`
-}
+type (
+	policyDoc struct {
+		Version   string            `json:"Version"`   //nolint: tagliatelle // AWS spec.
+		Statement []policyStatement `json:"Statement"` //nolint: tagliatelle // AWS spec.
+
+	}
+
+	policyStatement struct {
+		Effect   string   `json:"Effect"`   //nolint: tagliatelle // AWS spec.
+		Action   []string `json:"Action"`   //nolint: tagliatelle // AWS spec.
+		Resource []string `json:"Resource"` //nolint: tagliatelle // AWS spec.
+	}
+)
 
 func toAction(ctx context.Context, perms []types.Permission) (actions []string) {
 	known := make(map[types.Permission]struct{})
@@ -28,13 +35,14 @@ func toAction(ctx context.Context, perms []types.Permission) (actions []string) 
 			continue
 		}
 		known[p] = struct{}{}
-		switch types.Permission(p) {
+		switch p {
 		case types.PermissionRead:
-			actions = append(actions, "s3:GetObject", "s3:ListBucket")
+			actions = append(actions, s3GetObject, s3ListBucket)
 		case types.PermissionWrite:
-			actions = append(actions, "s3:PutObject")
+			actions = append(actions, s3PutObject)
 		default:
 			clog.Error(ctx, "Cannot create action for permissions '%v'.", p)
+
 			continue
 		}
 	}
@@ -61,7 +69,8 @@ func NewScopedPolicy(
 	permissions types.BucketPermissions,
 ) (*policyDoc, error) {
 	doc := &policyDoc{
-		Version: "2012-10-17",
+		Version:   "2012-10-17",
+		Statement: nil,
 	}
 
 	for i := range permissions {
@@ -81,7 +90,6 @@ func NewScopedPolicy(
 				"arn:aws:s3:::" + resourcePath + "/*",
 			},
 		})
-
 	}
 
 	return doc, nil

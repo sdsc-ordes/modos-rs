@@ -47,25 +47,25 @@ var _ = Describe("policy", func() {
 
 		It("maps read to object-get and bucket-list", func() {
 			assert.Equal(t,
-				[]string{"s3:GetObject", "s3:ListBucket"},
+				[]string{s3GetObject, s3ListBucket},
 				toAction(ctx, []types.Permission{types.PermissionRead}))
 		})
 
 		It("maps write to object-put", func() {
 			assert.Equal(t,
-				[]string{"s3:PutObject"},
+				[]string{s3PutObject},
 				toAction(ctx, []types.Permission{types.PermissionWrite}))
 		})
 
 		It("combines read and write actions in order", func() {
 			assert.Equal(t,
-				[]string{"s3:GetObject", "s3:ListBucket", "s3:PutObject"},
+				[]string{s3GetObject, s3ListBucket, s3PutObject},
 				toAction(ctx, []types.Permission{types.PermissionRead, types.PermissionWrite}))
 		})
 
 		It("deduplicates repeated permissions", func() {
 			assert.Equal(t,
-				[]string{"s3:GetObject", "s3:ListBucket"},
+				[]string{s3GetObject, s3ListBucket},
 				toAction(ctx, []types.Permission{types.PermissionRead, types.PermissionRead}))
 		})
 
@@ -101,7 +101,7 @@ var _ = Describe("policy", func() {
 
 			st := doc.Statement[0]
 			assert.Equal(t, "Allow", st.Effect)
-			assert.Equal(t, []string{"s3:GetObject", "s3:ListBucket"}, st.Action)
+			assert.Equal(t, []string{s3GetObject, s3ListBucket}, st.Action)
 			assert.Equal(t, []string{"arn:aws:s3:::bucket-a/sub/*"}, st.Resource)
 		})
 
@@ -114,7 +114,7 @@ var _ = Describe("policy", func() {
 			require.Len(t, doc.Statement, 2)
 
 			assert.Equal(t, []string{"arn:aws:s3:::bucket-a/read/*"}, doc.Statement[0].Resource)
-			assert.Equal(t, []string{"s3:PutObject"}, doc.Statement[1].Action)
+			assert.Equal(t, []string{s3PutObject}, doc.Statement[1].Action)
 			assert.Equal(t, []string{"arn:aws:s3:::bucket-b/write/*"}, doc.Statement[1].Resource)
 		})
 

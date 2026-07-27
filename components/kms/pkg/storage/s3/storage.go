@@ -22,7 +22,7 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 	ctxT, cancel := context.WithTimeout(ctx, defaultPingTimeout)
 	defer cancel()
 
-	_, e := c.client.ListBuckets(ctxT, &s3.ListBucketsInput{})
+	_, e := c.client.ListBuckets(ctxT, &s3.ListBucketsInput{}) //nolint: exhaustruct // intended
 
 	if e != nil {
 		return errors.AddContext(e,
@@ -58,7 +58,7 @@ func (c *clientS3) NewCredentials(
 	}
 	clog.Info(ctx, "Create credentials with policy.", "role", policy)
 
-	in := sts.AssumeRoleInput{
+	in := sts.AssumeRoleInput{ //nolint: exhaustruct // intended
 		RoleArn:         aws.String("arn:aws:iam::rustfs:role/scoped"),
 		RoleSessionName: aws.String("bucket-access"),
 		DurationSeconds: aws.Int32(int32(duration.Seconds())),
@@ -78,5 +78,6 @@ func (c *clientS3) NewCredentials(
 		AccessKeyID:     secret.RedactedString(*res.Credentials.AccessKeyId),
 		SessionToken:    secret.RedactedString(*res.Credentials.SessionToken),
 		SecretAccessKey: secret.RedactedString(*res.Credentials.SecretAccessKey),
+		Expiration:      *res.Credentials.Expiration,
 	}, nil
 }
