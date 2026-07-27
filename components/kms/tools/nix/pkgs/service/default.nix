@@ -25,7 +25,7 @@ build.buildGoModule {
   };
 
   target = "service";
-  vendorHash = "sha256-KTq/NAjeKJxoR7UTY3KxGGoSVcuUWhzJ/IedVcgOqjk=";
+  vendorHash = "sha256-9KLyIbZaaU+7xulFIQPDxQiIFijBf4vGgO64QRBIbn0=";
 
   doCheck = false;
 
