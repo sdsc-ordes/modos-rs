@@ -38,7 +38,7 @@ func (c *clientS3) NewCredentials(
 	ctx context.Context,
 	permissions types.BucketPermissions,
 	duration time.Duration,
-) (creds *types.Credentials, err error) {
+) (creds types.Credentials, err error) {
 	clog.Info(ctx,
 		"Create credential for permissions.",
 		"permissions", permissions, "duration", duration)
@@ -72,9 +72,9 @@ func (c *clientS3) NewCredentials(
 			"Could not call 'AssumeRole' in getting new credentials.",
 		)
 	}
-	clog.Info(ctx, "Create credentials successful.")
+	clog.Info(ctx, "Created credentials successfully.")
 
-	return &types.Credentials{
+	return &S3Credentials{
 		AccessKeyID:     secret.RedactedString(*res.Credentials.AccessKeyId),
 		SessionToken:    secret.RedactedString(*res.Credentials.SessionToken),
 		SecretAccessKey: secret.RedactedString(*res.Credentials.SecretAccessKey),

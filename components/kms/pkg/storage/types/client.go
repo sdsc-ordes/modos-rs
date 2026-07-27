@@ -16,6 +16,6 @@ type (
 			ctx context.Context,
 			perms BucketPermissions,
 			duration time.Duration,
-		) (creds *Credentials, err error)
+		) (creds Credentials, err error)
 	}
 )
