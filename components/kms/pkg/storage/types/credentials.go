@@ -6,7 +6,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/secret"
 )
 
-// Credentials represents temp. credentials.
+// Credentials represents temp. credentials from an S3.
 type Credentials struct {
 	// The access key ID that identifies the temporary security credentials.
 	AccessKeyID secret.RedactedString
