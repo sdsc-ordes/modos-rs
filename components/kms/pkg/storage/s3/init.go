@@ -9,11 +9,13 @@ import (
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type (
 	clientS3 struct {
 		client *s3.Client
+		sts    *sts.Client
 
 		// FIXME: Do we need this. Probably we should gather all buckets on startup.
 		// or from time to time.
@@ -39,16 +41,20 @@ func NewClient(
 				""),
 		),
 	)
-	if err != nil {
-		clog.ErrorE(ctx, err, "Failed to load S3 config.")
-	}
 
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+	addOpts := func(o *s3.Options) {
 		o.UsePathStyle = conf.UsePathStyle
 
 		// // We upload only encrypted data with `age` which provides integrity.
 		// o.ResponseChecksumValidation = aws.ResponseChecksumValidationUnset
-	})
+	}
 
-	return &clientS3{client, nil}, nil
+	if err != nil {
+		clog.ErrorE(ctx, err, "Failed to load S3 config.")
+	}
+
+	client := s3.NewFromConfig(cfg, addOpts)
+	sts := sts.NewFromConfig(cfg)
+
+	return &clientS3{client, sts, nil}, nil
 }

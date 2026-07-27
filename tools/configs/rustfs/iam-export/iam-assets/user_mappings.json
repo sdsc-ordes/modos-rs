@@ -1,7 +1,7 @@
 {
-  "test@example.com": {
+  "kms-broker": {
     "version": 1,
-    "policy": "readwrite",
-    "updatedAt": "2026-07-27T09:31:42.76020894Z"
+    "policy": "kms-broker-normal",
+    "updatedAt": "2026-07-27T12:46:13.173007197Z"
   }
 }

@@ -1,1 +1,1 @@
-{ "test@example.com": { "secretKey": "testtest", "status": "enabled" } }
+{ "kms-broker": { "secretKey": "brokerbroker", "status": "enabled" } }
