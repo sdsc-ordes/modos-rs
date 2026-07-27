@@ -30,22 +30,22 @@ jobs:
           - name: lint-kms
             command: just ci::run quitsh lint -c "kms"
             allow_failure: false
-          - name: lint-gateway
-            command: just ci::run quitsh lint -c "gateway"
+          - name: lint-comp-rust
+            command: just ci::run quitsh lint -c "comp-rust"
             allow_failure: false
 
           - name: build-kms
             command: just ci::run quitsh build -c "kms"
             allow_failure: false
-          - name: build-gateway
-            command: just ci::run quitsh build -c "gateway"
+          - name: build-comp-rust
+            command: just ci::run quitsh build -c "comp-rust"
             allow_failure: false
 
           - name: test-kms
             command: just ci::run quitsh test -c "kms"
             allow_failure: false
-          - name: test-gateway
-            command: just ci::run quitsh test -c "gateway"
+          - name: test-comp-rust
+            command: just ci::run quitsh test -c "comp-rust"
             allow_failure: false
           - name: test-quitsh
             command: just ci::run quitsh test -c "quitsh"
@@ -54,8 +54,8 @@ jobs:
           - name: image-kms
             command: just ci::run quitsh image -c "kms"
             allow_failure: false
-          - name: image-gateway
-            command: just ci::run quitsh image -c "gateway"
+          - name: image-comp-rust
+            command: just ci::run quitsh image -c "comp-rust"
             allow_failure: false
 
     steps:
