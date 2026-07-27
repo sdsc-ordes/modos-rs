@@ -1,1 +1,6 @@
-{ "kms-broker": { "secretKey": "brokerbroker", "status": "enabled" } }
+{
+  "kms-broker": {
+    "secretKey": "S9XGmaVxSTmhAu8LcU6jB9rS9hskBcMq2haF4Mo2",
+    "status": "enabled"
+  }
+}

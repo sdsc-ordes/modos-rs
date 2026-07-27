@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -35,19 +36,33 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 // Credentials implements [types.Client].
 func (c *clientS3) NewCredentials(
 	ctx context.Context,
-	bucket string,
-	permissions []types.Permission,
+	permissions types.BucketPermissions,
 	duration time.Duration,
 ) (creds *types.Credentials, err error) {
+	clog.Info(ctx,
+		"Create credential for permissions.",
+		"permissions", permissions, "duration", duration)
+
 	// For RustFS: https://docs.rustfs.com/administration/iam/sts#sts-temporary-credentials
-	// NOTE: - Service Accounts (an 'access-key' bound to a user) cannot call `AssumeRole`
+	// NOTE:
+	// - Service Accounts (an 'access-key' bound to a user) cannot call `AssumeRole`
 	// therefore we use a dedicated user account.
+	policy, err := NewScopedPolicy(ctx, permissions)
+	if err != nil {
+		return nil, errors.AddContext(err, "Could not create scoped policy document.")
+	}
+
+	policyJSON, err := json.MarshalIndent(policy, "", "  ")
+	if err != nil {
+		return nil, errors.AddContext(err, "Could marshal scoped policy document.")
+	}
+	clog.Info(ctx, "Create credentials with policy.", "role", policy)
 
 	in := sts.AssumeRoleInput{
 		RoleArn:         aws.String("arn:aws:iam::rustfs:role/scoped"),
 		RoleSessionName: aws.String("bucket-access"),
 		DurationSeconds: aws.Int32(int32(duration.Seconds())),
-		// Policy: json.Marshal(),
+		Policy:          aws.String(string(policyJSON)),
 	}
 
 	res, err := c.sts.AssumeRole(ctx, &in)
@@ -57,6 +72,7 @@ func (c *clientS3) NewCredentials(
 			"Could not call 'AssumeRole' in getting new credentials.",
 		)
 	}
+	clog.Info(ctx, "Create credentials successful.")
 
 	return &types.Credentials{
 		AccessKeyID:     secret.RedactedString(*res.Credentials.AccessKeyId),

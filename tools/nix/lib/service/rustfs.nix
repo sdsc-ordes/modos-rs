@@ -249,7 +249,7 @@ in
 
               echo "Provision: IAM import done."
             else
-              echo "Provision: IAM import: path '${cfg.iam.import.path}' does not exist."
+              echo "Provision: IAM import: path '$src' does not exist."
             fi
           '')
           + (lib.optionalString (cfg.provisionScript != null) "${lib.getExe cfg.provisionScript}")

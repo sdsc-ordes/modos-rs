@@ -43,10 +43,19 @@ func main() {
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
-	_, err = client.NewCredentials(ctx, "bucket-a", []st.Permission{"read"}, 1*time.Hour)
+	// FIXME: remove.
+	c, err := client.NewCredentials(
+		ctx,
+		[]st.BucketPermission{
+			{Path: "bucket-a", Permissions: []st.Permission{st.PermissionRead}},
+			{Path: "bucket-b", Permissions: []st.Permission{st.PermissionWrite}},
+		},
+		1*time.Hour,
+	)
 	if err != nil {
 		log.ErrorE(err, "Credentials could not be created.")
 	}
+	clog.Info(ctx, "Credentials created.", "creds", c)
 
 	_ = Service{client}
 }
