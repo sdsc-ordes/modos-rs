@@ -35,7 +35,7 @@ func main() {
 	ctx, stop := signal.WithSignal(clog.Context(context.Background()))
 	defer stop()
 
-	log.Infof("Starting KMS server.")
+	clog.Infof(ctx, "Starting KMS server.")
 
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
