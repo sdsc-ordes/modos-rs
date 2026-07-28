@@ -89,8 +89,10 @@ entries:
   # ==============================================
   # Assemble the user's bucket permissions from the groups they belong to, as a
   # `bp-groups` claim: a list of {p: <bucket-path>, bp: read|write}, one entry
-  # per group that carries both `bucket-path` and `bucket-permission`
-  # attributes. Groups without those attributes (e.g. structural parents) are
+  # per path `p`.
+  # We collect all `bucket-permission` attributes of all groups the user belongs to.
+  # Then for a path `p` the most loose restriction for the path `p` wins (`w`: write-access).
+  # Groups without those attributes (e.g. structural parents) are
   # skipped.
   - model: authentik_providers_oauth2.scopemapping
     id: modos-scopemapping-bp-mapper
@@ -101,12 +103,21 @@ entries:
       scope_name: permissions
       description: "Bucket permissions from the user's groups and their parents."
       expression: |
-        perms = []
-        seen_paths = set()   # child-wins: first time we see a path, keep it
-        visited = set()      # avoid re-processing / cycles in the parent graph (its possible wtf...)
+        perms = {}      # Path -> Permissions {p: ..., bp: ... }
+        visited = set() # avoid re-processing / cycles in the parent graph (its possible wtf...)
 
         # BFS upward through the group graph (a group can have multiple parents).
         queue = list(request.user.ak_groups.all())
+
+        def rank(perm):
+          match perm:
+            case "w":
+              return 2
+            case "r":
+              return 1
+            case _:
+              return 0
+
         while queue:
             g = queue.pop(0)
             if g.pk in visited:
@@ -115,17 +126,17 @@ entries:
 
             attrs = g.attributes or {}
             for perm in attrs.get("bucket-permissions", []):
-                p = perm.get("path")
-                bp = perm.get("permission")
+                p = perm.get("path", "").strip().lower()
+                bp = perm.get("permission", "").strip().lower()
 
-                if p and bp and p not in seen_paths:
-                    seen_paths.add(p)
-                    perms.append({"p": p, "bp": bp})
+                if p and bp:
+                  existing = perms.get(p)
+                  if not existing or (rank(bp) > rank(existing["bp"])):
+                      perms[p] = {"p": p, "bp": bp}
 
             queue.extend(g.parents.all())
 
-        return {"bp-mapper": perms}
-
+        return {"bp-mapper": [v for v in perms.values()]}
   # Property Mapping
   # ==============================================
   # All groups the user is a member of, as a `groups` claim.

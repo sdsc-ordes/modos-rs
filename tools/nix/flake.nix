@@ -58,7 +58,7 @@
     # Process-compose setup for services.
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     services-flake.url = "github:juspay/services-flake";
-    authentik-nix.url = "github:gabyx/authentik-nix/version/2026.5.4";
+    authentik-nix.url = "github:nix-community/authentik-nix?rev=233774596cb9e25d211a1d1cffdcde2c1bac87d9";
     rustfs-flake.url = "github:rustfs/rustfs-flake?rev=f5222f68c19bed705c619412827c4c0d3a33dcd6";
 
     # Importing flake-parts modules recursively.

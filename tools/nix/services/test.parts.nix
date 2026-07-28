@@ -87,6 +87,9 @@
             components = inputs'.authentik-nix.legacyPackages.authentikComponents;
             secretKey = "test";
 
+            initialAdminEmail = "admin@example.com";
+            initialAdminPassword = "admin";
+
             server.http.port = 9001;
             worker.http.port = 9002;
 
@@ -110,6 +113,9 @@
             dataDir = ".output/process-compose/data";
 
             settings.http-port = 8081;
+
+            # User is `admin`.
+            initialAdminPassword = "admin";
 
             plugins = [
               modos'.packages.component.keycloak-mapper.plugin
@@ -136,10 +142,14 @@
             package = inputs'.rustfs-flake.packages.default;
             server.port = 9010;
 
+            # Web Interface
             console = {
               enable = true;
               port = 9011;
             };
+
+            accessKey = "rustfsadmin";
+            secretKey = "rustfsadmin";
 
             logLevel = "debug";
 
@@ -147,6 +157,7 @@
               "bucket-a"
               "bucket-b"
             ];
+
             iam.import.path = "tools/configs/rustfs/iam-export";
             iam.export = {
               enable = true;

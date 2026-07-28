@@ -13,17 +13,17 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1784388325,
-        "narHash": "sha256-m67n2NDfM/deSiL0nNUFFT2fuINNakISlueIpf7qx50=",
-        "owner": "gabyx",
+        "lastModified": 1784970220,
+        "narHash": "sha256-Qqb3X70DBG+YfTFrKvjxXwy3kiG9RMK9Cpm/mFuxI8g=",
+        "owner": "nix-community",
         "repo": "authentik-nix",
-        "rev": "93da44d58fc1ab4ec01421188bc7b64bf909fe7c",
+        "rev": "233774596cb9e25d211a1d1cffdcde2c1bac87d9",
         "type": "github"
       },
       "original": {
-        "owner": "gabyx",
-        "ref": "version/2026.5.4",
+        "owner": "nix-community",
         "repo": "authentik-nix",
+        "rev": "233774596cb9e25d211a1d1cffdcde2c1bac87d9",
         "type": "github"
       }
     },

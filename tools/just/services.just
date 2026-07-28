@@ -57,6 +57,11 @@ authentik-export: check-started
     cd "{{root_dir}}"
     just -f "{{source_file()}}" pc process start authentik-export
 
+[group('oauth')]
+device-code-flow *args:
+    nu "{{root_dir}}/tools/nu/device-code-flow.nu" "$@"
+
+
 [group('process-compose')]
 pc *args:
     #!/usr/bin/env bash
