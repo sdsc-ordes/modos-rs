@@ -23,8 +23,7 @@ stop *args:
     just -f "{{source_file()}}" check-started &&
         just -f "{{source_file()}}" pc down || true
 
-# Push the test services to cachix.
-# Run `cachix authtoken` first.
+# Push the test services to cachix. Run `cachix authtoken` first.
 [group('cachix')]
 cache:
     #!/usr/bin/env bash

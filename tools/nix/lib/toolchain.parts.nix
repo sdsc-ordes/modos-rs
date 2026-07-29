@@ -250,6 +250,10 @@ let
                 # Changelog
                 pkgs.git-cliff
               ];
+
+              enterShell = ''
+                just --list --list-submodules
+              '';
             }
           )
         ];
