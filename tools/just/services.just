@@ -23,6 +23,15 @@ stop *args:
     just -f "{{source_file()}}" check-started &&
         just -f "{{source_file()}}" pc down || true
 
+# Push the test services to cachix.
+# Run `cachix authtoken` first.
+[group('cachix')]
+cache:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
+    nix build --show-trace -L --print-out-paths "./tools/nix#test-services" |
+        cachix push "$CACHIX_CACHE_NAME"
+
 # Attach to the running test services.
 [group('services')]
 attach *args: check-started
