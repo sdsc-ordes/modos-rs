@@ -2154,11 +2154,11 @@
       },
       "locked": {
         "dir": "tools/nix",
-        "lastModified": 1783427478,
-        "narHash": "sha256-0QUHlYBjRXmMrN6nnfT1SV5pKgzpXd91wPWhNpxJQLM=",
+        "lastModified": 1785331224,
+        "narHash": "sha256-o7tyZuW/F+22jQVzDmJWDDZNj6pm7oC/sgxurORhzKU=",
         "owner": "sdsc-ordes",
         "repo": "quitsh",
-        "rev": "b45b2da5053ecc65e92c006d805b247fb1ba392f",
+        "rev": "968f363543a38f2d810687c09f2da24ed3388768",
         "type": "github"
       },
       "original": {

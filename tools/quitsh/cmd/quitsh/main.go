@@ -4,11 +4,11 @@ import (
 	"modos-rs/tools/quitsh/cmd/quitsh/cmd"
 	"modos-rs/tools/quitsh/pkg/build"
 	modosConfig "modos-rs/tools/quitsh/pkg/config"
+	"modos-rs/tools/quitsh/pkg/nix"
 	modosRunner "modos-rs/tools/quitsh/pkg/runner"
 	"os"
 
 	cnConfig "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/config"
-	"gitlab.com/data-custodian/custodian/tools/quitsh/pkg/exec/nix"
 	cnRunner "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/runner"
 	"gitlab.com/data-custodian/custodian/tools/quitsh/pkg/stage"
 

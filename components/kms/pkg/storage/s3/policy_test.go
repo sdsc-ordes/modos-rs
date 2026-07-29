@@ -1,3 +1,5 @@
+//go:build test && unittest
+
 package s3
 
 import (

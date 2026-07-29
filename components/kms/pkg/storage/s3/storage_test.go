@@ -1,3 +1,5 @@
+//go:build test && unittest
+
 package s3
 
 import (
@@ -7,5 +9,5 @@ import (
 )
 
 func TestS3(t *testing.T) {
-	RunSpecs(t, "Storage S3 Suite")
+	RunSpecs(t, "storage s3")
 }

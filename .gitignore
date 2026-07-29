@@ -31,3 +31,6 @@ logs
 .claude
 CLAUDE.md
 AGENTS.md
+
+# Socket files
+.sock

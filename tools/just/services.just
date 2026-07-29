@@ -3,7 +3,7 @@ set shell := ["bash", "-cue"]
 set dotenv-load := true
 root_dir := `git rev-parse --show-toplevel`
 output_dir := root_dir / ".output"
-pc_socket := output_dir / "process-compose" / "pc.sock"
+pc_socket := output_dir / "run" / "process-compose" / "pc-test-services.sock"
 
 default:
     just --list --unsorted -f "{{source_file()}}"
@@ -13,7 +13,9 @@ default:
 start *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    nix run -L --show-trace "./tools/nix#test-services" -- "$@"
+    just quitsh process-compose start \
+        --flake-dir "./tools/nix" "test-services" \
+        --socket-path-file "{{pc_socket}}" -a "$@"
 
 # Stop the test services.
 [group('services')]
@@ -54,8 +56,8 @@ delete-data:
 keycloak-export: check-started
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    if process-compose process list | grep keycloak; then
-        process-compose process stop keycloak || true
+    if just -f "{{source_file()}}" pc process list | grep keycloak; then
+        just -f "{{source_file()}}" pc process stop keycloak || true
     fi
     just -f "{{source_file()}}" pc process start keycloak-realm-export-all
 
@@ -74,7 +76,7 @@ device-code-flow *args:
 pc *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    process-compose -u "{{pc_socket}}" "$@"
+    process-compose -u "$(cat {{pc_socket}})" "$@"
 
 [private]
 check-started:

@@ -26,7 +26,7 @@
           k: v:
           v
           // {
-            dataDir = ".output/process-compose/data/${k}";
+            dataDir = ".output/run/process-compose/data/${k}";
           }
         ) procs;
     in
@@ -50,9 +50,8 @@
           ];
 
           cli.options = {
-            keep-project = true;
-            unix-socket = "./.output/process-compose/pc.sock";
-            log-file = ".output/process-compose/log.txt";
+            unix-socket = "./.output/run/process-compose/pc-test-services.sock";
+            log-file = ".output/run/process-compose/log.txt";
             no-server = false;
           };
 
@@ -71,7 +70,7 @@
             {
               availability.restart = lib.mkDefault "no";
               availability.max_restarts = lib.mkDefault 0;
-              log_location = ".output/process-compose/log/${name}.log";
+              log_location = ".output/run/process-compose/log/${name}.log";
               log_configuration = {
                 disable_json = true;
                 no_color = true;
@@ -82,7 +81,7 @@
 
           services.authentik = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             components = inputs'.authentik-nix.legacyPackages.authentikComponents;
             secretKey = "test";
@@ -110,7 +109,7 @@
 
           services.keycloak = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             settings.http-port = 8081;
 
@@ -137,7 +136,7 @@
 
           services.rustfs = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             package = inputs'.rustfs-flake.packages.default;
             server.port = 9010;

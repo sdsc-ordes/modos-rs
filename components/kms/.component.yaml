@@ -9,7 +9,15 @@ targets:
         config:
           buildTags: ["unittest"]
       - runner: coverage-upload
-    inputs: ["self"]
+
+  test-integration:
+    steps:
+      - runner: go
+        config:
+          submodules:
+            - test
+          buildTags: ["integration"]
+      - runner: coverage-upload
 
   build:
     steps:
@@ -18,8 +26,6 @@ targets:
         config:
           paths:
             - internal
-
-    inputs: ["self"]
 
   lint:
     steps:
@@ -34,12 +40,9 @@ targets:
               - includePatterns: ["**/test/**/*_test.go"]
                 constraints: ["test && integration"]
 
-    inputs: ["self"]
-
   image:
     steps:
       - runner: nix
-    inputs: ["self"]
 
   test-nix:
     inputs: &ins-nix ["self"]

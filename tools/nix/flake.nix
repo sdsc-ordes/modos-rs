@@ -2,17 +2,15 @@
   description = "modos-rs";
 
   nixConfig = {
-    extra-trusted-substituters = [
+    extra-substituters = [
+      "https://modos-rs.cachix.org"
       "https://nix-community.cachix.org"
       "https://devenv.cachix.org"
-      "ssh://nix-ssh@nix-cache.swissmodos.ch"
-      "https://modos-rs.cachix.org"
     ];
     extra-trusted-public-keys = [
       "modos-rs.cachix.org-1:qznktesR1I4KmWol3CwKfi0vM0BaH1+rSVzLYwfenG0="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-      "nix-cache.swissmodos.ch.1:rPQnp1nJav3UluO5MeomJTEPeqffeIu7Y41xpecBqMA="
     ];
 
     allow-import-from-derivation = "true";
