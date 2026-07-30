@@ -41,6 +41,9 @@ jobs:
             command: just ci::run quitsh build -c "comp-rust"
             allow_failure: false
 
+          - name: test-kms-debug
+            command: just ci::run just services::cache
+            allow_failure: false
           - name: test-kms
             command: just ci::run quitsh test -c "kms"
             allow_failure: false
