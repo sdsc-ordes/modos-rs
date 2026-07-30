@@ -22,8 +22,8 @@
 .typos.toml
 .golangci.yaml
 .prek.toml
-go.work
-go.work.sum
+/go.work
+/go.work.sum
 
 logs
 
