@@ -1,6 +1,6 @@
 module modos-rs/tools/quitsh
 
-go 1.25.0
+go 1.26
 
 // Uncomment that to enable the local quitsh checkout.
 // replace github.com/sdsc-ordes/quitsh => ../../../quitsh

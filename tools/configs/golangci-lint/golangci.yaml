@@ -188,7 +188,7 @@ linters:
       go-debug-forbidden: true
       # Defines a pattern to validate `go` minimum version directive.
       # Default: '' (no match)
-      go-version-pattern: '1\.25(\.\d+)?'
+      go-version-pattern: '1\.26(\.\d+)?'
     govet:
       disable:
         - fieldalignment
