@@ -160,13 +160,13 @@ let
                "$dataDir/prometheus"
 
       # Set temp. dir.
-      if [ ! -L "$dataDir/temp" ]; then
-        tmpDir=$(mktemp -d)
-        mkdir -p "$tmpDir"
-        ln -s "$tmpDir" "$dataDir/temp"
+      if [ -L "$dataDir/temp" ]; then
+        tmpDir=$(readlink "$dataDir/temp")
       else
-        tmpDir=$(realpath "$dataDir/temp")
+        tmpDir=$(mktemp -d)
+        ln -fs "$tmpDir" "$dataDir/temp"
       fi
+      mkdir -p "$tmpDir"
 
       export TMPDIR="$tmpDir"
       export TEMPDIR="$TMPDIR"

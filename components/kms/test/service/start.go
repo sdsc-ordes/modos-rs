@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"os"
 	"path"
 	"time"
 
@@ -34,8 +35,8 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 		"pc-"+pcConfig+".sock")
 
 	mustBeStarted := false
-	if fs.Exists(socketPathFile) {
-		log.Infof("Skip starting the test services, socket '%v' exists.", socketPathFile)
+	if path, e := os.ReadFile(socketPathFile); e != nil && fs.Exists(string(path)) {
+		log.Warnf("Skip starting the test services, socket '%v' exists.", path)
 		mustBeStarted = true
 	} else {
 		log.Info("Starting test services.")
