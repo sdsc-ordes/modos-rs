@@ -163,7 +163,7 @@ let
       if [ ! -L "$dataDir/temp" ]; then
         tmpDir=$(mktemp -d)
         mkdir -p "$tmpDir"
-        chmod 755 "$tmpDir"
+        chmod -R 755 "$tmpDir"
         ln -s "$tmpDir" "$dataDir/temp"
       fi
       export TMPDIR="$tmpDir"

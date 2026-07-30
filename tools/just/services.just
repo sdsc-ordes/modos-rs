@@ -2,8 +2,8 @@ set positional-arguments
 set shell := ["bash", "-cue"]
 set dotenv-load := true
 root_dir := `git rev-parse --show-toplevel`
-output_dir := root_dir / ".output"
-pc_socket := output_dir / "run" / "process-compose" / "pc-test-services.sock"
+output_dir := root_dir / ".output" / "run" / "process-compose"
+pc_socket := output_dir / "pc-test-services.sock"
 
 default:
     just --list --unsorted -f "{{source_file()}}"
@@ -46,10 +46,10 @@ delete-data:
     cd "{{root_dir}}"
     just -f "{{source_file()}}" stop || true
 
-    if [ -d "{{output_dir}}/process-compose" ]; then
+    if [ -d "{{output_dir}}" ]; then
         echo "Delete output."
-        chmod -R +w "{{output_dir}}/process-compose"
-        rm -rf "{{output_dir}}/process-compose"
+        chmod -R +w "{{output_dir}}"
+        rm -rf "{{output_dir}}"
     fi
 
 [group('keycloak')]
