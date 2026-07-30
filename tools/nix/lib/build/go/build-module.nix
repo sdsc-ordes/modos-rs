@@ -50,6 +50,7 @@ let
     "vendorHash"
     "compName"
   ];
+  GOWORK = "off";
 
   # General GO build variables.
   GO111MODULE = "on";
@@ -85,7 +86,7 @@ let
 
         env = {
           inherit (go) GOOS GOARCH;
-          inherit GO111MODULE GOTOOLCHAIN;
+          inherit GOWORK GO111MODULE GOTOOLCHAIN;
         };
 
         nativeBuildInputs = nativeBuildInputs ++ [
@@ -169,7 +170,12 @@ let
 
       env = {
         inherit (go) GOOS GOARCH;
-        inherit GO111MODULE GOTOOLCHAIN QUITSH_TOOLCHAINS;
+        inherit
+          GOWORK
+          GO111MODULE
+          GOTOOLCHAIN
+          QUITSH_TOOLCHAINS
+          ;
       };
 
       inherit goModules;
