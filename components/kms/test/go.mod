@@ -5,7 +5,7 @@ go 1.26
 // If you need a quick way to develop with custodian, uncomment the below line.
 // replace gitlab.com/data-custodian/custodian/components/lib-common => ../../../custodian/components/lib-common
 
-replace github.com/sdsc-ordes/quitsh => ../../../../quitsh
+// replace github.com/sdsc-ordes/quitsh => ../../../../quitsh
 
 replace github.com/sdsc-ordes/modos-rs/tools/quitsh => ../../../tools/quitsh
 
