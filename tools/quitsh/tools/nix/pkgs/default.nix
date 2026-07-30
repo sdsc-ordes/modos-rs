@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo125Module,
+  buildGo126Module,
   installShellFiles,
   testers,
   git,
@@ -19,7 +19,7 @@ in
 #       This is probably due to caching of the source directory.
 #       Before debugging: Change the .component.yaml version and increment its patch number
 #       to trigger another source hash.
-buildGo125Module {
+buildGo126Module {
   inherit version;
   pname = compName;
 
