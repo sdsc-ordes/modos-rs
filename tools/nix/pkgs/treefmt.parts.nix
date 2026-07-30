@@ -67,12 +67,6 @@
         programs.deadnix.enable = false;
         programs.statix.enable = false;
         programs.nixfmt.enable = true;
-
-        # Lua.
-        programs.stylua.enable = true;
-
-        # Typos. TODO: Make this work only for markdown, its destructive in other formats.
-        # programs.typos.enable = true;
       };
     };
 }

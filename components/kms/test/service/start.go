@@ -4,7 +4,6 @@ package service
 
 import (
 	"context"
-	"os"
 	"path"
 	"time"
 
@@ -28,26 +27,28 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 	_, rootDir, err := git.NewCtxAtRoot(".")
 	log.PanicE(err, "Could not get root directory.")
 
+	pcConfig := "test-services"
+
+	socketPathFile := path.Join(rootDir,
+		fs.OutputDir, fs.OutRunDir, "process-compose",
+		"pc-"+pcConfig+".sock")
+
 	mustBeStarted := false
-	if os.Getenv("MODOS_TEST_SERVICES") == "skip" {
-		log.Info("Skip starting the test services.")
+	if fs.Exists(socketPathFile) {
+		log.Infof("Skip starting the test services, socket '%v' exists.", socketPathFile)
 		mustBeStarted = true
 	} else {
 		log.Info("Starting test services.")
 	}
 
-	config := "test-services"
-
 	pcCtx, err = pc.Start(
 		log.GetLogger(),
 		rootDir,
 		nix.DefaultFlakeDirRel,
-		config,
+		pcConfig,
 		pc.ProcessComposeOverServicesFlake,
 		pc.WithMustBeStarted(mustBeStarted),
-		pc.WithSocketPathFile(path.Join(rootDir,
-			fs.OutputDir, fs.OutRunDir, "process-compose",
-			"pc-"+config+".sock")),
+		pc.WithSocketPathFile(socketPathFile),
 	)
 
 	log.PanicE(err, "Could not start process-compose.")
