@@ -37,13 +37,11 @@ jobs:
           - name: build-kms
             command: just ci::run quitsh build -c "kms"
             allow_failure: false
+
           - name: build-comp-rust
             command: just ci::run quitsh build -c "comp-rust"
             allow_failure: false
 
-          - name: test-kms-debug
-            command: just ci::run just services::cache
-            allow_failure: false
           - name: test-kms
             command: just ci::run quitsh test -c "kms"
             allow_failure: false
@@ -71,3 +69,13 @@ jobs:
       - name: ${{ matrix.name }}
         continue-on-error: ${{ matrix.allow_failure }}
         run: ${{ matrix.command }}
+
+      - name: ${{ matrix.name }}-artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.name }}
+          path: |
+            .output/run/process-compose
+          if-no-files-found: ignore
+          retention-days: 3
