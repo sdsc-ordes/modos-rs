@@ -51,6 +51,8 @@ targets:
     stage: "aux"
     steps:
       - runnerID: quitsh::test-go
+        config:
+          buildTags: ["unittest"]
   build-nix:
     stage: "aux"
     steps:
