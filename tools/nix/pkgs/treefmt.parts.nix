@@ -14,7 +14,7 @@
       formatter = treefmt;
 
       # Define formatter as global output.
-      packages = {
+      modos.packages.global = {
         inherit treefmt;
       };
 
@@ -28,6 +28,9 @@
           excludes = [
             "external/**/*"
             "**/vendor/**/*"
+
+            # FIXME: add treefmt which runs on `git-diff` runner if existing.
+            "**/api/openapi*" # These are generated.
           ];
         };
 
@@ -39,7 +42,6 @@
         # Markdown, JSON, YAML, etc.
         programs.prettier.enable = true;
         settings.formatter.prettier.excludes = [
-          "*/api/openapi*" # these are symlinks, which prettier cannot deal with
           ".golangci.yaml" # this is a symlink, which prettier cannot deal with
           ".yamllint.yaml" # this is a symlink, which prettier cannot deal with
         ];

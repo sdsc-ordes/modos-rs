@@ -250,10 +250,6 @@ let
                 # Changelog
                 pkgs.git-cliff
               ];
-
-              enterShell = ''
-                just --list --list-submodules
-              '';
             }
           )
         ];
@@ -272,6 +268,7 @@ let
             quitsh-direct-ci-drv
             modos'.packages.global.bootstrap
             modos'.packages.global.quitsh
+            modos'.packages.global.treefmt
             pkgs.podman
 
             pkgs.openssh # SSH agent
