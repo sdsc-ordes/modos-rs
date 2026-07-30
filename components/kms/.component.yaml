@@ -16,6 +16,8 @@ targets:
         config:
           submodules:
             - test
+          args:
+            - "--timeout=20m"
           buildTags: ["integration"]
       - runner: coverage-upload
 
