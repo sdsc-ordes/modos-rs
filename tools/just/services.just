@@ -8,14 +8,24 @@ pc_socket := output_dir / "pc-test-services.sock"
 default:
     just --list --unsorted -f "{{source_file()}}"
 
-# Run the test services.
+# Run the test services without attaching to the TUI.
 [group('services')]
-start *args:
+start-notui *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
     just quitsh process-compose start \
         --flake-dir "./tools/nix" "test-services" \
-        --socket-path-file "{{pc_socket}}" -a "$@"
+        --socket-path-file "{{pc_socket}}" "$@"
+
+# Run the test services with attaching to the TUI.
+[group('services')]
+start *args:
+    just -f "{{source_file()}}" start-notui -a "$@"
+
+# Monitor services. For debugging.
+[group('services')]
+monitor *args: check-started
+    just -f "{{source_file()}}" pc process monitor
 
 # Stop the test services.
 [group('services')]

@@ -45,7 +45,9 @@ jobs:
           - name: test-kms
             command: just ci::run quitsh test -c "kms"
             allow_failure: false
-            debug: true # Enable this if you need a shell to debug.
+            debug: false # Enable this if you need a shell to debug.
+            # Execute:
+            # just develop && just services::start && just services::monitor
 
           - name: test-comp-rust
             command: just ci::run quitsh test -c "comp-rust"
@@ -71,6 +73,8 @@ jobs:
       - name: ${{ matrix.name }}-debug
         if: ${{ matrix.debug == true }}
         uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: ${{ matrix.name }}
         continue-on-error: ${{ matrix.allow_failure }}
