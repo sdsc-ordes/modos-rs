@@ -9,7 +9,7 @@
 # Nix
 .direnv
 .devenv
-result
+/result
 
 # Vendir temporary folder.
 .vendir*
@@ -22,8 +22,8 @@ result
 .typos.toml
 .golangci.yaml
 .prek.toml
-go.work
-go.work.sum
+/go.work
+/go.work.sum
 
 logs
 
@@ -31,3 +31,6 @@ logs
 .claude
 CLAUDE.md
 AGENTS.md
+
+# Socket files
+.sock

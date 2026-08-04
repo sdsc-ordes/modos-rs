@@ -92,6 +92,9 @@ def main [
         })
     }
 
+    print "Initiating request:"
+    print ($init_body | table --expand)
+
     let init = (
         http post $device_endpoint --full --allow-errors --content-type "application/x-www-form-urlencoded" $init_body
     )
@@ -133,7 +136,7 @@ def main [
 
     mut wait = $interval
     let start = (date now)
-    print $"(ansi cyan)Polling for token every ($wait)s \(code expires in ($expires_in)s\)...(ansi reset)"
+    print $"(ansi cyan)Polling '($token_endpoint)' for token every ($wait)s \(code expires in ($expires_in)s\)...(ansi reset)"
 
     loop {
         if ((date now) - $start) > ($expires_in * 1sec) {
@@ -156,7 +159,7 @@ def main [
             print $"  token_type    : ($tok.token_type)"
             print $"  expires_in    : ($tok.expires_in)"
             print $"  refresh_token : (if 'refresh_token' in $tok { 'yes' } else { 'no' })"
-            print $"  access_token  : (($tok.access_token) | str substring 0..48)..."
+            print $"  access_token  : ($tok.access_token)"
             print ""
 
             # Best-effort decode of the JWT access-token payload (nushell

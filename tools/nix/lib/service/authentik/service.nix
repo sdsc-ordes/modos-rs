@@ -160,12 +160,15 @@ let
                "$dataDir/prometheus"
 
       # Set temp. dir.
-      if [ ! -L "$dataDir/temp" ]; then
+      if [ -L "$dataDir/temp" ]; then
+        tmpDir=$(readlink "$dataDir/temp")
+      else
         tmpDir=$(mktemp -d)
-        mkdir -p "$tmpDir"
-        ln -s "$tmpDir" "$dataDir/temp"
+        ln -fs "$tmpDir" "$dataDir/temp"
       fi
-      export TMPDIR="$dataDir/temp"
+      mkdir -p "$tmpDir"
+
+      export TMPDIR="$tmpDir"
       export TEMPDIR="$TMPDIR"
 
       export PROMETHEUS_MULTIPROC_DIR="$dataDir/prometheus"

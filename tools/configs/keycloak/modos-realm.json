@@ -1731,7 +1731,7 @@
     {
       "attributes": {
         "bucket-path": ["bucket-d/d"],
-        "bucket-permission": ["read"]
+        "bucket-permission": ["r"]
       },
       "clientRoles": {},
       "description": "Permissions for Bucket D",
@@ -1743,7 +1743,7 @@
         {
           "attributes": {
             "bucket-path": ["bucket-d/d/subpath"],
-            "bucket-permission": ["write"]
+            "bucket-permission": ["w"]
           },
           "clientRoles": {},
           "description": "",
@@ -1759,7 +1759,7 @@
     {
       "attributes": {
         "bucket-path": ["bucket-e/e/subpath"],
-        "bucket-permission": ["read"]
+        "bucket-permission": ["r"]
       },
       "clientRoles": {},
       "description": "",
@@ -2351,7 +2351,7 @@
         }
       ],
       "disableableCredentialTypes": [],
-      "email": "test@mail.ch",
+      "email": "test@example.com",
       "emailVerified": false,
       "enabled": true,
       "groups": [
@@ -2366,7 +2366,7 @@
       "realmRoles": ["default-roles-modos"],
       "requiredActions": [],
       "totp": false,
-      "username": "test@mail.ch"
+      "username": "test@example.ch"
     }
   ],
   "verifiableCredentialsEnabled": false,

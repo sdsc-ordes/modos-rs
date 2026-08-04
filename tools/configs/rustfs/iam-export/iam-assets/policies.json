@@ -1,4 +1,44 @@
 {
+  "readwrite": {
+    "Version": "2012-10-17",
+    "Statement": [
+      { "Effect": "Allow", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::*"] },
+      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
+    ]
+  },
+  "readonly": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": ["s3:GetBucketLocation", "s3:GetObject", "s3:GetBucketQuota"],
+        "Resource": ["arn:aws:s3:::*"]
+      },
+      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
+    ]
+  },
+  "kms-broker-normal": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+        "Resource": ["arn:aws:s3:::*", "arn:aws:s3:::*/*"]
+      },
+      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
+    ]
+  },
+  "writeonly": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": ["s3:PutObject"],
+        "Resource": ["arn:aws:s3:::*"]
+      },
+      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
+    ]
+  },
   "diagnostics": {
     "Version": "2012-10-17",
     "Statement": [
@@ -19,52 +59,12 @@
       { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
     ]
   },
-  "kms-broker-normal": {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
-        "Resource": ["arn:aws:s3:::*", "arn:aws:s3:::*/*"]
-      },
-      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
-    ]
-  },
-  "readwrite": {
-    "Version": "2012-10-17",
-    "Statement": [
-      { "Effect": "Allow", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::*"] },
-      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
-    ]
-  },
   "consoleAdmin": {
     "Version": "2012-10-17",
     "Statement": [
       { "Effect": "Allow", "Action": ["admin:*"] },
       { "Effect": "Allow", "Action": ["kms:*"] },
       { "Effect": "Allow", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::*"] },
-      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
-    ]
-  },
-  "writeonly": {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": ["s3:PutObject"],
-        "Resource": ["arn:aws:s3:::*"]
-      },
-      { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
-    ]
-  },
-  "readonly": {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": ["s3:GetBucketLocation", "s3:GetObject", "s3:GetBucketQuota"],
-        "Resource": ["arn:aws:s3:::*"]
-      },
       { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
     ]
   }

@@ -13,6 +13,10 @@ type (
 		UsePathStyle bool `yaml:"usePathStyle" default:"false"`
 
 		// Credentials
+		// This is the access key and secret key of a
+		// dedicated user who is allowed to call `AssumeRole` to hand out
+		// temporary access credentials through the AWS Security Token Service
+		// API.
 		AccessKey secret.RedactedString `yaml:"accessKey"`
 		SecretKey secret.RedactedString `yaml:"secretKey"`
 

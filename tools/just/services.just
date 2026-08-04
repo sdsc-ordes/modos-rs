@@ -2,8 +2,8 @@ set positional-arguments
 set shell := ["bash", "-cue"]
 set dotenv-load := true
 root_dir := `git rev-parse --show-toplevel`
-output_dir := root_dir / ".output"
-pc_socket := output_dir / "process-compose" / "pc.sock"
+output_dir := root_dir / ".output" / "run" / "process-compose"
+pc_socket := output_dir / "pc-test-services.sock"
 
 default:
     just --list --unsorted -f "{{source_file()}}"
@@ -13,7 +13,9 @@ default:
 start *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    nix run -L --show-trace "./tools/nix#test-services" -- "$@"
+    just quitsh process-compose start \
+        --flake-dir "./tools/nix" "test-services" \
+        --socket-path-file "{{pc_socket}}" -a "$@"
 
 # Stop the test services.
 [group('services')]
@@ -22,6 +24,14 @@ stop *args:
     cd "{{root_dir}}"
     just -f "{{source_file()}}" check-started &&
         just -f "{{source_file()}}" pc down || true
+
+# Push the test services to cachix. Run `cachix authtoken` first.
+[group('cachix')]
+cache:
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
+    nix build --show-trace -L --print-out-paths "./tools/nix#test-services" |
+        cachix push "$CACHIX_CACHE_NAME"
 
 # Attach to the running test services.
 [group('services')]
@@ -36,18 +46,18 @@ delete-data:
     cd "{{root_dir}}"
     just -f "{{source_file()}}" stop || true
 
-    if [ -d "{{output_dir}}/process-compose" ]; then
+    if [ -d "{{output_dir}}" ]; then
         echo "Delete output."
-        chmod -R +w "{{output_dir}}/process-compose"
-        rm -rf "{{output_dir}}/process-compose"
+        chmod -R +w "{{output_dir}}"
+        rm -rf "{{output_dir}}"
     fi
 
 [group('keycloak')]
 keycloak-export: check-started
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    if process-compose process list | grep keycloak; then
-        process-compose process stop keycloak || true
+    if just -f "{{source_file()}}" pc process list | grep keycloak; then
+        just -f "{{source_file()}}" pc process stop keycloak || true
     fi
     just -f "{{source_file()}}" pc process start keycloak-realm-export-all
 
@@ -57,11 +67,16 @@ authentik-export: check-started
     cd "{{root_dir}}"
     just -f "{{source_file()}}" pc process start authentik-export
 
+[group('oauth')]
+device-code-flow *args:
+    nu "{{root_dir}}/tools/nu/device-code-flow.nu" "$@"
+
+
 [group('process-compose')]
 pc *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    process-compose -u "{{pc_socket}}" "$@"
+    process-compose -u "$(cat {{pc_socket}})" "$@"
 
 [private]
 check-started:

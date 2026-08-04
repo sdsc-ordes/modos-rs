@@ -10,12 +10,12 @@ type (
 		// Ping returns if the storage can be accessed.
 		Ping(ctx context.Context) error
 
-		// NewCredentials returns a scoped token to bucket `bucket`
-		// with duration `duration` and permissions `permissions`.
+		// NewCredentials returns a scoped token for bucket permissions `permissions`
+		// with duration `dur`.
 		NewCredentials(
 			ctx context.Context,
-			bucket string,
-			permissions []Permission,
-			duration time.Duration) (creds *Credentials, err error)
+			perms BucketPermissions,
+			duration time.Duration,
+		) (creds Credentials, err error)
 	}
 )

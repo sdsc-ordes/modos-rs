@@ -10,6 +10,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/signal"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 )
@@ -24,10 +25,6 @@ func loadConfigs(configDir string, dataDir string) (conf config.Config) {
 	return
 }
 
-type Service struct {
-	storage st.Client
-}
-
 func main() {
 	args := parseArgs()
 	conf := loadConfigs(args.ConfigDir, args.DataDir)
@@ -38,15 +35,24 @@ func main() {
 	ctx, stop := signal.WithSignal(clog.Context(context.Background()))
 	defer stop()
 
-	log.Infof("Starting KMS server.")
+	clog.Infof(ctx, "Starting KMS server.")
 
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
-	_, err = client.NewCredentials(ctx, "bucket-a", []st.Permission{"read"}, 1*time.Hour)
+	// FIXME: remove.
+	c, err := client.NewCredentials(
+		ctx,
+		[]st.BucketPermission{
+			{Path: "bucket-a", Permissions: []st.Permission{st.PermissionRead}},
+			{Path: "bucket-b", Permissions: []st.Permission{st.PermissionWrite}},
+		},
+		1*time.Hour,
+	)
 	if err != nil {
 		log.ErrorE(err, "Credentials could not be created.")
 	}
+	clog.Info(ctx, "Credentials created.", "creds", c)
 
-	_ = Service{client}
+	_ = service.Service{Storage: client}
 }

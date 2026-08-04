@@ -26,7 +26,7 @@
           k: v:
           v
           // {
-            dataDir = ".output/process-compose/data/${k}";
+            dataDir = ".output/run/process-compose/data/${k}";
           }
         ) procs;
     in
@@ -50,9 +50,8 @@
           ];
 
           cli.options = {
-            keep-project = true;
-            unix-socket = "./.output/process-compose/pc.sock";
-            log-file = ".output/process-compose/log.txt";
+            unix-socket = "./.output/run/process-compose/pc-test-services.sock";
+            log-file = ".output/run/process-compose/log.txt";
             no-server = false;
           };
 
@@ -71,7 +70,7 @@
             {
               availability.restart = lib.mkDefault "no";
               availability.max_restarts = lib.mkDefault 0;
-              log_location = ".output/process-compose/log/${name}.log";
+              log_location = ".output/run/process-compose/log/${name}.log";
               log_configuration = {
                 disable_json = true;
                 no_color = true;
@@ -82,10 +81,13 @@
 
           services.authentik = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             components = inputs'.authentik-nix.legacyPackages.authentikComponents;
             secretKey = "test";
+
+            initialAdminEmail = "admin@example.com";
+            initialAdminPassword = "admin";
 
             server.http.port = 9001;
             worker.http.port = 9002;
@@ -107,9 +109,12 @@
 
           services.keycloak = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             settings.http-port = 8081;
+
+            # User is `admin`.
+            initialAdminPassword = "admin";
 
             plugins = [
               modos'.packages.component.keycloak-mapper.plugin
@@ -131,15 +136,19 @@
 
           services.rustfs = {
             enable = true;
-            dataDir = ".output/process-compose/data";
+            dataDir = ".output/run/process-compose/data";
 
             package = inputs'.rustfs-flake.packages.default;
             server.port = 9010;
 
+            # Web Interface
             console = {
               enable = true;
               port = 9011;
             };
+
+            accessKey = "rustfsadmin";
+            secretKey = "rustfsadmin";
 
             logLevel = "debug";
 
@@ -147,6 +156,7 @@
               "bucket-a"
               "bucket-b"
             ];
+
             iam.import.path = "tools/configs/rustfs/iam-export";
             iam.export = {
               enable = true;

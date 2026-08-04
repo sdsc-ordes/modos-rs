@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo125Module,
+  buildGo126Module,
   installShellFiles,
   testers,
   git,
@@ -19,7 +19,7 @@ in
 #       This is probably due to caching of the source directory.
 #       Before debugging: Change the .component.yaml version and increment its patch number
 #       to trigger another source hash.
-buildGo125Module {
+buildGo126Module {
   inherit version;
   pname = compName;
 
@@ -33,7 +33,7 @@ buildGo125Module {
   # just nix::package quitsh
   # ```
   # to check if a new hash must be here:
-  vendorHash = "sha256-56OaYPBDEC4XKkBsMcNcqFgm7evbWRhjek5Fbi5fhfI=";
+  vendorHash = "sha256-teWO/blhO9E7sd+iPFUN5dfCe7UsUFKAnJi4DW6WwiU=";
   proxyVendor = true;
 
   nativeBuildInputs = [ installShellFiles ];

@@ -211,6 +211,7 @@ let
       # Default shell with no Git hooks (for agent mounts where the .git folder is read only).
       default-nogh =
         ci
+        ++ build-rust
         ++ build-go
         ++ dev-go
         ++ manifest-ytt
@@ -267,10 +268,15 @@ let
             quitsh-direct-ci-drv
             modos'.packages.global.bootstrap
             modos'.packages.global.quitsh
+            modos'.packages.global.treefmt
             pkgs.podman
 
             pkgs.openssh # SSH agent
           ];
+
+          env = {
+            CACHIX_CACHE_NAME = "modos-rs";
+          };
         }
       ];
     in

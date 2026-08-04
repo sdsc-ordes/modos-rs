@@ -1,6 +1,17 @@
 package types
 
-type Permission string
+const PermissionRead Permission = "read"
+const PermissionWrite Permission = "write"
 
-const PermissionsRead Permission = "read"
-const PermissionsWrite Permission = "write"
+type (
+	Permission string
+
+	BucketPermission struct {
+		// The bucket permission resource path (without '*' or '?' due to safetey)
+		Path string
+		// The permissions for this bucket.
+		Permissions []Permission
+	}
+
+	BucketPermissions = []BucketPermission
+)

@@ -2,17 +2,15 @@
   description = "modos-rs";
 
   nixConfig = {
-    extra-trusted-substituters = [
+    extra-substituters = [
+      "https://modos-rs.cachix.org"
       "https://nix-community.cachix.org"
       "https://devenv.cachix.org"
-      "ssh://nix-ssh@nix-cache.swissmodos.ch"
-      "https://modos-rs.cachix.org"
     ];
     extra-trusted-public-keys = [
       "modos-rs.cachix.org-1:qznktesR1I4KmWol3CwKfi0vM0BaH1+rSVzLYwfenG0="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-      "nix-cache.swissmodos.ch.1:rPQnp1nJav3UluO5MeomJTEPeqffeIu7Y41xpecBqMA="
     ];
 
     allow-import-from-derivation = "true";
@@ -58,7 +56,7 @@
     # Process-compose setup for services.
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     services-flake.url = "github:juspay/services-flake";
-    authentik-nix.url = "github:gabyx/authentik-nix/version/2026.5.4";
+    authentik-nix.url = "github:nix-community/authentik-nix?rev=233774596cb9e25d211a1d1cffdcde2c1bac87d9";
     rustfs-flake.url = "github:rustfs/rustfs-flake?rev=f5222f68c19bed705c619412827c4c0d3a33dcd6";
 
     # Importing flake-parts modules recursively.

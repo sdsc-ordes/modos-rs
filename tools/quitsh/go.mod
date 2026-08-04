@@ -1,6 +1,6 @@
 module modos-rs/tools/quitsh
 
-go 1.25.0
+go 1.26
 
 // Uncomment that to enable the local quitsh checkout.
 // replace github.com/sdsc-ordes/quitsh => ../../../quitsh
@@ -11,13 +11,13 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/hashicorp/go-version v1.7.0
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260707123118-b45b2da5053e
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618
 	github.com/stretchr/testify v1.11.1
 
 	// NOTE: This looks weird but is only due to that we use some runners from Custodian.
-	gitlab.com/data-custodian/custodian/components/contract-manager v0.0.0-20260707120543-5fdb00158128 // indirect
-	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260707120543-5fdb00158128 // indirect
-	gitlab.com/data-custodian/custodian/tools/quitsh v0.0.0-20260707120543-5fdb00158128
+	gitlab.com/data-custodian/custodian/components/contract-manager v0.0.0-20260727115656-de5a9ee9d6c1 // indirect
+	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1 // indirect
+	gitlab.com/data-custodian/custodian/tools/quitsh v0.0.0-20260727115656-de5a9ee9d6c1
 )
 
 require github.com/spf13/cobra v1.10.2

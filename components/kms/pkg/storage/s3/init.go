@@ -16,10 +16,6 @@ type (
 	clientS3 struct {
 		client *s3.Client
 		sts    *sts.Client
-
-		// FIXME: Do we need this. Probably we should gather all buckets on startup.
-		// or from time to time.
-		buckets []string
 	}
 )
 
@@ -27,7 +23,7 @@ func NewClient(
 	ctx context.Context,
 	conf *bst.S3Connection,
 ) (*clientS3, error) {
-	clog.Info(ctx, "Create connection to blob storage.",
+	clog.Info(ctx, "Create connection to S3 storage.",
 		"endpoint", conf.Endpoint.String())
 
 	cfg, err := awsconfig.LoadDefaultConfig(
@@ -44,9 +40,6 @@ func NewClient(
 
 	addOpts := func(o *s3.Options) {
 		o.UsePathStyle = conf.UsePathStyle
-
-		// // We upload only encrypted data with `age` which provides integrity.
-		// o.ResponseChecksumValidation = aws.ResponseChecksumValidationUnset
 	}
 
 	if err != nil {
@@ -56,5 +49,5 @@ func NewClient(
 	client := s3.NewFromConfig(cfg, addOpts)
 	sts := sts.NewFromConfig(cfg)
 
-	return &clientS3{client, sts, nil}, nil
+	return &clientS3{client, sts}, nil
 }

@@ -14,7 +14,7 @@ entries:
       attributes:
         bucket-permissions:
           - path: bucket-d/d
-            permission: read
+            permission: r
 
   - model: authentik_core.group
     id: group-bucket-d-partial
@@ -26,10 +26,10 @@ entries:
       attributes:
         bucket-permissions:
           - path: bucket-d/d/subpath
-            permission: write
+            permission: w
           # Test if that overwrites.
           - path: bucket-d/d
-            permission: write
+            permission: w
 
   - model: authentik_core.group
     id: group-bucket-e
@@ -39,7 +39,7 @@ entries:
       attributes:
         bucket-permissions:
           - path: bucket-e/e/subpath
-            permission: read
+            permission: r
 
   - model: authentik_core.group
     id: bucket-c-subpath

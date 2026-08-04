@@ -5,21 +5,22 @@
 </p>
 
 <p align="center">
-</p>
-<p align="center">
   <a href="https://github.com/sdsc-ordes/modos-rs/releases/latest">
-    <img src="https://img.shields.io/github/release/sdsc-ordes/modos-rs.svg?style=for-the-badge" alt="Current Release label" /></a>
+    <img src="https://img.shields.io/github/release/sdsc-ordes/modos-rs.svg?" alt="Current Release label" /></a>
   <a href="https://github.com/sdsc-ordes/modos-rs/actions/workflows/normal.yaml">
-   <img src="https://img.shields.io/github/actions/workflow/status/sdsc-ordes/modos-rs/normal.yaml?label=ci&style=for-the-badge" alt="CI">
+   <img src="https://img.shields.io/github/actions/workflow/status/sdsc-ordes/modos-rs/normal.yaml?label=ci&" alt="CI">
+  </a>
+  <a href="https://codecov.io/gh/sdsc-ordes/modos-rs" >
+    <img src="https://codecov.io/gh/sdsc-ordes/modos-rs/graph/badge.svg?&token=MYHDIHA1T7"/>
   </a>
   <a href="https://sdsc-ordes.github.io/modos-rs">
-    <img src="https://img.shields.io/website?url=https%3A%2F%2Fsdsc-ordes.github.io%2Fmodos-rs&up_message=online&up_color=blue&down_message=offline&style=for-the-badge&label=docs" alt="Documentation website" /></a>
+  <img src="https://img.shields.io/website?url=https%3A%2F%2Fsdsc-ordes.github.io%2Fmodos-rs&up_message=online&up_color=blue&down_message=offline&&label=docs" alt="Documentation website" /></a>
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
-    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge" alt="License label" /></a>
+  <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?" alt="License label" /></a>
 </p>
 
 This is [`modos`](https://github.com/sdsc-ordes/modos-api)'s support repository
-with some core packages and services written in Rust.
+with some core packages and services written in Rust and Go.
 
 **Authors:**
 
@@ -33,18 +34,71 @@ with some core packages and services written in Rust.
 <!--toc:start-->
 
 - [modos-rs](#modos-rs)
-  - [Introduction](#introduction)
-  <!--toc:end-->
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Development](#development)
+  - [Coverage](#coverage)
+  - [Acknowledgement](#acknowledgement)
+  - [Copyright](#copyright)
+
+<!--toc:end-->
 
 </details>
 
 ## Installation
 
-Describe the installation instruction here.
+```bash
+direnv allow && direnv reload
+```
+
+or
+
+```bash
+just develop
+```
 
 ## Usage
 
-Describe the installation instruction here.
+### Dev. Services
+
+```bash
+just services::start
+```
+
+### KMS
+
+```bash
+just quitsh build -c "kms"
+just quitsh lint -c "kms"
+just quitsh test -c "kms"
+just quitsh image -c "kms"
+```
+
+#### Tests
+
+##### Run Specific Tests
+
+To run specific tests use either for normal unit tests:
+
+```bash
+just quitsh exec-target \
+  -K "test.showTestLog: true" \
+  -K 'test.testArgs: [ "-test.run=TestBla.*" ]' \
+  "kms::test-unittest"
+```
+
+or for the integration tests (`ginkgo`) to run test with label `banana`:
+
+```bash
+just quitsh exec-target \
+  -K "test.showTestLog: true" \
+  -K 'test.testArgs: [ "-ginkgo.label-filter=banana" ]' \
+  "kms::test-integration"
+```
+
+### Nix Hashes
+
+To fix Nix fixed-output derivation hasesh run: `just quitsh nix fix-hash`
 
 ## Development
 
@@ -52,6 +106,10 @@ Read first the [Contribution Guidelines](/CONTRIBUTING.md).
 
 For technical documentation on setup and development, see the
 [Development Guide](docs/development-guide.md)
+
+## Coverage
+
+![Coverage](https://codecov.io/gh/sdsc-ordes/modos-rs/graphs/sunburst.svg?token=MYHDIHA1T7)
 
 ## Acknowledgement
 

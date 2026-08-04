@@ -26,8 +26,8 @@ import java.util.Map;
  *
  * <pre>
  *   "${claim-name}": [
- *     { "p": "mybucket",    "perm": "write" },
- *     { "p": "otherbucket", "perm": "read"  }
+ *     { "p": "mybucket",    "bp": "write" },
+ *     { "p": "otherbucket", "bp": "read"  }
  *   ]
  * </pre>
  *
@@ -78,15 +78,6 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         permissionAttr.setHelpText("Name of the group attribute holding the permission level (read/write).");
         CONFIG_PROPERTIES.add(permissionAttr);
 
-        ProviderConfigProperty writeImpliesRead = new ProviderConfigProperty();
-        writeImpliesRead.setName(WRITE_IMPLIES_READ);
-        writeImpliesRead.setLabel("Write implies read");
-        writeImpliesRead.setType(ProviderConfigProperty.BOOLEAN_TYPE);
-        writeImpliesRead.setDefaultValue("false");
-        writeImpliesRead.setHelpText(
-                "If enabled, a path granted write also emits a separate {path, read} entry.");
-        CONFIG_PROPERTIES.add(writeImpliesRead);
-
         // Standard "Token Claim Name" + "Add to ID/permission token/userinfo" config.
         OIDCAttributeMapperHelper.addTokenClaimNameConfig(CONFIG_PROPERTIES);
         OIDCAttributeMapperHelper.addIncludeInTokensConfig(CONFIG_PROPERTIES, BucketPermissionsMapper.class);
@@ -133,10 +124,9 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         Map<String, String> config = mappingModel.getConfig();
         String pathAttr = orDefault(config.get(PREFIX_ATTR), "path");
         String permissionAttr = orDefault(config.get(ACCESS_ATTR), "permission");
-        boolean writeImpliesRead = Boolean.parseBoolean(config.get(WRITE_IMPLIES_READ));
 
-        // path -> strongest permission seen so far (write beats read). LinkedHashMap keeps
-        // a stable, insertion-ordered claim which makes tokens easier to eyeball/diff.
+        // LinkedHashMap book-keeps all permissions.
+        // path -> strongest permission seen so far (write beats read).
         Map<String, String> strongest = new LinkedHashMap<>();
 
         user.getGroupsStream().forEach(group -> {
@@ -160,11 +150,6 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         for (Map.Entry<String, String> e : strongest.entrySet()) {
             String path = e.getKey();
             String permission = e.getValue();
-
-            if (writeImpliesRead && ACCESS_WRITE.equals(permission)) {
-                permissions.add(entry(path, ACCESS_READ));
-            }
-
             permissions.add(entry(path, permission));
         }
 
