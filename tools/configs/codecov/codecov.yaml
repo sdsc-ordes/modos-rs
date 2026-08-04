@@ -20,9 +20,9 @@ coverage:
   status:
     project:
       default:
+        informational: True
         target: auto
         threshold: 0%
-        informational: True
         base: auto
 
     patch:
