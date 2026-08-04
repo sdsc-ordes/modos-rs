@@ -34,8 +34,14 @@ with some core packages and services written in Rust and Go.
 <!--toc:start-->
 
 - [modos-rs](#modos-rs)
-  - [Introduction](#introduction)
-  <!--toc:end-->
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Development](#development)
+  - [Coverage](#coverage)
+  - [Acknowledgement](#acknowledgement)
+  - [Copyright](#copyright)
+
+<!--toc:end-->
 
 </details>
 
