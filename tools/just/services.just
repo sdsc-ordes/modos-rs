@@ -69,8 +69,9 @@ authentik-export: check-started
 
 [group('oauth')]
 device-code-flow *args:
-    nu "{{root_dir}}/tools/nu/device-code-flow.nu" "$@"
-
+    #!/usr/bin/env bash
+    cd "{{root_dir}}"
+    just quitsh oauth device-code-flow "$@"
 
 [group('process-compose')]
 pc *args:
