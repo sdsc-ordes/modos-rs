@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sort"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 	"github.com/sdsc-ordes/quitsh/pkg/errors"
@@ -21,7 +20,6 @@ import (
 // Settings holds the flags for the command.
 type Settings struct {
 	Repo        string // owner/name of the repository.
-	PR          string // reference PR whose checks define the required set.
 	RulesetName string // name of the ruleset to create-or-update.
 }
 
@@ -42,7 +40,8 @@ type rulesetRef struct {
 //nolint:tagliatelle // GitHub REST API uses snake_case.
 type (
 	statusCheck struct {
-		Context string `json:"context"`
+		Context       string `json:"context"`
+		IntegrationID int64  `json:"integration_id,omitempty"`
 	}
 
 	refNameCondition struct {
@@ -91,7 +90,6 @@ type (
 func AddCmd(cl cli.ICLI, parent *cobra.Command) {
 	sett := Settings{
 		Repo:        "sdsc-ordes/modos-rs",
-		PR:          "3", // any recent PR that ran all checks.
 		RulesetName: "main-protection",
 	}
 
@@ -108,8 +106,6 @@ func AddCmd(cl cli.ICLI, parent *cobra.Command) {
 
 	cmd.Flags().StringVar(&sett.Repo, "repo", sett.Repo,
 		"Repository as 'owner/name'.")
-	cmd.Flags().StringVar(&sett.PR, "pr", sett.PR,
-		"Reference PR whose checks define the required set.")
 	cmd.Flags().StringVar(&sett.RulesetName, "ruleset-name", sett.RulesetName,
 		"Name of the ruleset to create-or-update.")
 
@@ -126,14 +122,14 @@ func run(ctx context.Context, sett *Settings) error {
 		Env("GH_PAGER=cat").
 		Build()
 
-	checks, err := requiredChecks(gh, sett)
-	if err != nil {
-		return err
+	checks := []statusCheck{
+		{Context: "format", IntegrationID: 15368},
+		{Context: "checks-all", IntegrationID: 15368},
 	}
 
 	log.Infof("Requiring %d checks:", len(checks))
 	for _, c := range checks {
-		log.Infof("  - '%s'", c.Context)
+		log.Infof("  - '%v'", c)
 	}
 
 	payload, err := buildPayload(sett, checks)
@@ -142,37 +138,6 @@ func run(ctx context.Context, sett *Settings) error {
 	}
 
 	return applyRuleset(gh, sett, payload)
-}
-
-// requiredChecks fetches the unique check names of the reference PR.
-func requiredChecks(gh *exec.CmdContext, sett *Settings) ([]statusCheck, error) {
-	out, err := gh.Get("pr", "checks", sett.PR, "--repo", sett.Repo, "--json", "name,state")
-	if err != nil {
-		return nil, errors.AddContext(err, "could not list checks on PR #%s", sett.PR)
-	}
-
-	var raw []prCheck
-	if e := json.Unmarshal([]byte(out), &raw); e != nil {
-		return nil, errors.AddContext(e, "could not decode 'gh pr checks' output")
-	}
-
-	// Dedup names and shape into [{context: ...}], sorted for stable output.
-	seen := map[string]struct{}{}
-	checks := make([]statusCheck, 0, len(raw))
-	for _, c := range raw {
-		if _, ok := seen[c.Name]; ok {
-			continue
-		}
-		seen[c.Name] = struct{}{}
-		checks = append(checks, statusCheck{Context: c.Name})
-	}
-	sort.Slice(checks, func(i, j int) bool { return checks[i].Context < checks[j].Context })
-
-	if len(checks) == 0 {
-		return nil, errors.New("no checks found on PR #%s — aborting", sett.PR)
-	}
-
-	return checks, nil
 }
 
 // buildPayload marshals the ruleset payload with the live checks spliced in.
