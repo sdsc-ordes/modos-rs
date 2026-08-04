@@ -47,11 +47,58 @@ with some core packages and services written in Rust and Go.
 
 ## Installation
 
-Describe the installation instruction here.
+```bash
+direnv allow && direnv reload
+```
+
+or
+
+```bash
+just develop
+```
 
 ## Usage
 
-Describe the installation instruction here.
+### Dev. Services
+
+```bash
+just services::start
+```
+
+### KMS
+
+```bash
+just quitsh build -c "kms"
+just quitsh lint -c "kms"
+just quitsh test -c "kms"
+just quitsh image -c "kms"
+```
+
+#### Tests
+
+##### Run Specific Tests
+
+To run specific tests use either for normal unit tests:
+
+```bash
+just quitsh exec-target \
+  -K "test.showTestLog: true" \
+  -K 'test.testArgs: [ "-test.run=TestBla.*" ]' \
+  "kms::test-unittest"
+```
+
+or for the integration tests (`ginkgo`) to run test with label `banana`:
+
+```bash
+just quitsh exec-target \
+  -K "test.showTestLog: true" \
+  -K 'test.testArgs: [ "-ginkgo.label-filter=banana" ]' \
+  "kms::test-integration"
+```
+
+### Nix Hashes
+
+To fix Nix fixed-output derivation hasesh run: `just quitsh nix fix-hash`
 
 ## Development
 
