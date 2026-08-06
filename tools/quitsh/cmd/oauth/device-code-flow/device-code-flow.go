@@ -125,22 +125,17 @@ func endpoints(sett *Settings) (host, device, token string, err error) {
 		if host == "" {
 			host = "http://localhost:8081"
 		}
+		device = host + "/realms/" + sett.Realm + "/protocol/openid-connect/auth/device"
+		token = host + "/realms/" + sett.Realm + "/protocol/openid-connect/token"
 	case providerAuthentik:
 		if host == "" {
 			host = "http://localhost:9001"
 		}
+		device = host + "/application/o/device/"
+		token = host + "/application/o/token/"
 	default:
 		return "", "", "", errors.New(
 			"unknown provider '%s'; use 'keycloak' or 'authentik'", sett.Provider)
-	}
-
-	switch sett.Provider {
-	case providerKeycloak:
-		device = host + "/realms/" + sett.Realm + "/protocol/openid-connect/auth/device"
-		token = host + "/realms/" + sett.Realm + "/protocol/openid-connect/token"
-	case providerAuthentik:
-		device = host + "/application/o/device/"
-		token = host + "/application/o/token/"
 	}
 
 	return host, device, token, nil
