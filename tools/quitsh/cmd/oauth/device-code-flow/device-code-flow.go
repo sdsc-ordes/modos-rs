@@ -117,7 +117,7 @@ func AddCmd(cl cli.ICLI, parent *cobra.Command) {
 }
 
 // endpoints resolves the device and token endpoints for the configured provider.
-func endpoints(sett *Settings) (host, device, token string, err error) {
+func endpoints(sett *Settings) (host, device, token string, pkceEnabled bool, err error) {
 	host = sett.Host
 
 	switch sett.Provider {
@@ -127,29 +127,30 @@ func endpoints(sett *Settings) (host, device, token string, err error) {
 		}
 		device = host + "/realms/" + sett.Realm + "/protocol/openid-connect/auth/device"
 		token = host + "/realms/" + sett.Realm + "/protocol/openid-connect/token"
+		pkceEnabled = false
 	case providerAuthentik:
 		if host == "" {
 			host = "http://localhost:9001"
 		}
 		device = host + "/application/o/device/"
 		token = host + "/application/o/token/"
+		pkceEnabled = false
 	default:
-		return "", "", "", errors.New(
+		err = errors.New(
 			"unknown provider '%s'; use 'keycloak' or 'authentik'", sett.Provider)
+
+		return
 	}
 
-	return host, device, token, nil
+	return host, device, token, pkceEnabled, nil
 }
 
 // run executes the full device code flow.
 func run(ctx context.Context, sett *Settings) error {
-	host, deviceEndpoint, tokenEndpoint, err := endpoints(sett)
+	host, deviceEndpoint, tokenEndpoint, usePKCE, err := endpoints(sett)
 	if err != nil {
 		return err
 	}
-
-	// Keycloak's `modos-cli` mandates PKCE; for authentik it is optional.
-	usePKCE := sett.Provider == providerKeycloak || sett.PKCE
 
 	log.Infof("Provider: %s", sett.Provider)
 	log.Infof("Host: %s", host)
@@ -160,12 +161,15 @@ func run(ctx context.Context, sett *Settings) error {
 	log.Infof("Scopes: %s", sett.Scope)
 	log.Infof("PKCE: %v", usePKCE)
 
-	verifier, challenge, err := newPKCE()
-	if err != nil {
-		return err
+	var pkceChallenge, pkceVerifier string
+	if usePKCE {
+		pkceVerifier, pkceChallenge, err = newPKCE()
+		if err != nil {
+			return err
+		}
 	}
 
-	dev, err := requestDeviceCode(ctx, sett, deviceEndpoint, challenge, usePKCE)
+	dev, err := requestDeviceCode(ctx, sett, deviceEndpoint, pkceChallenge)
 	if err != nil {
 		return err
 	}
@@ -189,7 +193,7 @@ func run(ctx context.Context, sett *Settings) error {
 	log.Infof("Or visit %s and enter code: %s\n\n", dev.VerificationURI, dev.UserCode)
 	log.Info("-----------------------------")
 
-	return poll(ctx, tokenEndpoint, dev.DeviceCode, sett.Client, verifier, interval, expiresIn)
+	return poll(ctx, tokenEndpoint, dev.DeviceCode, sett.Client, pkceVerifier, interval, expiresIn)
 }
 
 // requestDeviceCode requests a device code and user code.
@@ -197,14 +201,13 @@ func requestDeviceCode(
 	ctx context.Context,
 	sett *Settings,
 	deviceEndpoint string,
-	challenge string,
-	usePKCE bool,
+	pkceChallenge string,
 ) (*deviceResponse, error) {
 	initBody := url.Values{}
 	initBody.Set("client_id", sett.Client)
 	initBody.Set("scope", sett.Scope)
-	if usePKCE {
-		initBody.Set("code_challenge", challenge)
+	if pkceChallenge != "" {
+		initBody.Set("code_challenge", pkceChallenge)
 		initBody.Set("code_challenge_method", "S256")
 	}
 
