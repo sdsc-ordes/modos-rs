@@ -1,6 +1,6 @@
 {
   lib,
-  rust-platform,
+  rustPlatform,
   libComponent,
   ...
 }:
@@ -13,10 +13,8 @@
   version,
   # The source (component directory) of this Rust build.
   src,
-  # The SRI hash of the vendored dependencies.
-  # If vendor hash is `null`, then no dependencies are fetched and
-  # the build relies on the vendor folder within the source.
-  vendorHash,
+
+  lockFileRel ? "Cargo.lock",
 
   # Meta information for `mkDerivation`.
   meta,
@@ -38,8 +36,11 @@ let
     "vendorHash"
     "compName"
   ];
+
+  compSrc = "${src}/${compDirRel}";
+  lockFile = "${compSrc}/${lockFileRel}";
 in
-rust-platform.buildRustPackage (
+rustPlatform.buildRustPackage (
   forwardArgs
   // {
     inherit
@@ -49,9 +50,16 @@ rust-platform.buildRustPackage (
       meta
       ;
 
-    src = "${src}/${compDirRel}";
+    src = compSrc;
 
-    cargoHash = vendorHash;
+    cargoDeps = rustPlatform.importCargoLock {
+      inherit lockFile;
+    };
+
+    postPatch = ''
+      install -m 644 ${lockFile} Cargo.lock
+    '';
+
     buildType = if buildType == "debug" then "debug" else "release";
     buildFeatures = [ environmentType ];
 
