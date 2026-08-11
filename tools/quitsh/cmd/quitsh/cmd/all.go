@@ -2,27 +2,26 @@ package cmd
 
 import (
 	"modos-rs/tools/quitsh/cmd/quitsh/cmd/setup"
+	modosConfig "modos-rs/tools/quitsh/pkg/config"
 
-	cnBuildCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/build"
-	cnFormatCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/format"
-	cnImageCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/image"
-	cnLintCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/lint"
-	cnManifestCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/manifest"
-	cnNix "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/nix"
-	cnTestCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/test"
-	"gitlab.com/data-custodian/custodian/tools/quitsh/pkg/config"
+	buildCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/build"
+	imageCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/image"
+	lintCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/lint"
+	testCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/test"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 	cleanCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/clean"
 	configCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/config"
 	execRunnerCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/exec-runner"
 	execTargetCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/exec-target"
+	formatCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/format"
 	listCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/list"
+	nixCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/nix"
 	proccompCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/process-compose"
-	versionupcmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/version-up"
+	versionupCmd "github.com/sdsc-ordes/quitsh/pkg/cli/cmd/version-up"
 )
 
-func AddCommands(cl cli.ICLI, conf *config.Config) {
+func AddCommands(cl cli.ICLI, conf *modosConfig.Config) {
 	// Quitsh commands.
 	configCmd.AddCmd(cl.RootCmd(), conf)
 	execRunnerCmd.AddCmd(cl, cl.RootCmd(), &conf.Commands.DispatchArgs)
@@ -30,16 +29,15 @@ func AddCommands(cl cli.ICLI, conf *config.Config) {
 	listCmd.AddCmd(cl, cl.RootCmd())
 	cleanCmd.AddCmd(cl)
 	proccompCmd.AddCmd(cl, cl.RootCmd(), conf.Nix.FlakeDirRel)
-	versionupcmd.AddCmd(cl, cl.RootCmd())
+	versionupCmd.AddCmd(cl, cl.RootCmd())
+	nixCmd.AddCmd(cl, cl.RootCmd(), &conf.Nix)
+	formatCmd.AddCmd(cl.RootCmd(), &conf.Nix)
 
 	// modos commands.
-	cnBuildCmd.AddCmd(cl, &conf.Build, &conf.Commands.ExecArgs)
-	cnLintCmd.AddCmd(cl, &conf.Lint, &conf.Commands.ExecArgs)
-	cnTestCmd.AddCmd(cl, &conf.Test, &conf.Commands.ExecArgs)
-	cnImageCmd.AddCmd(cl, &conf.Image, &conf.Commands.ExecArgs)
-	cnManifestCmd.AddCmd(cl, &conf.Manifest, &conf.Image, &conf.Commands.ExecArgs)
-	cnNix.AddCmd(cl, &conf.Nix)
-	cnFormatCmd.AddCmd(cl.RootCmd(), &conf.Nix)
+	buildCmd.AddCmd(cl, &conf.Build, &conf.Commands.ExecArgs)
+	lintCmd.AddCmd(cl, &conf.Lint, &conf.Commands.ExecArgs)
+	testCmd.AddCmd(cl, &conf.Test, &conf.Commands.ExecArgs)
+	imageCmd.AddCmd(cl, &conf.Image, &conf.Commands.ExecArgs)
 
 	// Own commands.
 	setup.AddCmd(cl.RootCmd(), &conf.Nix)

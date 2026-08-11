@@ -3,20 +3,16 @@ package main
 import (
 	"modos-rs/tools/quitsh/cmd/quitsh/cmd"
 	"modos-rs/tools/quitsh/pkg/build"
-	modosConfig "modos-rs/tools/quitsh/pkg/config"
+	mdConfig "modos-rs/tools/quitsh/pkg/config"
 	"modos-rs/tools/quitsh/pkg/nix"
-	modosRunner "modos-rs/tools/quitsh/pkg/runner"
+	mdRunner "modos-rs/tools/quitsh/pkg/runner"
 	"os"
-
-	cnConfig "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/config"
-	cnRunner "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/runner"
-	"gitlab.com/data-custodian/custodian/tools/quitsh/pkg/stage"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 	"github.com/sdsc-ordes/quitsh/pkg/common"
+	"github.com/sdsc-ordes/quitsh/pkg/component/stage"
 	"github.com/sdsc-ordes/quitsh/pkg/config"
 	"github.com/sdsc-ordes/quitsh/pkg/log"
-	qRunnerExec "github.com/sdsc-ordes/quitsh/pkg/runner/exec"
 	"github.com/sdsc-ordes/quitsh/pkg/toolchain"
 )
 
@@ -26,20 +22,20 @@ func main() {
 		log.PanicE(err, "Could not setup logger.")
 	}
 
-	args := modosConfig.New()
+	conf := mdConfig.New()
 
 	cli, err := cli.New(
-		&args.Commands.Root,
-		&args,
+		&conf.Commands.Root,
+		&conf,
 		cli.WithName("quitsh"),
 		cli.WithVersion(build.Version()),
-		cli.WithStages(stage.AllForQuitsh()...),
+		cli.WithStages(stage.AllStages()...),
 		cli.WithTargetToStageMapperDefault(),
 		cli.WithSignalContext(true),
 		cli.WithToolchainDispatcherNix(
 			nix.DefaultFlakeDirRel,
 			func(c config.IConfig) *toolchain.DispatchArgs {
-				cc := common.Cast[*cnConfig.Config](c)
+				cc := common.Cast[*mdConfig.Config](c)
 
 				return &cc.Commands.DispatchArgs
 			},
@@ -56,26 +52,16 @@ func main() {
 	}()
 
 	// Enhance the CLI with our commands and runners.
-	cmd.AddCommands(cli, &args.Config)
+	cmd.AddCommands(cli, &conf)
 
-	cnRunner.RegisterAll(
-		&args.Build,
-		&args.Lint,
-		&args.Test,
-		&args.Image,
-		nil,
-		&args.Nix,
-		cli.RunnerFactory())
-
-	modosRunner.RegisterAll(
-		&args.Lint,
-		&args.Build,
-		&args.Test,
+	mdRunner.RegisterAll(
+		&conf.Lint,
+		&conf.Build,
+		&conf.Test,
+		&conf.Image,
+		&conf.Nix,
 		cli.RunnerFactory(),
 	)
-
-	err = qRunnerExec.Register(args.Build.WrapToIBuildSettings(), cli.RunnerFactory(), true)
-	log.PanicE(err, "Could not register exec runner.")
 
 	// Run the app.
 	err = cli.Run()
