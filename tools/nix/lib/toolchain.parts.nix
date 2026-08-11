@@ -231,14 +231,10 @@ let
                 pkgs.cachix
 
                 # Essentials.
+                pkgs.gh
                 pkgs.git
                 pkgs.just
-                pkgs.fd
                 pkgs.source-meta-json-schema
-
-                # Web-Traffic
-                pkgs.xh # WARNING: Use this instead of httpie, which adds PYTHONPATH
-                pkgs.jwt-cli # Decode jwt tokens.
 
                 # Inspect/upload images.
                 pkgs.dive
