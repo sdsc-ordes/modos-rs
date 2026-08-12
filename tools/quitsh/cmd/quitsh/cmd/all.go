@@ -7,6 +7,7 @@ import (
 	ciCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/ci"
 	imageCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/image"
 	lintCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/lint"
+	oauthCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/oauth"
 	setupCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/setup"
 	testCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/test"
 
