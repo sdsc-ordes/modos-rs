@@ -10,21 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  nix-hash:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-nix
-        with:
-          cachix_cache_name: "${{ secrets.CACHIX_CACHE_NAME }}"
-          cachix_auth_token: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: nix-hash
-        run: just ci::run quitsh nix fix-hash
-
   checks:
     runs-on: ubuntu-latest
-    needs:
-      - nix-hash
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     strategy:
@@ -32,6 +19,9 @@ jobs:
 
       matrix:
         include:
+          - name: nix-hash
+            run: just ci::run quitsh nix fix-hash
+
           - name: lint-security
             command: just ci::run quitsh exec-target "global::lint-security"
             allow_failure: true
