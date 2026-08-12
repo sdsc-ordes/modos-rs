@@ -1,3 +1,5 @@
+//go:build test && integration
+
 package all
 
 import (
@@ -10,9 +12,12 @@ var _ = Describe("S3", func() {
 	var t testing.TB
 	BeforeEach(func() { t = GinkgoTB() })
 
-	Describe("requestin STS token triplet", func() {
+	Describe("requesting STS token triplet", Label("sts-access"), func() {
 		It("should give access to bucket-a", func() {
-			t.Log("Do something.")
+			tCtx := NewTestContext(t)
+			defer tCtx.Close(t)
+
+			t.Log("Do something.", tCtx.Keycloak)
 		})
 	})
 })

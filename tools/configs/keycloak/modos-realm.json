@@ -1366,7 +1366,7 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
-            "included.custom.audience": "modos-api",
+            "included.custom.audience": "modos-cli",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
             "userinfo.token.claim": "false"
