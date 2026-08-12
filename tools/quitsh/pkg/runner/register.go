@@ -10,6 +10,7 @@ import (
 
 	containerfilerunner "github.com/sdsc-ordes/quitsh/pkg/runner/containerfile"
 	coveragerunner "github.com/sdsc-ordes/quitsh/pkg/runner/coverage"
+	execRunner "github.com/sdsc-ordes/quitsh/pkg/runner/exec"
 	"github.com/sdsc-ordes/quitsh/pkg/runner/gitdiffrunner"
 	gorunner "github.com/sdsc-ordes/quitsh/pkg/runner/go"
 	nixrunner "github.com/sdsc-ordes/quitsh/pkg/runner/nix"
@@ -28,7 +29,10 @@ func RegisterAll(
 	log.Trace("Register all runners.")
 	var err error
 
-	e := gorunner.RegisterBuild(buildSettings.WrapToIBuildSettings(), factory, true)
+	e := execRunner.Register(buildSettings.WrapToIBuildSettings(), factory, true)
+	err = errors.Combine(err, e)
+
+	e = gorunner.RegisterBuild(buildSettings.WrapToIBuildSettings(), factory, true)
 	err = errors.Combine(err, e)
 
 	e = gorunner.RegisterTest(testSettings.WrapToITestSettings(), factory, true)

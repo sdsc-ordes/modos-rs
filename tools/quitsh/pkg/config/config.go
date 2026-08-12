@@ -1,6 +1,7 @@
 package config
 
 import (
+	modosregistry "modos-rs/tools/quitsh/pkg/modos-rs/registry"
 	"modos-rs/tools/quitsh/pkg/runner/config"
 	"path"
 
@@ -67,6 +68,16 @@ type (
 // SetDefaults implements [defaults.Setter].
 func (c *CISettings) SetDefaults() {
 	c.PipelineSettingsFile = DefaultPipelineSettingsFile()
+}
+
+func (c *Config) SetDefaults() {
+	c.Image.Push.RegistryDomain, c.Image.Push.RegistryBasePathFmt =
+		modosregistry.NewRegistryBaseName()
+
+	c.Nix.Cache.SSH.Enable = true
+	c.Nix.Cache.SSH.HostName = "nix-cache.swisscustodian.ch"
+	c.Nix.Cache.SSH.HostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMP4u5o2KC6f2OpO4b1GRQzhdcBheLENmS++xw1y5JvY"
+	c.Nix.Cache.SSH.Write.PrivateKeyEnv = "NIX_CACHE_SSH_WRITE_KEY"
 }
 
 // New returns a Custodian quitsh [config.IConfig] with default values.
