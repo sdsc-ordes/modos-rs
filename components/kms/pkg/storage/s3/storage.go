@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"time"
@@ -29,6 +30,67 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 			"could not ping buckets (timeout: '%v')",
 			defaultPingTimeout)
 	}
+
+	return
+}
+
+func (c *clientS3) uploadTest(
+	ctx context.Context,
+	bucketName string,
+) (err error) {
+	reader := bytes.NewReader([]byte("This is an upload test."))
+	objectKey := "test-object.txt"
+
+	clog.Infof(ctx, "Starting to upload test object.")
+
+	_, err = c.client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectKey),
+		Body:   reader,
+	})
+
+	if err != nil {
+		return errors.AddContext(err, "Failed to upload test object.")
+	} else {
+		err = s3.NewObjectExistsWaiter(c.client).Wait(
+			ctx, &s3.HeadObjectInput{
+				Bucket: aws.String(bucketName),
+				Key:    aws.String(objectKey)},
+			time.Minute)
+		if err != nil {
+			return errors.AddContext(
+				err,
+				"Failed attempt to wait for object %s to exist.\n",
+				objectKey,
+			)
+		}
+	}
+
+	clog.Infof(ctx, "Test object was successfully uploaded.")
+
+	_, err = c.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(bucketName),
+	})
+
+	if err != nil {
+		return errors.AddContext(err, "Failed to delete object %s.\n", objectKey)
+	} else {
+		err = s3.NewObjectNotExistsWaiter(c.client).Wait(
+			ctx, &s3.HeadObjectInput{
+				Bucket: aws.String(bucketName),
+				Key:    aws.String(objectKey)},
+			time.Minute)
+		if err != nil {
+			return errors.AddContext(
+				err,
+				"Failed attempt to wait for object %s to be delteted.\n",
+				objectKey,
+			)
+		}
+	}
+
+	clog.Infof(ctx, "Test object successfully deleted.")
 
 	return
 }
