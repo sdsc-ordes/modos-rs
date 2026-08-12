@@ -13,7 +13,7 @@ import (
 
 	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/lestrrat-go/jwx/v3/jwt"
-	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/pkg/jwt/test"
+	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 )
@@ -78,10 +78,10 @@ func (c *TestContext) NewTokenAuthentik(t testing.TB, options ...mdJwt.Option) j
 func getAuthentikPrivateKey(t testing.TB) jwk.Key {
 	// Note: same as in `modos-oauth-blueprint.yaml`
 	pemKey := `-----BEGIN PRIVATE KEY-----
-        MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE2rYNDdsy50q8Z+c
-        FJRWAy7ZXtn8EOYpYhrLH3P425+hRANCAAS2qulHIyTz2hobJ3eBxzhd4+iH2Kxj
-        nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
-        -----END PRIVATE KEY-----`
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE2rYNDdsy50q8Z+c
+FJRWAy7ZXtn8EOYpYhrLH3P425+hRANCAAS2qulHIyTz2hobJ3eBxzhd4+iH2Kxj
+nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
+-----END PRIVATE KEY-----`
 
 	block, _ := pem.Decode([]byte(pemKey))
 	require.NotNil(t, block, "Failed to decode PEM block.")
