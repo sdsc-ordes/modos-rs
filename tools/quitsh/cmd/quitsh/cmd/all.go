@@ -43,4 +43,5 @@ func AddCommands(cl cli.ICLI, conf *modosConfig.Config) {
 	// Own commands.
 	setupCmd.AddCmd(cl.RootCmd(), &conf.Nix)
 	ciCmd.AddCmd(cl, cl.RootCmd())
+	oauthCmd.AddCmd(cl, cl.RootCmd())
 }
