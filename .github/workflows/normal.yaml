@@ -10,6 +10,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Aggregate check for protection rule.
+  checks-all:
+    if: always()
+    needs:
+      - checks # your matrix job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all matrix jobs passed
+        run: |
+          if [[ "${{ needs.checks.result }}" != "success" ]]; then
+            echo "One or more checks failed: ${{ needs.checks.result }}"
+            exit 1
+          fi
+
   checks:
     runs-on: ${{ matrix.runs_on || 'ubuntu-latest' }}
     env:

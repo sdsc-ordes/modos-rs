@@ -1,7 +1,7 @@
 package oauth
 
 import (
-	devicecodeflow "modos-rs/tools/quitsh/cmd/oauth/device-code-flow"
+	devicecodeflow "modos-rs/tools/quitsh/cmd/quitsh/cmd/oauth/device-code-flow"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 
