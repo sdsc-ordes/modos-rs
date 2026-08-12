@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"modos-rs/tools/quitsh/cmd/quitsh/cmd/setup"
 	modosConfig "modos-rs/tools/quitsh/pkg/config"
 
 	buildCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/build"
+	ciCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/ci"
 	imageCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/image"
 	lintCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/lint"
+	setupCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/setup"
 	testCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/test"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
@@ -40,5 +41,6 @@ func AddCommands(cl cli.ICLI, conf *modosConfig.Config) {
 	imageCmd.AddCmd(cl, &conf.Image, &conf.Commands.ExecArgs)
 
 	// Own commands.
-	setup.AddCmd(cl.RootCmd(), &conf.Nix)
+	setupCmd.AddCmd(cl.RootCmd(), &conf.Nix)
+	ciCmd.AddCmd(cl, cl.RootCmd())
 }
