@@ -11,7 +11,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/hashicorp/go-version v1.7.0
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260811191533-87323c50acf5
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260812081929-07ff1624ba69
 	github.com/stretchr/testify v1.11.1
 )
 
