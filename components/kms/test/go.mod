@@ -13,7 +13,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.40.0
 	github.com/sdsc-ordes/modos-rs/tools/quitsh v0.0.0-00010101000000-000000000000
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260812081929-07ff1624ba69
 	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1
 )
 
@@ -50,7 +50,6 @@ require (
 	github.com/otiai10/copy v1.14.1 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
