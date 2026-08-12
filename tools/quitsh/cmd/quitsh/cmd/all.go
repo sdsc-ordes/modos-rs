@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	ciCmd "modos-rs/tools/quitsh/cmd/ci"
+	ciCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/ci"
+	oauthCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/oauth"
 	setupCmd "modos-rs/tools/quitsh/cmd/quitsh/cmd/setup"
 
 	cnBuildCmd "gitlab.com/data-custodian/custodian/tools/quitsh/cmd/quitsh/cmd/build"
@@ -45,4 +46,5 @@ func AddCommands(cl cli.ICLI, conf *config.Config) {
 	// Own commands.
 	setupCmd.AddCmd(cl.RootCmd(), &conf.Nix)
 	ciCmd.AddCmd(cl, cl.RootCmd())
+	oauthCmd.AddCmd(cl, cl.RootCmd())
 }

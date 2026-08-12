@@ -11,7 +11,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/hashicorp/go-version v1.7.0
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260804081940-7e5700a4552f
 	github.com/stretchr/testify v1.11.1
 
 	// NOTE: This looks weird but is only due to that we use some runners from Custodian.

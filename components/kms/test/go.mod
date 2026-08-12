@@ -13,7 +13,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.40.0
 	github.com/sdsc-ordes/modos-rs/tools/quitsh v0.0.0-00010101000000-000000000000
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260804081940-7e5700a4552f
 	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1
 )
 

@@ -5,6 +5,10 @@ Describe the big picture of your changes here to communicate to the maintainers
 why we should accept this pull request. If it fixes a bug or resolves a feature request, be sure to link to that issue.
 -->
 
+Assisted-by:
+
+<!-- Denote here if you used an agent or not, for what parts and in what detail. -->
+
 ## Types of Changes
 
 What types of changes does your contribution introduce? _Put an `x` in the boxes
