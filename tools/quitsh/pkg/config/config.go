@@ -80,7 +80,7 @@ func (c *Config) SetDefaults() {
 	c.Nix.Cache.SSH.Write.PrivateKeyEnv = "NIX_CACHE_SSH_WRITE_KEY"
 }
 
-// New returns a Custodian quitsh [config.IConfig] with default values.
+// New returns a Modos quitsh [config.IConfig] with default values.
 func New() (args Config) {
 	// Fields which are also flags will be initialized
 	// by the flags default values.
