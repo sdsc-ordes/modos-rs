@@ -130,18 +130,23 @@ Provider support for the **modern** `EdDSA`:
   certificates, limited to RSA (→ `RS256`) or ECDSA (→ `ES256`/`ES384`/`ES512`),
   with `HS256` as the client-secret fallback.
 
-| JWK `kty` | Math Family                  | Curves / Sizes               | JWS Algorithm(s)                                           | Go Type                         |
-| --------- | ---------------------------- | ---------------------------- | ---------------------------------------------------------- | ------------------------------- |
-| `RSA`     | Integer factorization        | ≥2048 bit (2048–4096 common) | `PS256`/`PS384`/`PS512`, (older: `RS256`/`RS384`/`RS512`), | `crypto/rsa`                    |
-| `EC`      | ECDSA over NIST prime curves | P-256, P-384, P-521          | `ES256`, `ES384`, `ES512`                                  | `crypto/ecdsa`                  |
-| `OKP`     | Edwards / Montgomery curves  | Ed25519, Ed448, X25519, X448 | `EdDSA` (sign), `ECDH-ES` (agreement)                      | `crypto/ed25519`, `crypto/ecdh` |
+| JWK `kty` | Math Family                           | Curves / Sizes               | JWS Algorithm(s)                                           | Go Type                         |
+| --------- | ------------------------------------- | ---------------------------- | ---------------------------------------------------------- | ------------------------------- |
+| `RSA`     | Integer factorization                 | ≥2048 bit (2048–4096 common) | `PS256`/`PS384`/`PS512`, (older: `RS256`/`RS384`/`RS512`), | `crypto/rsa`                    |
+| `EC`      | ECDSA over NIST prime elliptic curves | P-256, P-384, P-521          | `ES256`, `ES384`, `ES512`                                  | `crypto/ecdsa`                  |
+| `OKP`     | Edwards / Montgomery elliptic curves  | Ed25519, Ed448, X25519, X448 | `EdDSA` (sign), `ECDH-ES` (agreement)                      | `crypto/ed25519`, `crypto/ecdh` |
 
 > [!NOTE]
 >
-> We use
+> We use for JWT signing the following algorithms:
 >
 > - Keycloak: `Ed25519` -> `alg: EdDSA`
 > - Authentik: `ES256` -> `alg: ES256`
+
+> [!TODO]
+>
+> How and when are these predefined startup keys updated in keycloak and
+> authentik.
 
 # OAuth2 / OIDC Flows: Standard vs Device Code
 
