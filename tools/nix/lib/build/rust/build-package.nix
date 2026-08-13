@@ -56,10 +56,6 @@ rustPlatform.buildRustPackage (
       inherit lockFile;
     };
 
-    postPatch = ''
-      install -m 644 ${lockFile} Cargo.lock
-    '';
-
     buildType = if buildType == "debug" then "debug" else "release";
     buildFeatures = [ environmentType ];
 
