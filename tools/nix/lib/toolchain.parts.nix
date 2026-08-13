@@ -253,7 +253,7 @@ let
       collaboration = [
         {
           packages = [
-            pkgsStable.anydesk
+            pkgsStable.rustdesk
             pkgs.tmate
           ];
         }
