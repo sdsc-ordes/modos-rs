@@ -236,9 +236,6 @@ let
                 pkgs.just
                 pkgs.source-meta-json-schema
 
-                # Share Shells
-                pkgs.tmate
-
                 # Inspect/upload images.
                 pkgs.dive
                 pkgs.skopeo
@@ -252,6 +249,15 @@ let
             }
           )
         ];
+
+      collaboration = [
+        {
+          packages = [
+            pkgsStable.anydesk
+            pkgs.tmate
+          ];
+        }
+      ];
 
       default = git-hooks ++ default-nogh;
 
@@ -283,6 +289,7 @@ let
       # Main shells:
       default = addSetup default;
       default-nogh = addSetup default-nogh;
+      collaboration = addSetup collaboration;
 
       ci = addSetup ci;
 
