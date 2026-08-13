@@ -18,7 +18,7 @@ import (
 )
 
 // Ping implements [types.Client].
-func (c *clientS3) Ping(ctx context.Context) (err error) {
+func (c *clientS3) Ping(ctx context.Context) error {
 	clog.Infof(ctx, "Pinging buckets.")
 
 	ctxT, cancel := context.WithTimeout(ctx, defaultPingTimeout)
@@ -32,28 +32,33 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 			defaultPingTimeout)
 	}
 
-	return
+	return nil
 }
 
 func (c *clientS3) UploadTest(
 	ctx context.Context,
 	bucketName string,
 	creds types.Credentials,
-) (err error) {
+) error {
 	reader := bytes.NewReader([]byte("This is an upload test."))
 	objectKey := "test-object.txt"
 
 	clog.Infof(ctx, "Starting to upload test object.")
 
-	_, err = c.client.PutObject(ctx, &s3.PutObjectInput{
+	s3Creds, ok := creds.(*S3Credentials)
+	if !ok {
+		return errors.New("credentials must be 'S3Credentials'")
+	}
+
+	_, err := c.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: &bucketName,
 		Key:    &objectKey,
 		Body:   reader,
 	}, func(o *s3.Options) {
 		o.Credentials = credentials.NewStaticCredentialsProvider(
-			string(creds.AccessKeyID),
-			string(creds.SecretAccessKey),
-			string(creds.SessionToken),
+			string(s3Creds.AccessKeyID),
+			string(s3Creds.SecretAccessKey),
+			string(s3Creds.SessionToken),
 		)
 	})
 	if err != nil {
@@ -77,12 +82,12 @@ func (c *clientS3) UploadTest(
 
 	_, err = c.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(bucketName),
-		Key:    aws.String(bucketName),
+		Key:    aws.String(objectKey),
 	}, func(o *s3.Options) {
 		o.Credentials = credentials.NewStaticCredentialsProvider(
-			string(creds.AccessKeyID),
-			string(creds.SecretAccessKey),
-			string(creds.SessionToken),
+			string(s3Creds.AccessKeyID),
+			string(s3Creds.SecretAccessKey),
+			string(s3Creds.SessionToken),
 		)
 	})
 	if err != nil {
@@ -104,7 +109,7 @@ func (c *clientS3) UploadTest(
 
 	clog.Infof(ctx, "Test object successfully deleted.")
 
-	return
+	return nil
 }
 
 // Credentials implements [types.Client].

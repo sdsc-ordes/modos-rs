@@ -10,6 +10,7 @@ import (
 )
 
 const s3GetObject = "s3:GetObject"
+const s3DeleteObject = "s3:DeleteObject"
 const s3PutObject = "s3:PutObject"
 const s3ListBucket = "s3:ListBucket"
 
@@ -39,7 +40,7 @@ func toAction(ctx context.Context, perms []types.Permission) (actions []string) 
 		case types.PermissionRead:
 			actions = append(actions, s3GetObject, s3ListBucket)
 		case types.PermissionWrite:
-			actions = append(actions, s3PutObject)
+			actions = append(actions, s3PutObject, s3DeleteObject)
 		default:
 			clog.Error(ctx, "Cannot create action for permissions '%v'.", p)
 

@@ -54,6 +54,10 @@ func main() {
 	}
 	clog.Info(ctx, "Credentials created.", "creds", creds)
 
-	client.UploadTest(ctx, "bucket-a", creds)
+	err = client.UploadTest(ctx, "bucket-b", creds)
+	if err != nil {
+		log.ErrorE(err, "Could not upload test file.")
+	}
+
 	_ = service.Service{Storage: client}
 }

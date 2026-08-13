@@ -22,7 +22,12 @@
     "Statement": [
       {
         "Effect": "Allow",
-        "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ],
         "Resource": ["arn:aws:s3:::*", "arn:aws:s3:::*/*"]
       },
       { "Effect": "Allow", "Action": ["sts:AssumeRole"] }
