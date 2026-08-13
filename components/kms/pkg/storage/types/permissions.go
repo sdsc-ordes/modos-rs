@@ -8,9 +8,9 @@ type (
 
 	BucketPermission struct {
 		// The bucket permission resource path (without '*' or '?' due to safetey)
-		Path string
+		Path string `json:"path"`
 		// The permissions for this bucket.
-		Permissions []Permission
+		Permissions []Permission `json:"permission"`
 	}
 
 	BucketPermissions = []BucketPermission

@@ -16,6 +16,8 @@ import (
 	"github.com/lestrrat-go/jwx/v3/jwt"
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
+	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/modos-rs/components/kms/test/common"
 	"github.com/stretchr/testify/require"
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
@@ -25,11 +27,15 @@ import (
 
 type (
 	TestContext struct {
-		Context   context.Context
-		Log       log.Logger
-		RootDir   string
+		Ctx context.Context
+
+		Log     log.Logger
+		RootDir string
+
 		Keycloak  OAuth
 		Authentik OAuth
+
+		Storage st.Client
 	}
 
 	OAuth struct {
@@ -56,10 +62,13 @@ func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestConte
 	require.NoError(t, err, "Could not load config files in '%s'.", configDir)
 	conf.WithDataDir(dataDir)
 
-	return &TestContext{
-		Context: ctx,
-		RootDir: rootDir,
+	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
+	log.PanicEf(err, "Could not create S3 storage.")
 
+	return &TestContext{
+		Ctx:       ctx,
+		RootDir:   rootDir,
+		Storage:   client,
 		Keycloak:  OAuth{JWTPrivateKey: getKeycloakPrivateKey(t)},
 		Authentik: OAuth{JWTPrivateKey: getAuthentikPrivateKey(t)},
 	}
@@ -76,9 +85,11 @@ func (c *testContextOpts) Apply(options ...TestContextOption) {
 
 // NewTokenKeycloak returns a signed token with default values.
 func (c *TestContext) NewTokenKeycloak(t testing.TB, options ...mdJwt.Option) jwt.Token {
-	options = append(options, mdJwt.WithModifications(func(b *jwt.Builder) {
-		b.Audience([]string{mdJwt.DefaultIssuerKeycloak})
-	}))
+	options = append(
+		options,
+		mdJwt.WithModifications(func(b *jwt.Builder) {
+			b.Audience([]string{mdJwt.DefaultIssuerKeycloak})
+		}))
 
 	return mdJwt.NewToken(t, options...)
 }
