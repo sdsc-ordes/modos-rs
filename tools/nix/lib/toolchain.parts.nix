@@ -236,6 +236,9 @@ let
                 pkgs.just
                 pkgs.source-meta-json-schema
 
+                # Share Shells
+                pkgs.tmate
+
                 # Inspect/upload images.
                 pkgs.dive
                 pkgs.skopeo
