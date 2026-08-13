@@ -9,18 +9,25 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"path"
 	"testing"
 
 	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/lestrrat-go/jwx/v3/jwt"
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
+	"github.com/sdsc-ordes/modos-rs/components/kms/test/common"
 	"github.com/stretchr/testify/require"
+	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
+	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 )
 
 type (
 	TestContext struct {
 		Context   context.Context
+		Log       log.Logger
+		RootDir   string
 		Keycloak  OAuth
 		Authentik OAuth
 	}
@@ -30,19 +37,29 @@ type (
 	}
 
 	TestContextOption func(*testContextOpts)
-
-	testContextOpts struct {
-	}
+	testContextOpts   struct{}
 )
 
 // NewTestContext sets up test context.
 func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestContext) {
 	log.Info("Construct new test context.")
-
 	var o testContextOpts
 	o.Apply(opts...)
 
+	ctx := clog.ContextFrom(context.Background(), log.GetLoggerOrig().Named("kms"))
+
+	rootDir := common.GetTestRootDir()
+	dataDir := path.Join(rootDir, "data")
+	configDir := path.Join(dataDir, "config")
+
+	conf, err := cmc.LoadConfigs[config.Config](configDir)
+	require.NoError(t, err, "Could not load config files in '%s'.", configDir)
+	conf.WithDataDir(dataDir)
+
 	return &TestContext{
+		Context: ctx,
+		RootDir: rootDir,
+
 		Keycloak:  OAuth{JWTPrivateKey: getKeycloakPrivateKey(t)},
 		Authentik: OAuth{JWTPrivateKey: getAuthentikPrivateKey(t)},
 	}
@@ -88,7 +105,7 @@ nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
 
 	rawKey, e := x509.ParsePKCS8PrivateKey(block.Bytes)
 	require.NoError(t, e, "failed to parse key as PKCS#8.")
-	privKey, ok := rawKey.(ecdsa.PrivateKey)
+	privKey, ok := rawKey.(*ecdsa.PrivateKey)
 	require.True(t, ok, "Failed to convert key to RSA private key.")
 
 	key, err := jwk.Import(privKey)
@@ -102,6 +119,7 @@ nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
 }
 
 func getKeycloakPrivateKey(t testing.TB) jwk.Key {
+	// Note: same as in `modos-realm.json`
 	b64Key := "MC4CAQAwBQYDK2VwBCIEIGaiqDys9Gpq+mGrDeFus9q9WTmrD9x8rJW1Bvdynbix"
 
 	derBytes, err := base64.StdEncoding.DecodeString(b64Key)
