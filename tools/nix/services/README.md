@@ -105,7 +105,7 @@ sequenceDiagram
     Auth-->>CLI: access_token, id_token
 ```
 
-# Signing Algorithm
+# Signing Algorithms
 
 The **JWK** specification (RFC 7517) defines a JSON representation for
 cryptographic keys — this covers both **signing** (JWS) and **encryption / key
@@ -140,8 +140,8 @@ Provider support for the **modern** `EdDSA`:
 >
 > We use
 >
-> - Keycloak: `Ed25519` -> `kty: EdDSA`
-> - Authentik: `ES256` -> `kty: ES256`
+> - Keycloak: `Ed25519` -> `alg: EdDSA`
+> - Authentik: `ES256` -> `alg: ES256`
 
 # OAuth2 / OIDC Flows: Standard vs Device Code
 
