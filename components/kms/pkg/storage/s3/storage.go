@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
@@ -34,9 +35,10 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 	return
 }
 
-func (c *clientS3) uploadTest(
+func (c *clientS3) UploadTest(
 	ctx context.Context,
 	bucketName string,
+	creds types.Credentials,
 ) (err error) {
 	reader := bytes.NewReader([]byte("This is an upload test."))
 	objectKey := "test-object.txt"
@@ -44,50 +46,60 @@ func (c *clientS3) uploadTest(
 	clog.Infof(ctx, "Starting to upload test object.")
 
 	_, err = c.client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(objectKey),
+		Bucket: &bucketName,
+		Key:    &objectKey,
 		Body:   reader,
+	}, func(o *s3.Options) {
+		o.Credentials = credentials.NewStaticCredentialsProvider(
+			string(creds.AccessKeyID),
+			string(creds.SecretAccessKey),
+			string(creds.SessionToken),
+		)
 	})
-
 	if err != nil {
-		return errors.AddContext(err, "Failed to upload test object.")
-	} else {
-		err = s3.NewObjectExistsWaiter(c.client).Wait(
-			ctx, &s3.HeadObjectInput{
-				Bucket: aws.String(bucketName),
-				Key:    aws.String(objectKey)},
-			time.Minute)
-		if err != nil {
-			return errors.AddContext(
-				err,
-				"Failed attempt to wait for object %s to exist.\n",
-				objectKey,
-			)
-		}
+		return errors.AddContext(err, "failed to upload test object")
 	}
 
-	clog.Infof(ctx, "Test object was successfully uploaded.")
+	err = s3.NewObjectExistsWaiter(c.client).Wait(
+		ctx, &s3.HeadObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(objectKey)},
+		time.Minute)
+	if err != nil {
+		return errors.AddContext(
+			err,
+			"failed attempt to wait for object '%s' to exist",
+			objectKey,
+		)
+	}
+
+	clog.Info(ctx, "Test object was successfully uploaded.", "bn", bucketName)
 
 	_, err = c.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(bucketName),
+	}, func(o *s3.Options) {
+		o.Credentials = credentials.NewStaticCredentialsProvider(
+			string(creds.AccessKeyID),
+			string(creds.SecretAccessKey),
+			string(creds.SessionToken),
+		)
 	})
-
 	if err != nil {
-		return errors.AddContext(err, "Failed to delete object %s.\n", objectKey)
-	} else {
-		err = s3.NewObjectNotExistsWaiter(c.client).Wait(
-			ctx, &s3.HeadObjectInput{
-				Bucket: aws.String(bucketName),
-				Key:    aws.String(objectKey)},
-			time.Minute)
-		if err != nil {
-			return errors.AddContext(
-				err,
-				"Failed attempt to wait for object %s to be delteted.\n",
-				objectKey,
-			)
-		}
+		return errors.AddContext(err, "Failed to delete object '%s'", objectKey)
+	}
+
+	err = s3.NewObjectNotExistsWaiter(c.client).Wait(
+		ctx, &s3.HeadObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(objectKey)},
+		time.Minute)
+	if err != nil {
+		return errors.AddContext(
+			err,
+			"failed attempt to wait for object %s to be delteted",
+			objectKey,
+		)
 	}
 
 	clog.Infof(ctx, "Test object successfully deleted.")

@@ -17,5 +17,11 @@ type (
 			perms BucketPermissions,
 			duration time.Duration,
 		) (creds Credentials, err error)
+
+		UploadTest(
+			ctx context.Context,
+			bucketName string,
+			creds Credentials,
+		) (err error)
 	}
 )
