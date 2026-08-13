@@ -1,9 +1,8 @@
 package setup
 
 import (
+	"modos-rs/tools/quitsh/pkg/runner/config"
 	"modos-rs/tools/quitsh/pkg/setup"
-
-	"gitlab.com/data-custodian/custodian/tools/quitsh/pkg/runner/config"
 
 	"github.com/spf13/cobra"
 )

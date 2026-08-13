@@ -6,18 +6,18 @@ import (
 	"github.com/sdsc-ordes/quitsh/pkg/exec"
 	fs "github.com/sdsc-ordes/quitsh/pkg/filesystem"
 	"github.com/sdsc-ordes/quitsh/pkg/runner"
-	cnConfig "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/runner/config"
+	"github.com/sdsc-ordes/quitsh/pkg/runner/config"
 )
 
 const RustLintRunnerID = "quitsh::lint-rust"
 
 type RustLintRunner struct {
 	config   *RunnerConfigLint
-	settings *cnConfig.LintSettings
+	settings *config.LintSettings
 }
 
 // NewRustLintRunner constructs a new GoBuildRunner with its own config.
-func NewRustLintRunner(config any, settings *cnConfig.LintSettings) (runner.IRunner, error) {
+func NewRustLintRunner(config any, settings *config.LintSettings) (runner.IRunner, error) {
 	debug.Assert(config != nil, "config is nil")
 
 	return &RustLintRunner{
