@@ -1,4 +1,8 @@
-{ lib, modos, ... }:
+{
+  lib,
+  wrappersLib,
+  ...
+}:
 let
 
   # Create `devenv` modules where `pkgs` and `pkgsStable`
@@ -250,6 +254,30 @@ let
           )
         ];
 
+      collaboration = [
+        (
+          { config, ... }:
+          {
+            quitsh.toolchains = [ "collaboration" ];
+
+            enterShell = ''
+              ${config.quitsh.log.package}/bin/log info "🐚🐚🐚 Run 'tmate' and connect to each others terminals. 🐚🐚🐚"
+            '';
+
+            packages = [
+              pkgsStable.rustdesk
+              (wrappersLib.wrapPackage {
+                inherit pkgs;
+                package = pkgs.tmate;
+                flags = {
+                  "-f" = "$HOME/.config/tmate/sit-cloud-infra.conf";
+                };
+              })
+            ];
+          }
+        )
+      ];
+
       default = git-hooks ++ default-nogh;
 
       ci = [
@@ -280,6 +308,8 @@ let
       # Main shells:
       default = addSetup default;
       default-nogh = addSetup default-nogh;
+
+      inherit collaboration;
 
       ci = addSetup ci;
 
