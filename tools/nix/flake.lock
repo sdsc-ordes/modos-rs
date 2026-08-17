@@ -1818,6 +1818,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_14": {
+      "locked": {
+        "lastModified": 1773734432,
+        "narHash": "sha256-IF5ppUWh6gHGHYDbtVUyhwy/i7D261P7fWD1bPefOsw=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "cda48547b432e8d3b18b4180ba07473762ec8558",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1765186076,
@@ -2185,7 +2201,8 @@
         "rustfs-flake": "rustfs-flake",
         "services-flake": "services-flake",
         "systems": "systems_5",
-        "treefmt-nix": "treefmt-nix_4"
+        "treefmt-nix": "treefmt-nix_4",
+        "wrappers": "wrappers"
       }
     },
     "rust-overlay": {
@@ -2490,6 +2507,24 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
+        "type": "github"
+      }
+    },
+    "wrappers": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_14"
+      },
+      "locked": {
+        "lastModified": 1786302707,
+        "narHash": "sha256-YUeRuvsvqtJAUquflKk9xs9nA3OFlPvbMKiaIw2jC3U=",
+        "owner": "lassulus",
+        "repo": "wrappers",
+        "rev": "c47db17fbb8830e4f9f81a3bf416b71d3449687e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lassulus",
+        "repo": "wrappers",
         "type": "github"
       }
     },

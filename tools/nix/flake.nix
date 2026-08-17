@@ -53,6 +53,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Wrapper executables and other stuff.
+    wrappers.url = "github:lassulus/wrappers";
+
     # Process-compose setup for services.
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     services-flake.url = "github:juspay/services-flake";
