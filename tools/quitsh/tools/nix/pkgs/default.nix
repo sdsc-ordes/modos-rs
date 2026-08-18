@@ -33,7 +33,7 @@ buildGo126Module {
   # just nix::package quitsh
   # ```
   # to check if a new hash must be here:
-  vendorHash = "sha256-teWO/blhO9E7sd+iPFUN5dfCe7UsUFKAnJi4DW6WwiU=";
+  vendorHash = "sha256-n2hWcXtP18Rf+OZuquxdVcNZlnIuoMtnMWRj6PMqh+c=";
   proxyVendor = true;
 
   nativeBuildInputs = [ installShellFiles ];

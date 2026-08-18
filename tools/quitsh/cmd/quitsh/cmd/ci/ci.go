@@ -2,7 +2,7 @@
 package ci
 
 import (
-	updateruleset "modos-rs/tools/quitsh/cmd/ci/update-main-protection-ruleset"
+	updateruleset "modos-rs/tools/quitsh/cmd/quitsh/cmd/ci/update-main-protection-ruleset"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 
