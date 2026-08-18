@@ -265,6 +265,7 @@ let
             '';
 
             packages = [
+              pkgs.upterm
               (wrappersLib.wrapPackage {
                 inherit pkgs;
                 package = pkgs.tmate;
