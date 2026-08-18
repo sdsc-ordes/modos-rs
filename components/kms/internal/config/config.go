@@ -10,6 +10,8 @@ type Config struct {
 	Server Server `yaml:"server"`
 
 	Storage StorageS3 `yaml:"storage"`
+
+	OIDC OIDC `yaml:"oidc"`
 }
 
 type (
@@ -23,6 +25,20 @@ type (
 
 	StorageS3 struct {
 		Connection types.S3Connection `yaml:"connection"`
+	}
+
+	OIDC struct {
+		// The OpenID Connect issuer URL.
+		Issuer string `yaml:"issuer"`
+
+		// The OpenID Connect client id.
+		ClientID string `yaml:"clientID"`
+
+		// Accepted algorithms on the JWT validator.
+		TrustedAlgorithms []string `yaml:"trustedAlgorithms" default:"[\"EdDSA\", \"RS256\", \"RS512\", \"ES256\"]"`
+
+		// Accepted audiences (claim: `aud`) on the JWT validator (the `ClientID` is added by default).
+		TrustedAudiences []string `yaml:"trustedAudiences"`
 	}
 
 	Log struct {

@@ -11,6 +11,8 @@ import (
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/quitsh/pkg/log"
+
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
 
 var _ = Describe("S3", func() {
@@ -29,9 +31,29 @@ var _ = Describe("S3", func() {
 			token := testCtx.NewTokenKeycloak(t,
 				mdJwt.WithSign(testCtx.Authentik.JWTPrivateKey),
 				mdJwt.WithModifications(func(b *jwt.Builder) {
-					b.Claim("bp", []st.BucketPermissions{})
+					b.Claim("bp", st.BucketPermissions{
+						st.BucketPermission{
+							Path:        "bucket-a",
+							Permissions: []st.Permission{st.PermissionWrite}},
+					})
 				}),
 			)
+
+			cl, err := auth.ValidateJWT[D]()
+
+			// provider, err := oidc.NewProvider(ctx, issuer) // fetches .well-known/openid-configuration
+			// // endpoints for oauth2.Config:
+			// endpoint := provider.Endpoint()
+			// // verifier (handles JWKS fetch internally):
+			// verifier := provider.Verifier(&oidc.Config{ClientID: clientID})
+			// idToken, err := verifier.Verify(ctx, rawIDToken)
+			//
+			// // grab extra discovery fields not exposed as methods:
+			// var extra struct {
+			// 	ScopesSupported []string `json:"scopes_supported"`
+			// }
+			// _ = provider.Claims(&extra)
+			// Which to pick
 
 			// JWT validate -> no - because not needed.
 			// JWT -> serialize to JSON

@@ -7,5 +7,9 @@ storage:
     endpoint: http://localhost:9010
     usePathStyle: true
 
+oidc:
+  issuer: http://localhost:8081
+  clientID: modos-cli
+
 log:
   forceDevLog: true
