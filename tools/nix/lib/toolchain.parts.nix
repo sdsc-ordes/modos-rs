@@ -265,7 +265,6 @@ let
             '';
 
             packages = [
-              pkgsStable.rustdesk
               (wrappersLib.wrapPackage {
                 inherit pkgs;
                 package = pkgs.tmate;
