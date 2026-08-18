@@ -278,7 +278,7 @@ let
         )
       ];
 
-      default = git-hooks ++ default-nogh;
+      default = collaboration ++ git-hooks ++ default-nogh;
 
       ci = [
         {
