@@ -17,6 +17,7 @@ import (
 )
 
 func loadConfigs(configDir string, dataDir string) (conf config.Config) {
+
 	conf, err := cmc.LoadConfigs[config.Config](configDir)
 	log.PanicEf(err, "Failed loading config files.")
 	conf.WithDataDir(dataDir)
@@ -41,7 +42,8 @@ func main() {
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
-	jwtVerifier, err := createJWTVerifier()
+	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
+	log.PanicEf(err, "Could not create JWT verifier.")
 
 	// FIXME: remove.
 	c, err := client.NewCredentials(

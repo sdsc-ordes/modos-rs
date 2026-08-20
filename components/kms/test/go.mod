@@ -17,9 +17,9 @@ require (
 	github.com/onsi/gomega v1.40.0
 	github.com/sdsc-ordes/modos-rs/components/kms v0.0.0-00010101000000-000000000000
 	github.com/sdsc-ordes/modos-rs/tools/quitsh v0.0.0-00010101000000-000000000000
-	github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618
+	github.com/sdsc-ordes/quitsh v0.43.1-0.20260812081929-07ff1624ba69
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1
+	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260819153604-f0f63d913239
 )
 
 require (

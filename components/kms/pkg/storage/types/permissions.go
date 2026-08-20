@@ -4,13 +4,14 @@ const PermissionRead Permission = "read"
 const PermissionWrite Permission = "write"
 
 type (
-	Permission string
+	Permission = string
 
 	BucketPermission struct {
 		// The bucket permission resource path (without '*' or '?' due to safetey)
-		Path string `json:"path"`
+		Path string `json:"p"`
+
 		// The permissions for this bucket.
-		Permissions []Permission `json:"permission"`
+		Permissions []Permission `json:"bp"`
 	}
 
 	BucketPermissions = []BucketPermission

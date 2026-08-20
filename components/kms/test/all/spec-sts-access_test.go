@@ -3,15 +3,15 @@
 package all
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/lestrrat-go/jwx/v3/jwt"
 	. "github.com/onsi/ginkgo/v2"
-	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
+	mdJwtT "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/quitsh/pkg/log"
-
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
 
@@ -29,8 +29,8 @@ var _ = Describe("S3", func() {
 
 			// - Create a dummy JWT with Permissions.
 			token := testCtx.NewTokenKeycloak(t,
-				mdJwt.WithSign(testCtx.Authentik.JWTPrivateKey),
-				mdJwt.WithModifications(func(b *jwt.Builder) {
+				mdJwtT.WithSign(testCtx.Authentik.JWTPrivateKey),
+				mdJwtT.WithModifications(func(b *jwt.Builder) {
 					b.Claim("bp", st.BucketPermissions{
 						st.BucketPermission{
 							Path:        "bucket-a",
@@ -39,7 +39,9 @@ var _ = Describe("S3", func() {
 				}),
 			)
 
-			cl, err := auth.ValidateJWT[D]()
+			tokenS, err := json.Marshal(token)
+
+			cl, err := auth.ValidateJWT[mdJwt.Claims](testCtx.Ctx, testCtx.JWTVerifier, tokenS, nil)
 
 			// provider, err := oidc.NewProvider(ctx, issuer) // fetches .well-known/openid-configuration
 			// // endpoints for oauth2.Config:
@@ -59,7 +61,7 @@ var _ = Describe("S3", func() {
 			// JWT -> serialize to JSON
 			// JSON -> parse with lib-common claim `bp`.
 
-			c, err := testCtx.Storage.NewCredentials(
+			_, err := testCtx.Storage.NewCredentials(
 				testCtx.Ctx,
 				[]st.BucketPermission{},
 				1*time.Hour,

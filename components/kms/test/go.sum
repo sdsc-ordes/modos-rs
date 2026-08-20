@@ -130,6 +130,7 @@ github.com/sagikazarmark/locafero v0.9.0 h1:GbgQGNtTrEmddYDSAH9QLRyfAHY12md+8YFT
 github.com/sagikazarmark/locafero v0.9.0/go.mod h1:UBUyz37V+EdMS3hDF3QWIiVr/2dPrx49OMO0Bn0hJqk=
 github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618 h1:TgZ15Ek8tIoAPAbBTR4M4H2KAo3NqNm9r+6wEo54qZs=
 github.com/sdsc-ordes/quitsh v0.43.1-0.20260730171309-97f8788ca618/go.mod h1:JIC35KmXQYuXxhbyGMv7Zwfqts97+I1IQLR0HQLmcxk=
+github.com/sdsc-ordes/quitsh v0.43.1-0.20260812081929-07ff1624ba69/go.mod h1:N4LVcJbIhf9KmjVEgf1i/05iwNyuo9YeOj/YzLFldiw=
 github.com/segmentio/asm v1.2.1 h1:DTNbBqs57ioxAD4PrArqftgypG4/qNpXoJx8TVXxPR0=
 github.com/segmentio/asm v1.2.1/go.mod h1:BqMnlJP91P8d+4ibuonYZw9mfnzI9HfxselHZr5aAcs=
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
@@ -162,6 +163,8 @@ github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e h1:JVG44RsyaB9T2KIHavM
 github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e/go.mod h1:RbqR21r5mrJuqunuUZ/Dhy/avygyECGrLceyNeo4LiM=
 gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1 h1:rmVresI22eNfbbvLWjB5ZmCYLWUnfhVsvxKoSb/nbRY=
 gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260727115656-de5a9ee9d6c1/go.mod h1:HgYCRbatsXX43wEDMYzxoJXLneMrSSiI4KuHWxWfFOw=
+gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260819153604-f0f63d913239 h1:/fmMfNImq5s/OFQyBWgX42v5LQ+pucJ7jOTi8BP542k=
+gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260819153604-f0f63d913239/go.mod h1:HgYCRbatsXX43wEDMYzxoJXLneMrSSiI4KuHWxWfFOw=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=

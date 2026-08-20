@@ -8,7 +8,8 @@ storage:
     usePathStyle: true
 
 oidc:
-  issuer: http://localhost:8081
+  issuer: http://localhost:9001/application/o/modos-cli-app
+  # issuer: http://localhost:8081/realms/modos
   clientID: modos-cli
 
 log:

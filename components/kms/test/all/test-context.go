@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/lestrrat-go/jwx/v3/jwt"
@@ -20,6 +21,7 @@ import (
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/modos-rs/components/kms/test/common"
 	"github.com/stretchr/testify/require"
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
@@ -35,7 +37,8 @@ type (
 		Keycloak  OAuth
 		Authentik OAuth
 
-		Storage st.Client
+		Storage     st.Client
+		JWTVerifier *auth.JWTVerifier
 	}
 
 	OAuth struct {
@@ -65,12 +68,16 @@ func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestConte
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
+	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
+	log.PanicEf(err, "Could not create JWT verifier.")
+
 	return &TestContext{
-		Ctx:       ctx,
-		RootDir:   rootDir,
-		Storage:   client,
-		Keycloak:  OAuth{JWTPrivateKey: getKeycloakPrivateKey(t)},
-		Authentik: OAuth{JWTPrivateKey: getAuthentikPrivateKey(t)},
+		Ctx:         ctx,
+		RootDir:     rootDir,
+		Storage:     client,
+		Keycloak:    OAuth{JWTPrivateKey: getKeycloakPrivateKey(t)},
+		Authentik:   OAuth{JWTPrivateKey: getAuthentikPrivateKey(t)},
+		JWTVerifier: jwtVerifier,
 	}
 }
 
@@ -149,4 +156,18 @@ func getKeycloakPrivateKey(t testing.TB) jwk.Key {
 	require.NoError(t, err, "Could not set `kid` field.")
 
 	return key
+}
+
+func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVerifier, error) {
+	const timeout = 30 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	return auth.NewJWTVerifier(
+		ctx,
+		oidcCfg.Issuer,
+		oidcCfg.ClientID,
+		auth.WithTrustedAlgorithms(oidcCfg.TrustedAlgorithms...),
+		auth.WithTrustedAudiences(oidcCfg.TrustedAudiences...),
+	)
 }
