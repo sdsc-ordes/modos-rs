@@ -3,16 +3,22 @@ package jwt
 import (
 	"strings"
 
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/quitsh/pkg/errors"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
 
-const BucketPermissionsName = "bp"
-
 type Claims struct {
 	*auth.StandardClaims
 	BucketPermission types.BucketPermissions
+
+	cfg config.ClaimBucketPermissions
+}
+
+// NewClaims creates a new bucket permissions claim.
+func NewClaims(cfg *config.ClaimBucketPermissions) *Claims {
+	return &Claims{cfg: *cfg}
 }
 
 // InitStdClaims implements [auth.IInitStdClaims] interface.
@@ -24,9 +30,9 @@ func (c *Claims) InitStdClaims(stdClaims *auth.StandardClaims) {
 func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 	var bp []any
 
-	err := getter("bp", &bp)
+	err := getter(c.cfg.Name, &bp)
 	if err != nil {
-		return errors.AddContext(err, "could not convert subject to UUID for '%v'", c.Subject)
+		return errors.AddContext(err, "could not convert claim '%v'", c.cfg.Name)
 	}
 
 	for _, v := range bp {
@@ -35,7 +41,7 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 			return errors.New("could not extract bucket permissions claim")
 		}
 
-		p, ok := m["p"]
+		p, ok := m[c.cfg.PathName]
 		if !ok {
 			return errors.New("could not extract bucket permissions claim: 'p'")
 		}
@@ -44,7 +50,7 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 			return errors.New("bucket permission claim: 'p' not a string")
 		}
 
-		bp, ok := m["bp"]
+		bp, ok := m[c.cfg.PermissionsName]
 		if !ok {
 			return errors.New("could not extract bucket permissions claim: 'bp'")
 		}
@@ -52,13 +58,36 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 		if !ok {
 			return errors.New("bucket permission claim: 'bp' not a string")
 		}
-		perms := strings.Split(permsS, ",")
+
+		permsSplit := strings.Split(permsS, ",")
+		permissions, err := validatePermissions(permsSplit)
+		if err != nil {
+			return err
+		}
 
 		c.BucketPermission = append(c.BucketPermission, types.BucketPermission{
 			Path:        path,
-			Permissions: perms,
+			Permissions: permissions,
 		})
 	}
 
 	return nil
+}
+
+func validatePermissions(in []string) (out []types.Permission, _ error) {
+	for i := range in {
+		switch in[i] {
+		case "r":
+			out = append(out, types.PermissionRead)
+		case "w":
+			out = append(out, types.PermissionWrite)
+		default:
+			return nil, errors.New(
+				"Bucket permissions contains unknown permissions '%v'.",
+				in[i],
+			)
+		}
+	}
+
+	return out, nil
 }

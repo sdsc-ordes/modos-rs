@@ -39,6 +39,27 @@ type (
 
 		// Accepted audiences (claim: `aud`) on the JWT validator (the `ClientID` is added by default).
 		TrustedAudiences []string `yaml:"trustedAudiences"`
+
+		// The bucket permissions claims.
+		ClaimBucketPermissions ClaimBucketPermissions `yaml:"claimBucketPermissions"`
+	}
+
+	ClaimBucketPermissions struct {
+		// The name of the claim with a list
+		// of bucket permissions in the form of
+		//`{<PathName>: "...", <PermissionsName>: "..." }`.
+		Name string `yaml:"name" default:"bps"`
+
+		// The key name of the bucket path.
+		PathName string `yaml:"pathName" default:"p"`
+
+		// The key name of the bucket permissions.
+		PermissionsName string `yaml:"permissionsName" default:"bp"`
+
+		// The tag name of the read permissions.
+		PermissionsReadTagName string `yaml:"permissionsReadTagName" default:"r"`
+		// The tag name of the write permissions.
+		PermissionsWriteTagName string `yaml:"permissionsWriteTagName" default:"w"`
 	}
 
 	Log struct {

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const DefaultIssuerKeycloak = "http://localhost:8081/realms/modos/.well-known/openid-configuration"
+const DefaultIssuerKeycloak = "http://localhost:8081/realms/modos"
 
-const DefaultIssuerAuthentik = "http://localhost:9001/application/o/modos-cli-app/.well-known/openid-configuration"
+const DefaultIssuerAuthentik = "http://localhost:9001/application/o/modos-cli-app"
 
 // DefaultAudience is the same as Keycloak client or the application `modos-cli` in Authentik.
 const DefaultAudience = "modos-cli"
@@ -33,9 +33,6 @@ type (
 
 		// Make the valid -> expired.
 		expired bool
-
-		// Sign the token with that key.
-		privateKey jwk.Key
 	}
 )
 
@@ -74,15 +71,11 @@ func NewToken(t require.TestingT, options ...Option) jwt.Token {
 	tk, err := b.Build()
 	require.NoError(t, err)
 
-	if o.privateKey != nil {
-		signToken(t, tk, o.privateKey)
-	}
-
 	return tk
 }
 
-// signToken signs a JWT with `privateKey`.
-func signToken(t require.TestingT, tk jwt.Token, privateKey jwk.Key) string {
+// SignToken signs a JWT with `privateKey`.
+func SignToken(t require.TestingT, tk jwt.Token, privateKey jwk.Key) string {
 	alg, ok := privateKey.Algorithm()
 	require.True(t, ok, "Algorithm is not set on private key.")
 
@@ -100,18 +93,20 @@ func (c *opts) Apply(options ...Option) {
 
 func WithModifications(f func(b *jwt.Builder)) Option {
 	return func(o *opts) {
-		o.mods = f
+		if o.mods != nil {
+			old := o.mods
+			o.mods = func(b *jwt.Builder) {
+				old(b)
+				f(b)
+			}
+		} else {
+			o.mods = f
+		}
 	}
 }
 
 func WithInvalid() Option {
 	return func(o *opts) {
 		o.expired = true
-	}
-}
-
-func WithSign(privateKey jwk.Key) Option {
-	return func(o *opts) {
-		o.privateKey = privateKey
 	}
 }

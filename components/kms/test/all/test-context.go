@@ -31,22 +31,25 @@ type (
 	TestContext struct {
 		Ctx context.Context
 
+		Cfg *config.Config
+
 		Log     log.Logger
 		RootDir string
 
-		Keycloak  OAuth
-		Authentik OAuth
+		OIDC OIDC
 
 		Storage     st.Client
 		JWTVerifier *auth.JWTVerifier
 	}
 
-	OAuth struct {
+	OIDC struct {
 		JWTPrivateKey jwk.Key
 	}
 
 	TestContextOption func(*testContextOpts)
-	testContextOpts   struct{}
+	testContextOpts   struct {
+		withAuthentik bool
+	}
 )
 
 // NewTestContext sets up test context.
@@ -65,18 +68,29 @@ func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestConte
 	require.NoError(t, err, "Could not load config files in '%s'.", configDir)
 	conf.WithDataDir(dataDir)
 
+	// Overwrite some special test options.
+	var oauth OIDC
+	if o.withAuthentik {
+		conf.OIDC.Issuer = mdJwt.DefaultIssuerAuthentik
+		oauth = OIDC{JWTPrivateKey: getAuthentikPrivateKey(t)}
+	} else {
+		conf.OIDC.Issuer = mdJwt.DefaultIssuerKeycloak
+		oauth = OIDC{JWTPrivateKey: getKeycloakPrivateKey(t)}
+	}
+
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
+	log.Infof("Issuer: '%v'", jwtVerifier.Issuer())
 
 	return &TestContext{
 		Ctx:         ctx,
+		Cfg:         &conf,
+		OIDC:        oauth,
 		RootDir:     rootDir,
 		Storage:     client,
-		Keycloak:    OAuth{JWTPrivateKey: getKeycloakPrivateKey(t)},
-		Authentik:   OAuth{JWTPrivateKey: getAuthentikPrivateKey(t)},
 		JWTVerifier: jwtVerifier,
 	}
 }
@@ -90,22 +104,14 @@ func (c *testContextOpts) Apply(options ...TestContextOption) {
 	}
 }
 
-// NewTokenKeycloak returns a signed token with default values.
-func (c *TestContext) NewTokenKeycloak(t testing.TB, options ...mdJwt.Option) jwt.Token {
+// NewToken returns a signed token with default values.
+func (c *TestContext) NewToken(t testing.TB, options ...mdJwt.Option) jwt.Token {
 	options = append(
 		options,
 		mdJwt.WithModifications(func(b *jwt.Builder) {
-			b.Audience([]string{mdJwt.DefaultIssuerKeycloak})
+			b.Issuer(c.Cfg.OIDC.Issuer)
+			b.Audience([]string{c.Cfg.OIDC.ClientID})
 		}))
-
-	return mdJwt.NewToken(t, options...)
-}
-
-// NewTokenAuthentik returns a signed token with default values.
-func (c *TestContext) NewTokenAuthentik(t testing.TB, options ...mdJwt.Option) jwt.Token {
-	options = append(options, mdJwt.WithModifications(func(b *jwt.Builder) {
-		b.Audience([]string{mdJwt.DefaultIssuerAuthentik})
-	}))
 
 	return mdJwt.NewToken(t, options...)
 }
@@ -130,7 +136,9 @@ nyK+Tb15OjCIhIFTqknYaMyQcsu+1btcpvR9E8KlMsTv7awVoA5+9+7z
 	require.NoError(t, err, "Could not import key.")
 	err = key.Set("alg", "ES256")
 	require.NoError(t, err, "Could not set `alg` field.")
-	jwk.AssignKeyID(key)
+	err = key.Set("kid",
+		"HsqvUTcND8gNqM3pPXYPpZYgmyQoq7T8VFKjHMLtRSf1x7jPVXXrLLaEOWDiobmLenxJsgz9CIWtTNN1SmWiAw",
+	)
 	require.NoError(t, err, "Could not set `kid` field.")
 
 	return key
@@ -152,7 +160,8 @@ func getKeycloakPrivateKey(t testing.TB) jwk.Key {
 	require.NoError(t, err, "Could not import key.")
 	err = key.Set("alg", "EdDSA")
 	require.NoError(t, err, "Could not set `alg` field.")
-	jwk.AssignKeyID(key)
+
+	err = key.Set("kid", "kdL-JZ5pnx6Zgk2P50Ai2hg4NApn2zYg0OHyLhXGzTE")
 	require.NoError(t, err, "Could not set `kid` field.")
 
 	return key
