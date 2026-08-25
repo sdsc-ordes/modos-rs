@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/lestrrat-go/jwx/v3/jwt"
 	. "github.com/onsi/ginkgo/v2"
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt"
 	mdJwtT "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
@@ -14,7 +15,36 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
 
-var _ = Describe("JWT", func() {
+// CreateToken creates a token with bucket permissions claims.
+func CreateToken(
+	t testing.TB,
+	testCtx *TestContext,
+	permissions st.BucketPermissions,
+) (jwt.Token, string) {
+	token := testCtx.NewToken(t,
+		mdJwtT.WithBucketPermissionsClaim(
+			&testCtx.Cfg.OIDC.ClaimBucketPermissions,
+			permissions,
+		),
+	)
+
+	signedToken := mdJwtT.SignToken(t, token, testCtx.OIDC.JWTPrivateKey)
+
+	return token, signedToken
+}
+
+// Run with
+//
+// ```bash
+//
+//	just quitsh exec-target \
+//		--log-level debug
+//		-K "test.showTestLog: true" \
+//		-K 'test.testArgs: [ "-ginkgo.label-filter=jwt" ]'
+//		"kms::test-integration"
+//
+// ```
+var _ = Describe("A JWT", func() {
 	var t testing.TB
 
 	BeforeEach(func() {
@@ -26,17 +56,13 @@ var _ = Describe("JWT", func() {
 			testCtx := NewTestContext(t)
 			defer testCtx.Close(t)
 
-			token := testCtx.NewToken(t,
-				mdJwtT.WithBucketPermissionsClaim(
-					&testCtx.Cfg.OIDC.ClaimBucketPermissions,
-					st.BucketPermissions{
-						st.BucketPermission{
-							Path:        "bucket-a",
-							Permissions: []st.Permission{st.PermissionWrite},
-						},
-					}))
-
-			signedToken := mdJwtT.SignToken(t, token, testCtx.OIDC.JWTPrivateKey)
+			token, signedToken := CreateToken(
+				t, testCtx, st.BucketPermissions{
+					st.BucketPermission{
+						Path:        "bucket-a",
+						Permissions: []st.Permission{st.PermissionWrite},
+					},
+				})
 
 			b, err := json.Marshal(token)
 			require.NoError(t, err)
