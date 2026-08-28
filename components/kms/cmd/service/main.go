@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
@@ -16,6 +17,7 @@ import (
 )
 
 func loadConfigs(configDir string, dataDir string) (conf config.Config) {
+
 	conf, err := cmc.LoadConfigs[config.Config](configDir)
 	log.PanicEf(err, "Failed loading config files.")
 	conf.WithDataDir(dataDir)
@@ -40,6 +42,9 @@ func main() {
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
+	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
+	log.PanicEf(err, "Could not create JWT verifier.")
+
 	// FIXME: remove.
 	c, err := client.NewCredentials(
 		ctx,
@@ -54,5 +59,19 @@ func main() {
 	}
 	clog.Info(ctx, "Credentials created.", "creds", c)
 
-	_ = service.Service{Storage: client}
+	_ = service.Service{Storage: client, JWTVerifier: jwtVerifier}
+}
+
+func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVerifier, error) {
+	const timeout = 30 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	return auth.NewJWTVerifier(
+		ctx,
+		oidcCfg.Issuer,
+		oidcCfg.ClientID,
+		auth.WithTrustedAlgorithms(oidcCfg.TrustedAlgorithms...),
+		auth.WithTrustedAudiences(oidcCfg.TrustedAudiences...),
+	)
 }
