@@ -25,10 +25,7 @@ func loadConfigs(configDir string, dataDir string) (conf config.Config) {
 	return
 }
 
-type F = func(int, int) int
-
 func main() {
-
 	args := parseArgs()
 	conf := loadConfigs(args.ConfigDir, args.DataDir)
 	log.Setup(
