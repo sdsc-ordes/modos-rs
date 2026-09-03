@@ -9,18 +9,10 @@
   perSystem =
     {
       pkgs,
-      pkgsStable,
       modos',
       ...
     }:
     let
-      # Create a set of devenv modules.
-      devenvs = modos.lib.toolchain.createDevenvModules {
-        inherit pkgs;
-        inherit pkgsStable;
-        inherit modos';
-      };
-
       # Define all shells over the set of `devenvs` modules.
       shells = lib.attrsets.mapAttrs (
         name: modules:
@@ -32,7 +24,7 @@
             ;
           inherit (pkgs) system;
         }
-      ) devenvs;
+      ) modos'.devenvModules;
     in
     {
       modos.shells = shells;

@@ -8,9 +8,9 @@
   perSystem =
     {
       self',
-      inputs',
       modos',
       pkgs,
+      mvs,
       ...
     }:
     let
@@ -20,7 +20,7 @@
         build
         ;
 
-      process-compose = inputs'.process-compose.legacyPackages.process-compose;
+      process-compose = (mvs.at "56c02bc00adcf003215cc4bd996d6efaf4cff188").process-compose;
       codecov-cli = self'.packages.codecov-cli;
 
       rust = lib.genAttrs [ "shell" "release" ] (

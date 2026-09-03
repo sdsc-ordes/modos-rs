@@ -1331,7 +1331,6 @@
         "oauth2.device.authorization.grant.enabled": "true",
         "oauth2.jwt.authorization.grant.enabled": "false",
         "oidc.ciba.grant.enabled": "false",
-        "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "+",
         "realm_client": "false",
         "request.object.required": "not required",
@@ -1559,12 +1558,12 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper",
             "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
             "oidc-address-mapper",
             "saml-role-list-mapper"
           ]
@@ -1597,14 +1596,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-role-list-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-user-property-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper"
+            "saml-user-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
+            "saml-role-list-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper"
           ]
         },
         "id": "74842203-5618-4574-9c8c-910612390d11",
@@ -2335,9 +2334,9 @@
       "clientConsents": [
         {
           "clientId": "modos-cli",
-          "createdDate": 1784543312733,
+          "createdDate": 1786001865393,
           "grantedClientScopes": ["roles", "permissions", "profile"],
-          "lastUpdatedDate": 1784543312737
+          "lastUpdatedDate": 1786001865397
         }
       ],
       "createdTimestamp": 1784117721190,

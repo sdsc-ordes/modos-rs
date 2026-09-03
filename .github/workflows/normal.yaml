@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs_on || 'ubuntu-latest' }}
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     strategy:
@@ -19,45 +19,36 @@ jobs:
 
       matrix:
         include:
+          - name: nix-hash
+            run: just ci::run quitsh nix fix-hash
+
           - name: lint-security
             command: just ci::run quitsh exec-target "global::lint-security"
             allow_failure: true
 
-          - name: lint-nix-hash
-            command: just ci::run quitsh nix fix-hash
-            allow_failure: false
-
           - name: lint-kms
             command: just ci::run quitsh lint -c "kms"
-            allow_failure: false
           - name: lint-comp-rust
             command: just ci::run quitsh lint -c "comp-rust"
-            allow_failure: false
 
           - name: build-kms
             command: just ci::run quitsh build -c "kms"
-            allow_failure: false
 
           - name: build-comp-rust
             command: just ci::run quitsh build -c "comp-rust"
-            allow_failure: false
 
           - name: test-kms
+            runs-on: ubuntu-latest-8-cores
             command: just ci::run quitsh test -c "kms"
-            allow_failure: false
           - name: test-comp-rust
             command: just ci::run quitsh test -c "comp-rust"
-            allow_failure: false
           - name: test-quitsh
             command: just ci::run quitsh test -c "quitsh"
-            allow_failure: false
 
           - name: image-kms
             command: just ci::run quitsh image -c "kms"
-            allow_failure: false
           - name: image-comp-rust
             command: just ci::run quitsh image -c "comp-rust"
-            allow_failure: false
 
     steps:
       - uses: actions/checkout@v4
@@ -65,6 +56,12 @@ jobs:
         with:
           cachix_cache_name: "${{ secrets.CACHIX_CACHE_NAME }}"
           cachix_auth_token: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: ${{ matrix.name }}-debug
+        if: ${{ matrix.debug == true }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: ${{ matrix.name }}
         continue-on-error: ${{ matrix.allow_failure }}
@@ -79,3 +76,17 @@ jobs:
             .output/run/process-compose
           if-no-files-found: ignore
           retention-days: 3
+
+  # Aggregate check for protection rule.
+  checks-all:
+    if: always()
+    needs:
+      - checks # your matrix job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all matrix jobs passed
+        run: |
+          if [[ "${{ needs.checks.result }}" != "success" ]]; then
+            echo "One or more checks failed: ${{ needs.checks.result }}"
+            exit 1
+          fi

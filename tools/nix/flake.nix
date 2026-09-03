@@ -17,12 +17,8 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
-
-    # Pinning some packages:
-    # ref: commit points to nixpkgs-unstable
-    process-compose.url = "github:nixos/nixpkgs/b5aa0fbd538984f6e3d201be0005b4463d8b09f8";
+    nixpkgs.url = "github:nixos/nixpkgs?rev=56c02bc00adcf003215cc4bd996d6efaf4cff188";
+    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
 
     # The devenv module to create good development shells.
     # The `nixpkgs-devenv` must be aligned with the pinned version.
@@ -52,6 +48,9 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Wrapper executables and other stuff.
+    wrappers.url = "github:lassulus/wrappers";
 
     # Process-compose setup for services.
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";

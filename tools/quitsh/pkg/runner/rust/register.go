@@ -7,13 +7,11 @@ import (
 	"github.com/sdsc-ordes/quitsh/pkg/runner"
 	"github.com/sdsc-ordes/quitsh/pkg/runner/config"
 	"github.com/sdsc-ordes/quitsh/pkg/runner/factory"
-
-	cnConfig "gitlab.com/data-custodian/custodian/tools/quitsh/pkg/runner/config"
 )
 
 // Register registers the build/build-gen/test runner in the factory.
 func Register(
-	lintSettings *cnConfig.LintSettings,
+	lintSettings *config.LintSettings,
 	buildSettings config.IBuildSettings,
 	testSettings config.ITestSettings,
 	factory factory.IFactory,
