@@ -28,6 +28,7 @@ func main() {
 		&conf.Commands.Root,
 		&conf,
 		cli.WithName("quitsh"),
+		cli.WithDescription("The entry tool for all needs in this repository 🌻."),
 		cli.WithVersion(build.Version()),
 		cli.WithStages(stage.AllStages()...),
 		cli.WithTargetToStageMapperDefault(),
