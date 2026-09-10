@@ -105,6 +105,49 @@ sequenceDiagram
     Auth-->>CLI: access_token, id_token
 ```
 
+# Signing Algorithms
+
+The **JWK** specification (RFC 7517) defines a JSON representation for
+cryptographic keys — this covers both **signing** (JWS) and **encryption / key
+agreement** (JWE). Every JWK carries a `kty` (key type) field naming the key
+family, which in turn determines the other members present and which algorithms
+the key can drive.
+
+For **new** signing deployments, the Edwards family (`kty: OKP, alg: EdDSA`) is
+an excellent default: small keys and signatures, fast, deterministic. Using
+`kty: EC, alg: ES256`) is the other strong modern choice. `RSA` is _not_
+deprecated and remains the safe interoperability default — it's supported by
+essentially every library and identity provider (IdP), and RS256/PS256 at
+2048-bit keys or larger are secure.
+
+Provider support for the **modern** `EdDSA`:
+
+- **Keycloak**: supported since **24.0.0** (March 2024). You can create EdDSA
+  realm keys and use them as signature algorithms for clients. Its algorithm set
+  includes `EdDSA`, `Ed25519`, and `Ed448`.
+
+- **Authentik**: **not yet**. Its OAuth2/OIDC signing keys are X.509
+  certificates, limited to RSA (→ `RS256`) or ECDSA (→ `ES256`/`ES384`/`ES512`),
+  with `HS256` as the client-secret fallback.
+
+| JWK `kty` | Math Family                           | Curves / Sizes               | JWS Algorithm(s)                                           | Go Type                         |
+| --------- | ------------------------------------- | ---------------------------- | ---------------------------------------------------------- | ------------------------------- |
+| `RSA`     | Integer factorization                 | ≥2048 bit (2048–4096 common) | `PS256`/`PS384`/`PS512`, (older: `RS256`/`RS384`/`RS512`), | `crypto/rsa`                    |
+| `EC`      | ECDSA over NIST prime elliptic curves | P-256, P-384, P-521          | `ES256`, `ES384`, `ES512`                                  | `crypto/ecdsa`                  |
+| `OKP`     | Edwards / Montgomery elliptic curves  | Ed25519, Ed448, X25519, X448 | `EdDSA` (sign), `ECDH-ES` (agreement)                      | `crypto/ed25519`, `crypto/ecdh` |
+
+> [!NOTE]
+>
+> We use for JWT signing the following algorithms:
+>
+> - Keycloak: `Ed25519` -> `alg: EdDSA`
+> - Authentik: `ES256` -> `alg: ES256`
+
+> [!TODO]
+>
+> How and when are these predefined startup keys updated in keycloak and
+> authentik.
+
 # OAuth2 / OIDC Flows: Standard vs Device Code
 
 Plain-language explanation of the three login flows relevant to Keycloak, with
