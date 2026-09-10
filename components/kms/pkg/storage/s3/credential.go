@@ -45,6 +45,7 @@ func (c *S3Credentials) MarshalerJSON() json.Marshaler {
 		AccessKeyID:     string(c.AccessKeyID),
 		SecretAccessKey: string(c.SecretAccessKey),
 		SessionToken:    string(c.SessionToken),
+		Expiration:      c.Expiration,
 	}}
 }
 

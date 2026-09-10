@@ -28,14 +28,13 @@ type (
 // Contains checks if permissions contains permission `p`.
 func (ps Permissions) Contains(p Permission) bool {
 	return slices.Contains(ps, p)
-
 }
 
 // Bucket returns the bucket string.
 func (p *BucketPermission) Bucket() string {
 	s := strings.SplitN(
 		strings.TrimLeft(p.Path, "/"),
-		"/", 2)
+		"/", 2) //nolint:mnd
 
 	return s[0]
 }

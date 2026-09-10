@@ -18,7 +18,12 @@ type Claims struct {
 
 // NewClaims creates a new bucket permissions claim.
 func NewClaims(cfg *config.ClaimBucketPermissions) *Claims {
-	return &Claims{cfg: *cfg}
+	return &Claims{
+		StandardClaims:    nil,
+		BucketPermissions: nil,
+
+		cfg: *cfg,
+	}
 }
 
 // InitStdClaims implements [auth.IInitStdClaims] interface.
@@ -63,9 +68,9 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 		}
 
 		permsSplit := strings.Split(permsS, ",")
-		permissions, err := validatePermissions(permsSplit, &c.cfg)
-		if err != nil {
-			return err
+		permissions, e := validatePermissions(permsSplit, &c.cfg)
+		if e != nil {
+			return e
 		}
 
 		c.BucketPermissions = append(c.BucketPermissions, types.BucketPermission{

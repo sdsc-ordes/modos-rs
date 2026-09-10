@@ -47,7 +47,7 @@ type (
 	ClaimBucketPermissions struct {
 		// The name of the claim with a list
 		// of bucket permissions in the form of
-		//`{<PathName>: "...", <PermissionsName>: "..." }`.
+		// `{<PathName>: "...", <PermissionsName>: "..." }`.
 		Name string `yaml:"name" default:"bps"`
 
 		// The key name of the bucket path.

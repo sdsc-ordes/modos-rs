@@ -13,11 +13,9 @@ import (
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
-	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 )
 
 func loadConfigs(configDir string, dataDir string) (conf config.Config) {
-
 	conf, err := cmc.LoadConfigs[config.Config](configDir)
 	log.PanicEf(err, "Failed loading config files.")
 	conf.WithDataDir(dataDir)
@@ -44,20 +42,6 @@ func main() {
 
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
-
-	// FIXME: remove.
-	c, err := client.NewCredentials(
-		ctx,
-		[]st.BucketPermission{
-			{Path: "bucket-a", Permissions: []st.Permission{st.PermissionRead}},
-			{Path: "bucket-b", Permissions: []st.Permission{st.PermissionWrite}},
-		},
-		1*time.Hour,
-	)
-	if err != nil {
-		log.ErrorE(err, "Credentials could not be created.")
-	}
-	clog.Info(ctx, "Credentials created.", "creds", c)
 
 	_ = service.Service{Storage: client, JWTVerifier: jwtVerifier}
 }
