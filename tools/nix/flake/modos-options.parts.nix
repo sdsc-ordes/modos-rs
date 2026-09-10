@@ -96,6 +96,12 @@ in
             };
           };
 
+          devenvModules = lib.mkOption {
+            type = lib.types.attrsOf lib.types.anything;
+            description = "Attribute set of list of devenv modules.";
+            default = { };
+          };
+
           services.config = lib.mkOption {
             type = lib.types.attrsOf lib.types.raw;
             description = "The process-compose configuration to inspect.";

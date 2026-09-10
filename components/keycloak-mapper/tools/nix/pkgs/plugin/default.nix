@@ -24,7 +24,7 @@ maven.buildMavenPackage {
       --replace-fail '<version>1.0.0</version>' '<version>${version}</version>'
   '';
 
-  mvnHash = "sha256-7NyPWO0rskwdtZUplWPsxprdH4RN19hgNr1gIfkXYYA=";
+  mvnHash = "sha256-xNHnjWauvDnpC+vZuM1RAm0PbXsRExnZ3l8ifoCU/r8=";
 
   mvnParameters = "-DskipTests";
 

@@ -7,53 +7,37 @@ let
     allowUnfree = true;
   };
 
-  # Imports nixpkgs from `nixpkgs` (input)
-  # where the localSystem depends on some env. variables which require
-  # `--no-pure-eval`, if not enabled, it will by default report the
-  # normal host platform.
-  #
-  # Options:
-  # - If `USE_LIBC_MUSL` is set it will use the `musl` version.
-  importPkgs =
-    {
-      nixpkgs,
-      system,
-      overlays ? [ ],
-    }:
-    let
-      lib = nixpkgs.lib;
-      p = import nixpkgs (
-        lib.info "modos: Importing nixpkgs for system = '${system}'" {
-          inherit system overlays config;
-        }
-      );
-      pkgs = if builtins.getEnv "USE_LIBC_MUSL" == "true" then p.pkgsMusl else p;
-    in
-    pkgs;
+  mkMultiverse =
+    { system }:
+    inputs.multiverse.lib.mkMultiverse {
+      inherit system config;
+      # No overlays for now needed.
+    };
 in
 {
+
   flake.lib.nixpkgs = {
     # Shorthand to access the std library in the `nix repl`.
     lib = inputs.nixpkgs.lib;
 
+    inherit mkMultiverse;
+
     importPkgs =
       {
         system,
-        overlays ? [ ],
       }:
-      importPkgs {
-        nixpkgs = inputs.nixpkgs;
-        inherit system overlays;
-      };
+      let
+        mvs = mkMultiverse { inherit system; };
+      in
+      mvs.daysBehind "tip" 7; # Branch: 7 days behind nixos-unstable.
 
     importPkgsStable =
       {
         system,
-        overlays ? [ ],
       }:
-      importPkgs {
-        nixpkgs = inputs.nixpkgs-stable;
-        inherit system overlays;
-      };
+      let
+        mvs = mkMultiverse { inherit system; };
+      in
+      mvs.at "26.05"; # Branch: nixos-26.05
   };
 }

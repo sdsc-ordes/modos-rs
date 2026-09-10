@@ -5,8 +5,8 @@ import (
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
-	"github.com/sdsc-ordes/quitsh/pkg/errors"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/errors"
 )
 
 type Claims struct {
