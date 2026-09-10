@@ -60,7 +60,7 @@
 
         # Generate the Rust build-support functions.
         buildRustPackage = pkgs.callPackage build.createBuildRustPackage {
-          rust-platform = pkgsPinned.rust.release.platform;
+          rustPlatform = pkgsPinned.rust.release.platform;
           libComponent = component;
         };
       };

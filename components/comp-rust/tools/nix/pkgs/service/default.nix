@@ -30,8 +30,6 @@ build.buildRustPackage {
 
   src = fileset.toSource { filesets = [ compName ]; };
 
-  vendorHash = "sha256-ugPJchw4qIT05+aMFaQ2a4oO757/XSUkyUJwwnf6VQA=";
-
   doCheck = false;
 
   buildInputs = [ makeWrapper ];
