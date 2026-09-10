@@ -10,15 +10,19 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"path"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/lestrrat-go/jwx/v3/jwt"
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
-	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+	mdS3 "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/s3"
+	mdSt "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/sdsc-ordes/modos-rs/components/kms/test/common"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
@@ -38,7 +42,8 @@ type (
 
 		OIDC OIDC
 
-		Storage     st.Client
+		Storage     mdSt.Client
+		S3Client    *s3.Client
 		JWTVerifier *auth.JWTVerifier
 	}
 
@@ -81,6 +86,9 @@ func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestConte
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
+	err = setupTestFiles(ctx, client)
+	log.PanicEf(err, "Could not setup test files.")
+
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
 	log.Infof("Issuer: '%v'", jwtVerifier.Issuer())
@@ -91,6 +99,7 @@ func NewTestContext(t testing.TB, opts ...TestContextOption) (testCtx *TestConte
 		OIDC:        oauth,
 		RootDir:     rootDir,
 		Storage:     client,
+		S3Client:    client.Client,
 		JWTVerifier: jwtVerifier,
 	}
 }
@@ -179,4 +188,23 @@ func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVeri
 		auth.WithTrustedAlgorithms(oidcCfg.TrustedAlgorithms...),
 		auth.WithTrustedAudiences(oidcCfg.TrustedAudiences...),
 	)
+}
+
+func setupTestFiles(ctx context.Context, client *mdS3.Client) error {
+	body := strings.NewReader("hello")
+
+	for _, b := range []string{"bucket-a", "bucket-b"} {
+		_, err := client.Client.PutObject(ctx,
+			&s3.PutObjectInput{
+				Bucket: aws.String(b),
+				Key:    aws.String("test.txt"),
+				Body:   body,
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

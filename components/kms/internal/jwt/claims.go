@@ -11,7 +11,7 @@ import (
 
 type Claims struct {
 	*auth.StandardClaims
-	BucketPermission types.BucketPermissions
+	BucketPermissions types.BucketPermissions
 
 	cfg config.ClaimBucketPermissions
 }
@@ -28,14 +28,14 @@ func (c *Claims) InitStdClaims(stdClaims *auth.StandardClaims) {
 
 // InitCustomClaims implements [auth.IClaimInitializer] interface.
 func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
-	var bp []any
+	var bps []any
 
-	err := getter(c.cfg.Name, &bp)
+	err := getter(c.cfg.Name, &bps)
 	if err != nil {
 		return errors.AddContext(err, "could not convert claim '%v'", c.cfg.Name)
 	}
 
-	for _, v := range bp {
+	for _, v := range bps {
 		m, ok := v.(map[string]any)
 		if !ok {
 			return errors.New("could not extract bucket permissions claim")
@@ -43,29 +43,32 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 
 		p, ok := m[c.cfg.PathName]
 		if !ok {
-			return errors.New("could not extract bucket permissions claim: 'p'")
+			return errors.New("could not extract bucket permissions claim: '%s'", c.cfg.PathName)
 		}
 		path, ok := p.(string)
 		if !ok {
-			return errors.New("bucket permission claim: 'p' not a string")
+			return errors.New("bucket permission claim: '%s' not a string", c.cfg.PathName)
 		}
 
 		bp, ok := m[c.cfg.PermissionsName]
 		if !ok {
-			return errors.New("could not extract bucket permissions claim: 'bp'")
+			return errors.New(
+				"could not extract bucket permissions claim: '%s'",
+				c.cfg.PermissionsName,
+			)
 		}
 		permsS, ok := bp.(string)
 		if !ok {
-			return errors.New("bucket permission claim: 'bp' not a string")
+			return errors.New("bucket permission claim: '%s' not a string", c.cfg.PermissionsName)
 		}
 
 		permsSplit := strings.Split(permsS, ",")
-		permissions, err := validatePermissions(permsSplit)
+		permissions, err := validatePermissions(permsSplit, &c.cfg)
 		if err != nil {
 			return err
 		}
 
-		c.BucketPermission = append(c.BucketPermission, types.BucketPermission{
+		c.BucketPermissions = append(c.BucketPermissions, types.BucketPermission{
 			Path:        path,
 			Permissions: permissions,
 		})
@@ -74,12 +77,17 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 	return nil
 }
 
-func validatePermissions(in []string) (out []types.Permission, _ error) {
+func validatePermissions(
+	in []string,
+	cfg *config.ClaimBucketPermissions,
+) ([]types.Permission, error) {
+	var out []types.Permission
+
 	for i := range in {
 		switch in[i] {
-		case "r":
+		case cfg.PermissionsReadTagName:
 			out = append(out, types.PermissionRead)
-		case "w":
+		case cfg.PermissionsWriteTagName:
 			out = append(out, types.PermissionWrite)
 		default:
 			return nil, errors.New(

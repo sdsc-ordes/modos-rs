@@ -3,12 +3,20 @@
 package all
 
 import (
-	"log"
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	. "github.com/onsi/ginkgo/v2"
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt"
-	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+	mdS3 "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/s3"
+	mdSt "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
@@ -32,48 +40,123 @@ var _ = Describe("S3", func() {
 	})
 
 	Describe("requesting credentials (STS)", Label("storage-access"), func() {
-		It("should give access to bucket-b", func() {
-			testCtx := NewTestContext(t)
-			defer testCtx.Close(t)
+		It("should give read access to bucket-*", Label("read"), func() {
+			tCtx := NewTestContext(t)
+			defer tCtx.Close(t)
 
-			_, signedToken := CreateToken(
-				t, testCtx, st.BucketPermissions{
-					st.BucketPermission{
+			_, signedTokenW := CreateToken(
+				t, tCtx, mdSt.BucketPermissions{
+					mdSt.BucketPermission{
 						Path:        "bucket-a",
-						Permissions: []st.Permission{st.PermissionWrite},
+						Permissions: []mdSt.Permission{mdSt.PermissionRead},
+					},
+					mdSt.BucketPermission{
+						Path:        "bucket-b",
+						Permissions: []mdSt.Permission{mdSt.PermissionRead},
 					},
 				})
 
-			cl := mdJwt.NewClaims(&testCtx.Cfg.OIDC.ClaimBucketPermissions)
-			err := auth.ValidateJWT(testCtx.Ctx, testCtx.JWTVerifier, signedToken, nil, cl)
+			// Test writing.
+			cl := mdJwt.NewClaims(&tCtx.Cfg.OIDC.ClaimBucketPermissions)
+			err := auth.ValidateJWT(tCtx.Ctx, tCtx.JWTVerifier, signedTokenW, nil, cl)
 			require.NoError(t, err)
 
-			cred, err := getStorageCredential(t, testCtx, cl)
+			err = testStorageAccess(t, tCtx, cl)
+			require.NoError(t, err)
+		})
+
+		It("should give write access to bucket-*", Label("write"), func() {
+			tCtx := NewTestContext(t)
+			defer tCtx.Close(t)
+
+			_, signedTokenW := CreateToken(
+				t, tCtx, mdSt.BucketPermissions{
+					mdSt.BucketPermission{
+						Path:        "bucket-a",
+						Permissions: []mdSt.Permission{mdSt.PermissionWrite},
+					},
+					mdSt.BucketPermission{
+						Path:        "bucket-b",
+						Permissions: []mdSt.Permission{mdSt.PermissionWrite},
+					},
+				})
+
+			// Test writing.
+			cl := mdJwt.NewClaims(&tCtx.Cfg.OIDC.ClaimBucketPermissions)
+			err := auth.ValidateJWT(tCtx.Ctx, tCtx.JWTVerifier, signedTokenW, nil, cl)
 			require.NoError(t, err)
 
-			err = testStorageAccess(t, testCtx, cred, true)
+			err = testStorageAccess(t, tCtx, cl)
 			require.NoError(t, err)
 		})
 	})
 })
 
-func getStorageCredential(
-	_ testing.TB,
-	_ *TestContext,
-	_ *mdJwt.Claims,
-) (st.Credentials, error) {
-	log.Panicf("Not implemented")
-
-	return nil, nil
-}
-
 func testStorageAccess(
-	_ testing.TB,
-	_ *TestContext,
-	_ st.Credentials,
-	_ bool, /* test write flag */
+	t testing.TB,
+	tCtx *TestContext,
+	cl *mdJwt.Claims,
 ) error {
-	log.Panicf("Not implemented")
+	ctx := tCtx.Ctx
+
+	creds, err := tCtx.Storage.NewCredentials(
+		ctx,
+		cl.BucketPermissions,
+		1*time.Hour,
+	)
+	require.NoError(t, err)
+
+	s3cred, ok := creds.(*mdS3.S3Credentials)
+	require.Equal(t, creds.Type(), "s3")
+	require.True(t, ok)
+
+	clientS3, ok := tCtx.Storage.(*mdS3.Client)
+	require.True(t, ok)
+
+	opts := func(o *s3.Options) {
+		o.Credentials =
+			credentials.NewStaticCredentialsProvider(
+				string(s3cred.AccessKeyID),
+				string(s3cred.SecretAccessKey),
+				string(s3cred.SessionToken))
+	}
+
+	for _, p := range cl.BucketPermissions {
+		_, err = clientS3.Client.GetObject(ctx,
+			&s3.GetObjectInput{
+				Bucket: aws.String(p.Bucket()),
+				Key:    aws.String("test.txt"),
+			},
+			opts,
+		)
+
+		if p.Permissions.Contains(mdSt.PermissionRead) {
+			require.NoError(t, err,
+				"permissions '%v' allow read, but does not work", p)
+		} else {
+			require.Error(t, err,
+				"permissions '%v' dont allow read, but does work", p)
+		}
+
+		file := fmt.Sprintf("test-%v.txt", uuid.New())
+		body := strings.NewReader("hello")
+
+		_, err = clientS3.Client.PutObject(ctx,
+			&s3.PutObjectInput{
+				Bucket: aws.String(p.Bucket()),
+				Key:    aws.String(file),
+				Body:   body,
+			},
+			opts)
+
+		if p.Permissions.Contains(mdSt.PermissionWrite) {
+			require.NoError(t, err,
+				"permissions '%v' allow write, but does not work", p)
+		} else {
+			require.Error(t, err,
+				"permissions '%v' dont allow write, but does work", p)
+		}
+	}
 
 	return nil
 }

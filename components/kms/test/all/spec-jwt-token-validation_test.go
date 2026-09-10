@@ -11,6 +11,7 @@ import (
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt"
 	mdJwtT "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt/test"
 	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 )
@@ -38,9 +39,9 @@ func CreateToken(
 // ```bash
 //
 //	just quitsh exec-target \
-//		--log-level debug
+//		--log-level debug \
 //		-K "test.showTestLog: true" \
-//		-K 'test.testArgs: [ "-ginkgo.label-filter=jwt" ]'
+//		-K 'test.testArgs: [ "-ginkgo.label-filter=jwt" ]' \
 //		"kms::test-integration"
 //
 // ```
@@ -67,11 +68,17 @@ var _ = Describe("A JWT", func() {
 			b, err := json.Marshal(token)
 			require.NoError(t, err)
 
+			// Test that validating the JWT works as in `kms` main function.
 			cl := mdJwt.NewClaims(&testCtx.Cfg.OIDC.ClaimBucketPermissions)
 			err = auth.ValidateJWT(
 				testCtx.Ctx, testCtx.JWTVerifier, signedToken, nil, cl,
 			)
 			require.NoError(t, err, "JWT: '%v'", string(b))
+
+			assert.Len(t, cl.BucketPermissions, 1)
+			assert.Equal(t, "bucket-a", cl.BucketPermissions[0].Path)
+			assert.Len(t, cl.BucketPermissions[0].Permissions, 1)
+			assert.Contains(t, cl.BucketPermissions[0].Permissions, st.PermissionWrite)
 		})
 	})
 })

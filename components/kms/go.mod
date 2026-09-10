@@ -13,11 +13,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.0
 	github.com/creasty/defaults v1.8.0
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/lestrrat-go/jwx/v3 v3.1.1
 	github.com/onsi/ginkgo/v2 v2.32.0
-	github.com/sdsc-ordes/quitsh v0.43.0
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/data-custodian/custodian/components/lib-common v0.0.0-20260824120719-2e67b9425238
 )
@@ -51,6 +51,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
+	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
