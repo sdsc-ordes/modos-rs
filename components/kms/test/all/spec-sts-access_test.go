@@ -4,6 +4,7 @@ package all
 
 import (
 	"fmt"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -56,7 +57,6 @@ var _ = Describe("S3", func() {
 					},
 				})
 
-			// Test writing.
 			cl := mdJwt.NewClaims(&tCtx.Cfg.OIDC.ClaimBucketPermissions)
 			err := auth.ValidateJWT(tCtx.Ctx, tCtx.JWTVerifier, signedTokenW, nil, cl)
 			require.NoError(t, err)
@@ -77,6 +77,10 @@ var _ = Describe("S3", func() {
 					},
 					mdSt.BucketPermission{
 						Path:        "bucket-b",
+						Permissions: []mdSt.Permission{mdSt.PermissionWrite},
+					},
+					mdSt.BucketPermission{
+						Path:        "bucket-a/c/d/e",
 						Permissions: []mdSt.Permission{mdSt.PermissionWrite},
 					},
 				})
@@ -122,10 +126,12 @@ func testStorageAccess(
 	}
 
 	for _, p := range cl.BucketPermissions {
+		bucket, rest := p.PathSplit()
+
 		_, err = clientS3.Client.GetObject(ctx,
 			&s3.GetObjectInput{
-				Bucket: aws.String(p.Bucket()),
-				Key:    aws.String("test.txt"),
+				Bucket: aws.String(bucket),
+				Key:    aws.String(path.Join(rest, "test.txt")),
 			},
 			opts,
 		)
@@ -143,8 +149,8 @@ func testStorageAccess(
 
 		_, err = clientS3.Client.PutObject(ctx,
 			&s3.PutObjectInput{
-				Bucket: aws.String(p.Bucket()),
-				Key:    aws.String(file),
+				Bucket: aws.String(bucket),
+				Key:    aws.String(path.Join(rest, file)),
 				Body:   body,
 			},
 			opts)

@@ -4,6 +4,7 @@ package all
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/lestrrat-go/jwx/v3/jwt"
@@ -79,6 +80,42 @@ var _ = Describe("A JWT", func() {
 			assert.Equal(t, "bucket-a", cl.BucketPermissions[0].Path)
 			assert.Len(t, cl.BucketPermissions[0].Permissions, 1)
 			assert.Contains(t, cl.BucketPermissions[0].Permissions, st.PermissionWrite)
+		})
+
+		It("should not validate", func() {
+			testCtx := NewTestContext(t)
+			defer testCtx.Close(t)
+
+			testCtxDiffClaims := NewTestContext(t)
+			defer testCtxDiffClaims.Close(t)
+
+			testCtxDiffClaims.Cfg.OIDC.ClaimBucketPermissions.PermissionsName = "banana"
+			token, signedToken := CreateToken(
+				t, testCtxDiffClaims, st.BucketPermissions{
+					st.BucketPermission{
+						Path:        "bucket-a",
+						Permissions: []st.Permission{st.PermissionWrite},
+					},
+				})
+
+			b, err := json.Marshal(token)
+			require.NoError(t, err)
+
+			// Test that validating the JWT works as in `kms` main function.
+			cl := mdJwt.NewClaims(&testCtx.Cfg.OIDC.ClaimBucketPermissions)
+			err = auth.ValidateJWT(
+				testCtx.Ctx, testCtx.JWTVerifier, signedToken, nil, cl,
+			)
+			require.Error(t, err, "JWT validation must fail: '%v'", string(b))
+			require.ErrorContains(t, err, "could not")
+			require.ErrorContains(
+				t,
+				err,
+				fmt.Sprintf(
+					"bucket permissions claim: '%s'",
+					testCtx.Cfg.OIDC.ClaimBucketPermissions.PermissionsName,
+				),
+			)
 		})
 	})
 })

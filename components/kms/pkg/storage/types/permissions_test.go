@@ -19,11 +19,36 @@ var _ = Describe("permissions", func() {
 	var t require.TestingT
 	BeforeEach(func() { t = GinkgoT() })
 
-	It("bucket name should work", func() {
-		b := BucketPermission{Path: "bucket-a/a/b/c"}
-		assert.Equal(t, "bucket-a", b.Bucket())
+	type D struct {
+		perm      BucketPermission
+		bucketExp string
+		restExp   string
+	}
 
-		b = BucketPermission{Path: "/bucket-a///"}
-		assert.Equal(t, "bucket-a", b.Bucket())
+	It("bucket name should work", func() {
+		tests := []D{
+			{
+				perm:      BucketPermission{Path: "bucket-a/a/b/c"},
+				bucketExp: "bucket-a",
+				restExp:   "a/b/c",
+			},
+			{
+				perm:      BucketPermission{Path: "/bucket-a///"},
+				bucketExp: "bucket-a",
+				restExp:   "/",
+			},
+			{
+				perm:      BucketPermission{Path: "/bucket-a/a/b///a"},
+				bucketExp: "bucket-a",
+				restExp:   "a/b/a",
+			},
+		}
+
+		for _, d := range tests {
+			assert.Equal(t, d.bucketExp, d.perm.Bucket())
+			bucket, rest := d.perm.PathSplit()
+			assert.Equal(t, d.bucketExp, bucket)
+			assert.Equal(t, d.restExp, rest)
+		}
 	})
 })

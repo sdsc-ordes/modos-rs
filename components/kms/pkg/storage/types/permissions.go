@@ -1,6 +1,7 @@
 package types
 
 import (
+	"path"
 	"slices"
 	"strings"
 )
@@ -37,4 +38,16 @@ func (p *BucketPermission) Bucket() string {
 		"/", 2) //nolint:mnd
 
 	return s[0]
+}
+
+func (p *BucketPermission) PathSplit() (string, string) {
+	s := strings.SplitN(
+		strings.TrimLeft(p.Path, "/"),
+		"/", 2) //nolint:mnd
+
+	if len(s) == 1 {
+		return s[0], ""
+	}
+
+	return s[0], path.Clean(s[1])
 }
