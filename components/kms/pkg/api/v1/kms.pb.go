@@ -7,12 +7,11 @@
 package kmsv1
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -100,9 +99,8 @@ const file_v1_kms_proto_rawDesc = "" +
 	"\n" +
 	"\fv1/kms.proto\x12\x06kms.v1\"\x16\n" +
 	"\x14GetCredentialRequest\"\x17\n" +
-	"\x15GetCredentialResponse2Z\n" +
-	"\n" +
-	"KMSService\x12L\n" +
+	"\x15GetCredentialResponse2S\n" +
+	"\x03Kms\x12L\n" +
 	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB@Z>github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kmsv1b\x06proto3"
 
 var (
@@ -123,8 +121,8 @@ var file_v1_kms_proto_goTypes = []any{
 	(*GetCredentialResponse)(nil), // 1: kms.v1.GetCredentialResponse
 }
 var file_v1_kms_proto_depIdxs = []int32{
-	0, // 0: kms.v1.KMSService.GetCredential:input_type -> kms.v1.GetCredentialRequest
-	1, // 1: kms.v1.KMSService.GetCredential:output_type -> kms.v1.GetCredentialResponse
+	0, // 0: kms.v1.Kms.GetCredential:input_type -> kms.v1.GetCredentialRequest
+	1, // 1: kms.v1.Kms.GetCredential:output_type -> kms.v1.GetCredentialResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

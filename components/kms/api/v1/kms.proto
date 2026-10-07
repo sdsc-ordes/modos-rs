@@ -4,8 +4,8 @@ package kms.v1;
 
 option go_package = "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kmsv1";
 
-// KmsService hands out short-lived storage credentials.
-service KMSService {
+// Kms hands out short-lived storage credentials.
+service Kms {
   // GetCredential returns a credential for the buckets the caller is
   // entitled to, as derived from its authentication token (JWT).
   rpc GetCredential(GetCredentialRequest) returns (GetCredentialResponse);
