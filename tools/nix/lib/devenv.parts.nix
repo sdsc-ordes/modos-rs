@@ -8,6 +8,7 @@
     {
       pkgs,
       modos',
+      mvs,
       ...
     }:
     {
@@ -66,7 +67,20 @@
 
           addSetup = modules: modules ++ quitsh-setup ++ no-devenv-processes;
 
-          build-go = [
+          build-proto = [
+            {
+              packages = [
+                pkgs.buf
+                # One could also use `go get -tool ...` to add a tool
+                # however that stuff is then only available in the Go ecosystem.
+                # We might need it for other components as well.
+                (mvs.versions.protoc-gen-go."1.36.11")
+                (mvs.versions.protoc-gen-go-grpc."1.6.2")
+              ];
+            }
+          ];
+
+          build-go = build-proto ++ [
             {
               quitsh.toolchains = [ "build-go" ];
               quitsh.languages.go = {
@@ -214,6 +228,7 @@
             ci
             ++ build-rust
             ++ build-go
+            ++ build-proto
             ++ dev-go
             ++ manifest-ytt
             ++ quitsh-direct
@@ -315,6 +330,7 @@
             # General CI ---------
             build-rust
             build-go
+            build-proto
             lint-go
             lint-trivy
 
