@@ -7,6 +7,7 @@
 package kms
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,6 +24,7 @@ const (
 
 type GetCredentialRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Latitude      float32                `protobuf:"fixed32,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -55,6 +57,13 @@ func (x *GetCredentialRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetCredentialRequest.ProtoReflect.Descriptor instead.
 func (*GetCredentialRequest) Descriptor() ([]byte, []int) {
 	return file_v1_kms_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetCredentialRequest) GetLatitude() float32 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
 }
 
 type GetCredentialResponse struct {
@@ -97,11 +106,16 @@ var File_v1_kms_proto protoreflect.FileDescriptor
 
 const file_v1_kms_proto_rawDesc = "" +
 	"\n" +
-	"\fv1/kms.proto\x12\x06kms.v1\"\x16\n" +
-	"\x14GetCredentialRequest\"\x17\n" +
+	"\fv1/kms.proto\x12\x06kms.v1\x1a\x1bbuf/validate/validate.proto\"C\n" +
+	"\x14GetCredentialRequest\x12+\n" +
+	"\blatitude\x18\x01 \x01(\x02B\x0f\xbaH\f\n" +
+	"\n" +
+	"\x1d\x00\x00\xb4B-\x00\x00\xb4\xc2R\blatitude\"\x17\n" +
 	"\x15GetCredentialResponse2S\n" +
 	"\x03KMS\x12L\n" +
-	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB>Z<github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kmsb\x06proto3"
+	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x8d\x01\n" +
+	"\n" +
+	"com.kms.v1B\bKmsProtoP\x01Z<github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kms\xa2\x02\x03KXX\xaa\x02\x06Kms.V1\xca\x02\x06Kms\\V1\xe2\x02\x12Kms\\V1\\GPBMetadata\xea\x02\aKms::V1b\x06proto3"
 
 var (
 	file_v1_kms_proto_rawDescOnce sync.Once

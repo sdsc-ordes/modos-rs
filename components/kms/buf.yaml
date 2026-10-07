@@ -5,11 +5,11 @@ version: v2
 # package `kms.v1` -> `api/kms/v1/*.proto` -> `import "kms/v1/kms.proto"`.
 modules:
   - path: api
-
+deps:
+  - buf.build/bufbuild/protovalidate
 lint:
   use:
     - STANDARD
-
 breaking:
   use:
     - FILE

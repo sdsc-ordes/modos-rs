@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package kms.v1;
 
+import "buf/validate/validate.proto";
+
 option go_package = "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kms";
 
 // KMS hands out short-lived storage credentials.
@@ -11,6 +13,11 @@ service KMS {
   rpc GetCredential(GetCredentialRequest) returns (GetCredentialResponse);
 }
 
-message GetCredentialRequest {}
+message GetCredentialRequest {
+  float latitude = 1 [
+    (buf.validate.field).float.gte = -90,
+    (buf.validate.field).float.lte = 90
+  ];
+}
 
 message GetCredentialResponse {}

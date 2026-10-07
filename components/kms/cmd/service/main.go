@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
@@ -44,7 +45,13 @@ func main() {
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
 
-	_ = service.Service{Storage: client, JWTVerifier: jwtVerifier}
+	srv := service.Service{Storage: client, JWTVerifier: jwtVerifier}
+	err = srv.Serve(ctx, &conf.Server)
+
+	if err != nil {
+		clog.ErrorE(ctx, err, "Serve failed.")
+		os.Exit(-1)
+	}
 }
 
 func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVerifier, error) {

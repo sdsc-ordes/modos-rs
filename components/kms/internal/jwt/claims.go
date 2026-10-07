@@ -74,7 +74,7 @@ func (c *Claims) InitCustomClaims(getter auth.ClaimGetter) error {
 		}
 
 		c.BucketPermissions = append(c.BucketPermissions, types.BucketPermission{
-			Path:        path,
+			Path:        types.Path(path),
 			Permissions: permissions,
 		})
 	}

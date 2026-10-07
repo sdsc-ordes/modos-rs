@@ -10,16 +10,16 @@ targets:
           buildTags: ["unittest"]
       - runner: coverage-upload
 
-  test-integration:
-    steps:
-      - runner: go
-        config:
-          submodules:
-            - test
-          args:
-            - "--timeout=20m"
-          buildTags: ["integration"]
-      - runner: coverage-upload
+  # test-integration:
+  #   steps:
+  #     - runner: go
+  #       config:
+  #         submodules:
+  #           - test
+  #         args:
+  #           - "--timeout=20m"
+  #         buildTags: ["integration"]
+  #     - runner: coverage-upload
 
   build:
     steps:

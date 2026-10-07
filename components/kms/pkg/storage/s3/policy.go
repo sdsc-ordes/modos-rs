@@ -2,10 +2,8 @@ package s3
 
 import (
 	"context"
-	"strings"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
-	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/errors"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 )
 
@@ -50,19 +48,6 @@ func toAction(ctx context.Context, perms []types.Permission) (actions []string) 
 	return
 }
 
-func sanitizeResourcePath(resource string) (string, error) {
-	p := strings.Trim(resource, "/")
-	parts := strings.Split(p, "/")
-
-	if len(parts) == 0 {
-		return "", errors.New("Bucket path '%v' results in an empty resource path -> Ignore.", p)
-	} else if strings.ContainsAny(parts[0], "*?") {
-		return "", errors.New("Bucket path '%v' contains '?' or '*' which is not supported yet.", p)
-	}
-
-	return p, nil
-}
-
 // NewScopedPolicy returns a scoped policy based on bucket permissions [types.BucketPermissions].
 func NewScopedPolicy(
 	ctx context.Context,
@@ -76,7 +61,8 @@ func NewScopedPolicy(
 	for i := range permissions {
 		perm := &permissions[i]
 
-		resourcePath, err := sanitizeResourcePath(perm.Path)
+		var err error
+		perm.Path, err = perm.Path.Sanitize()
 		if err != nil {
 			clog.ErrorEf(ctx, err, "Skipping permissions for '%v' due to path errors.", perm)
 
@@ -87,7 +73,7 @@ func NewScopedPolicy(
 			Effect: "Allow",
 			Action: toAction(ctx, perm.Permissions),
 			Resource: []string{
-				"arn:aws:s3:::" + resourcePath + "/*",
+				"arn:aws:s3:::" + (string)(perm.Path) + "/*",
 			},
 		})
 	}

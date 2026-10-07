@@ -16,7 +16,7 @@ type Config struct {
 
 type (
 	Server struct {
-		// The hostname.
+		// The hostname (use 0.0.0.0 for serving it in the cloud).
 		Hostname string `yaml:"hostname" default:"localhost"`
 
 		// The port for the portal endpoints.
