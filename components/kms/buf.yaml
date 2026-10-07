@@ -1,0 +1,15 @@
+version: v2
+
+# The module root: import paths are relative to `api/`, and must mirror the
+# proto package (enforced by the `PACKAGE_DIRECTORY_MATCH` lint rule), e.g.
+# package `kms.v1` -> `api/kms/v1/*.proto` -> `import "kms/v1/kms.proto"`.
+modules:
+  - path: api
+
+lint:
+  use:
+    - STANDARD
+
+breaking:
+  use:
+    - FILE

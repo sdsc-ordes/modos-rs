@@ -19,6 +19,8 @@ default:
 [group('general')]
 lint *args:
     just quitsh lint --component-dir "$(pwd)" "$@"
+    just lint-proto
+    just lint-proto-breaking
 
 # Build the project.
 # Pass build args with `-K 'build.args: ["--tags "debug,development,auth_disable"]`
@@ -84,4 +86,16 @@ update-deps branchOrTag="main" *args:
 
     go mod tidy
     git add .
+
+
+# Generate the Go API bindings from the protobuf definitions in `api/`.
+[group('general')]
+generate *args:
+    buf generate "$@"
+
+# Lint the protobuf definitions.
+[group('general')]
+[private]
+lint-proto *args:
+    buf lint "$@"
 

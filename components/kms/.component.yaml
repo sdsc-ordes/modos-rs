@@ -28,6 +28,7 @@ targets:
         config:
           paths:
             - internal
+            - pkg
 
   lint:
     steps:
