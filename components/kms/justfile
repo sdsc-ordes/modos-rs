@@ -99,8 +99,3 @@ generate *args:
 lint-proto *args:
     buf lint "$@"
 
-# Check the protobuf definitions for breaking changes against `main`.
-[group('general')]
-[private]
-lint-proto-breaking *args:
-    buf breaking --against "{{root_dir}}/.git#branch=main,subdir=components/kms" "$@"

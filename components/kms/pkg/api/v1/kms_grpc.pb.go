@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: v1/kms.proto
 
-package kmsv1
+package kms
 
 import (
 	context "context"
@@ -19,109 +19,109 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Kms_GetCredential_FullMethodName = "/kms.v1.Kms/GetCredential"
+	KMS_GetCredential_FullMethodName = "/kms.v1.KMS/GetCredential"
 )
 
-// KmsClient is the client API for Kms service.
+// KMSClient is the client API for KMS service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Kms hands out short-lived storage credentials.
-type KmsClient interface {
+// KMS hands out short-lived storage credentials.
+type KMSClient interface {
 	// GetCredential returns a credential for the buckets the caller is
 	// entitled to, as derived from its authentication token (JWT).
 	GetCredential(ctx context.Context, in *GetCredentialRequest, opts ...grpc.CallOption) (*GetCredentialResponse, error)
 }
 
-type kmsClient struct {
+type kMSClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewKmsClient(cc grpc.ClientConnInterface) KmsClient {
-	return &kmsClient{cc}
+func NewKMSClient(cc grpc.ClientConnInterface) KMSClient {
+	return &kMSClient{cc}
 }
 
-func (c *kmsClient) GetCredential(ctx context.Context, in *GetCredentialRequest, opts ...grpc.CallOption) (*GetCredentialResponse, error) {
+func (c *kMSClient) GetCredential(ctx context.Context, in *GetCredentialRequest, opts ...grpc.CallOption) (*GetCredentialResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCredentialResponse)
-	err := c.cc.Invoke(ctx, Kms_GetCredential_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, KMS_GetCredential_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// KmsServer is the server API for Kms service.
-// All implementations must embed UnimplementedKmsServer
+// KMSServer is the server API for KMS service.
+// All implementations must embed UnimplementedKMSServer
 // for forward compatibility.
 //
-// Kms hands out short-lived storage credentials.
-type KmsServer interface {
+// KMS hands out short-lived storage credentials.
+type KMSServer interface {
 	// GetCredential returns a credential for the buckets the caller is
 	// entitled to, as derived from its authentication token (JWT).
 	GetCredential(context.Context, *GetCredentialRequest) (*GetCredentialResponse, error)
-	mustEmbedUnimplementedKmsServer()
+	mustEmbedUnimplementedKMSServer()
 }
 
-// UnimplementedKmsServer must be embedded to have
+// UnimplementedKMSServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedKmsServer struct{}
+type UnimplementedKMSServer struct{}
 
-func (UnimplementedKmsServer) GetCredential(context.Context, *GetCredentialRequest) (*GetCredentialResponse, error) {
+func (UnimplementedKMSServer) GetCredential(context.Context, *GetCredentialRequest) (*GetCredentialResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCredential not implemented")
 }
-func (UnimplementedKmsServer) mustEmbedUnimplementedKmsServer() {}
-func (UnimplementedKmsServer) testEmbeddedByValue()             {}
+func (UnimplementedKMSServer) mustEmbedUnimplementedKMSServer() {}
+func (UnimplementedKMSServer) testEmbeddedByValue()             {}
 
-// UnsafeKmsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to KmsServer will
+// UnsafeKMSServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to KMSServer will
 // result in compilation errors.
-type UnsafeKmsServer interface {
-	mustEmbedUnimplementedKmsServer()
+type UnsafeKMSServer interface {
+	mustEmbedUnimplementedKMSServer()
 }
 
-func RegisterKmsServer(s grpc.ServiceRegistrar, srv KmsServer) {
-	// If the following call panics, it indicates UnimplementedKmsServer was
+func RegisterKMSServer(s grpc.ServiceRegistrar, srv KMSServer) {
+	// If the following call panics, it indicates UnimplementedKMSServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Kms_ServiceDesc, srv)
+	s.RegisterService(&KMS_ServiceDesc, srv)
 }
 
-func _Kms_GetCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KMS_GetCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetCredentialRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KmsServer).GetCredential(ctx, in)
+		return srv.(KMSServer).GetCredential(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Kms_GetCredential_FullMethodName,
+		FullMethod: KMS_GetCredential_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KmsServer).GetCredential(ctx, req.(*GetCredentialRequest))
+		return srv.(KMSServer).GetCredential(ctx, req.(*GetCredentialRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Kms_ServiceDesc is the grpc.ServiceDesc for Kms service.
+// KMS_ServiceDesc is the grpc.ServiceDesc for KMS service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Kms_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "kms.v1.Kms",
-	HandlerType: (*KmsServer)(nil),
+var KMS_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "kms.v1.KMS",
+	HandlerType: (*KMSServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetCredential",
-			Handler:    _Kms_GetCredential_Handler,
+			Handler:    _KMS_GetCredential_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

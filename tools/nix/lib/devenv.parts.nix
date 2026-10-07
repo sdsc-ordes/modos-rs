@@ -71,11 +71,6 @@
             {
               packages = [
                 pkgs.buf
-                # One could also use `go get -tool ...` to add a tool
-                # however that stuff is then only available in the Go ecosystem.
-                # We might need it for other components as well.
-                (mvs.versions.protoc-gen-go."1.36.11")
-                (mvs.versions.protoc-gen-go-grpc."1.6.2")
               ];
             }
           ];
