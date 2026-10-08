@@ -1,4 +1,4 @@
-//go:generate env GOWORK=off buf generate --config ../../buf.yaml -o ../.. --template ../../buf.gen.yaml ../..
+//go:generate env GOWORK=off buf generate -o ../.. --template ../../buf.gen.yaml ../../api
 package main
 
 import (

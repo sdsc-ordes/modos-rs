@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: v1/kms.proto
 
-package kms
+package kmsv1
 
 import (
 	context "context"

@@ -4,8 +4,6 @@ package kms.v1;
 
 import "buf/validate/validate.proto";
 
-option go_package = "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kms";
-
 // KMS hands out short-lived storage credentials.
 service KMS {
   // GetCredential returns a credential for the buckets the caller is

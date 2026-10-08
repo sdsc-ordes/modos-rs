@@ -1,5 +1,7 @@
 {
   lib,
+  # Add. packages.
+  buf,
   # Own arguments.
   modos,
   build,
@@ -23,6 +25,14 @@ build.buildGoModule {
       compName
     ];
   };
+
+  preConfigure = ''
+    export HOME=$(mktemp -d)
+  '';
+
+  nativeBuildInputs = [
+    buf
+  ];
 
   target = "service";
   vendorHash = "sha256-69EGfYXwNJXdTZZvp0jHQSIPEF0RrDWZLNMnKHdglko=";

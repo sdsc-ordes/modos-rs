@@ -4,10 +4,10 @@
 // 	protoc        (unknown)
 // source: v1/kms.proto
 
-package kms
+package kmsv1
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -113,9 +113,9 @@ const file_v1_kms_proto_rawDesc = "" +
 	"\x1d\x00\x00\xb4B-\x00\x00\xb4\xc2R\blatitude\"\x17\n" +
 	"\x15GetCredentialResponse2S\n" +
 	"\x03KMS\x12L\n" +
-	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x8d\x01\n" +
+	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x8f\x01\n" +
 	"\n" +
-	"com.kms.v1B\bKmsProtoP\x01Z<github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kms\xa2\x02\x03KXX\xaa\x02\x06Kms.V1\xca\x02\x06Kms\\V1\xe2\x02\x12Kms\\V1\\GPBMetadata\xea\x02\aKms::V1b\x06proto3"
+	"com.kms.v1B\bKmsProtoP\x01Z>github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kmsv1\xa2\x02\x03KXX\xaa\x02\x06Kms.V1\xca\x02\x06Kms\\V1\xe2\x02\x12Kms\\V1\\GPBMetadata\xea\x02\aKms::V1b\x06proto3"
 
 var (
 	file_v1_kms_proto_rawDescOnce sync.Once

@@ -1,11 +1,20 @@
 version: v2
 
+inputs:
+  - directory: api
+
 managed:
   # Moves language specific proto options out of our .proto files.
   # This is generally wanted as we are the producer and we might
   # have consumers using these files which do not want the same `go_options`
   # etc in the proto files. In managed mode one can remove these language specific options and that means: `buf generate` will inject now such language specific option to the proto compiler `protoc`
   enabled: true
+
+  override:
+    # Derives `go_package` for our protos as `<prefix>/<dir of .proto>`,
+    # e.g. `api/v1/kms.proto` -> `.../pkg/api/v1` (Go package `kmsv1`).
+    - file_option: go_package_prefix
+      value: github.com/sdsc-ordes/modos-rs/components/kms/pkg/api
 
 plugins:
   - local: ["go", "tool", "protoc-gen-go"]
