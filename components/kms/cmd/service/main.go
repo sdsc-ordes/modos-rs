@@ -13,6 +13,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/signal"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/grpc"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
 )
@@ -45,8 +46,15 @@ func main() {
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
 
+	server, err := grpc.NewServer(jwtVerifier, &conf.OIDC)
+	log.PanicEf(err, "Could not create GRPC server.")
+
+	clog.Infof(ctx, "Creating GRPC server.")
 	srv := service.Service{Storage: client, JWTVerifier: jwtVerifier}
-	err = srv.Serve(ctx, &conf.Server)
+	srv.RegisterAtGRPCServer(server.S)
+
+	err = server.Serve(ctx, &conf.Server)
+	defer server.Close()
 
 	if err != nil {
 		clog.ErrorE(ctx, err, "Serve failed.")

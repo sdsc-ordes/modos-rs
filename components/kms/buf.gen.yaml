@@ -1,6 +1,10 @@
 version: v2
 
 managed:
+  # Moves language specific proto options out of our .proto files.
+  # This is generally wanted as we are the producer and we might
+  # have consumers using these files which do not want the same `go_options`
+  # etc in the proto files. In managed mode one can remove these language specific options and that means: `buf generate` will inject now such language specific option to the proto compiler `protoc`
   enabled: true
 
 plugins:
