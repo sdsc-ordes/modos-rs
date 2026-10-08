@@ -29,8 +29,9 @@
             "external/**/*"
             "**/vendor/**/*"
 
-            # FIXME: add treefmt which runs on `git-diff` runner if existing.
-            "**/api/openapi*" # These are generated.
+            # Generated files.
+            "*.pb.go"
+            "**/api/openapi*"
           ];
         };
 

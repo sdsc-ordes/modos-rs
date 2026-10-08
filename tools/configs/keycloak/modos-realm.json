@@ -815,7 +815,7 @@
         "include.in.openid.provider.metadata": "true",
         "include.in.token.scope": "true"
       },
-      "description": "The S3 bucket permissions for modos. Scope `bp-user`, `bp-groups`, `bp-mapper`",
+      "description": "The S3 bucket permissions for modos. Scope `bp-user`, `bp-groups`, `bps`",
       "id": "c369b4b8-5b6a-47d3-b026-dccb4d8159df",
       "name": "permissions",
       "protocol": "openid-connect",
@@ -840,7 +840,7 @@
           "config": {
             "access.attribute": "permissions",
             "access.token.claim": "true",
-            "claim.name": "bp-mapper",
+            "claim.name": "bps",
             "id.token.claim": "false",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
@@ -1365,7 +1365,7 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
-            "included.custom.audience": "modos-api",
+            "included.custom.audience": "modos-cli",
             "introspection.token.claim": "true",
             "lightweight.claim": "true",
             "userinfo.token.claim": "false"

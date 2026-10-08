@@ -6,6 +6,7 @@ import (
 	"context"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/sdsc-ordes/modos-rs/tools/quitsh/pkg/nix"
@@ -35,11 +36,14 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 		"pc-"+pcConfig+".sock")
 
 	mustBeStarted := false
-	if path, e := os.ReadFile(socketPathFile); e != nil && fs.Exists(string(path)) {
+	if path, e := os.ReadFile(
+		socketPathFile,
+	); e == nil &&
+		fs.Exists(string(strings.TrimSpace(string(path)))) {
 		log.Warnf("Skip starting the test services, socket '%v' exists.", path)
 		mustBeStarted = true
 	} else {
-		log.Info("Starting test services.")
+		log.Infof("Starting test services, file '%v' not existing.", socketPathFile)
 	}
 
 	pcCtx, err = pc.Start(

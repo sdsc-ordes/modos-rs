@@ -19,6 +19,8 @@ default:
 [group('general')]
 lint *args:
     just quitsh lint --component-dir "$(pwd)" "$@"
+    just lint-proto
+    just lint-proto-breaking
 
 # Build the project.
 # Pass build args with `-K 'build.args: ["--tags "debug,development,auth_disable"]`
@@ -54,6 +56,47 @@ run-nix *args:
 # Run the executable `service`.
 [group('ci')]
 run-service service:
+    #!/usr/bin/env bash
     "{{service}}" \
         --config-dir data/config \
         --data-dir data
+
+update-deps branchOrTag="main" *args:
+    #!/usr/bin/env bash
+    set -eu
+
+    echo "Updating 'kms'."
+
+    branchOrTag="{{branchOrTag}}"
+    shift 1
+    pkgs=("$@")
+
+    if [ "${pkgs:-}" = "" ]; then
+        pkgs=("components/lib-common")
+    fi
+
+    sha=$(git ls-remote -q \
+        https://gitlab.com/data-custodian/custodian.git \
+        "refs/heads/$branchOrTag" | cut -f 1)
+
+    for pkg in "${pkgs[@]}"; do
+        echo "Updating pkg '$pkg' to '$sha'"
+        go get -u "gitlab.com/data-custodian/custodian/$pkg@$sha"
+        (cd test && go get -u "gitlab.com/data-custodian/custodian/$pkg@$sha")
+    done
+
+    go mod tidy
+    git add .
+
+
+# Generate the Go API bindings from the protobuf definitions in `api/`.
+[group('general')]
+generate *args:
+    buf generate "$@"
+
+# Lint the protobuf definitions.
+[group('general')]
+[private]
+lint-proto *args:
+    buf lint "$@"
+

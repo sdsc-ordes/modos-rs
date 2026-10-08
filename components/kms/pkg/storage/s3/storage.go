@@ -16,13 +16,13 @@ import (
 )
 
 // Ping implements [types.Client].
-func (c *clientS3) Ping(ctx context.Context) (err error) {
+func (c *Client) Ping(ctx context.Context) (err error) {
 	clog.Infof(ctx, "Pinging buckets.")
 
 	ctxT, cancel := context.WithTimeout(ctx, defaultPingTimeout)
 	defer cancel()
 
-	_, e := c.client.ListBuckets(ctxT, &s3.ListBucketsInput{}) //nolint: exhaustruct // intended
+	_, e := c.Client.ListBuckets(ctxT, &s3.ListBucketsInput{}) //nolint: exhaustruct // intended
 
 	if e != nil {
 		return errors.AddContext(e,
@@ -34,7 +34,7 @@ func (c *clientS3) Ping(ctx context.Context) (err error) {
 }
 
 // Credentials implements [types.Client].
-func (c *clientS3) NewCredentials(
+func (c *Client) NewCredentials(
 	ctx context.Context,
 	permissions types.BucketPermissions,
 	duration time.Duration,
@@ -65,7 +65,7 @@ func (c *clientS3) NewCredentials(
 		Policy:          aws.String(string(policyJSON)),
 	}
 
-	res, err := c.sts.AssumeRole(ctx, &in)
+	res, err := c.Sts.AssumeRole(ctx, &in)
 	if err != nil {
 		return nil, errors.AddContext(
 			err,

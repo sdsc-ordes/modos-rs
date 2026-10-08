@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// Client is the storage client interface to request credentials from.
 	Client interface {
 		// Ping returns if the storage can be accessed.
 		Ping(ctx context.Context) error

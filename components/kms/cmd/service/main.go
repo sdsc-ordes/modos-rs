@@ -1,18 +1,21 @@
+//go:generate env GOWORK=off buf generate -o ../.. --template ../../buf.gen.yaml ../../api
 package main
 
 import (
 	"context"
+	"os"
 	"time"
 
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 	cmc "gitlab.com/data-custodian/custodian/components/lib-common/pkg/config"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/signal"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/grpc"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
-	st "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
 )
 
 func loadConfigs(configDir string, dataDir string) (conf config.Config) {
@@ -40,19 +43,37 @@ func main() {
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
 
-	// FIXME: remove.
-	c, err := client.NewCredentials(
-		ctx,
-		[]st.BucketPermission{
-			{Path: "bucket-a", Permissions: []st.Permission{st.PermissionRead}},
-			{Path: "bucket-b", Permissions: []st.Permission{st.PermissionWrite}},
-		},
-		1*time.Hour,
-	)
-	if err != nil {
-		log.ErrorE(err, "Credentials could not be created.")
-	}
-	clog.Info(ctx, "Credentials created.", "creds", c)
+	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
+	log.PanicEf(err, "Could not create JWT verifier.")
 
-	_ = service.Service{Storage: client}
+	server, err := grpc.NewServer(jwtVerifier, &conf.OIDC)
+	log.PanicEf(err, "Could not create GRPC server.")
+
+	clog.Infof(ctx, "Creating GRPC server.")
+	srv := service.Service{
+		Storage:         client,
+		JWTVerifier:     jwtVerifier,
+		UnsafeKMSServer: nil,
+	}
+	srv.RegisterAtGRPCServer(server.Public)
+
+	err = server.Serve(ctx, &conf.Server, &conf.ServerManagement)
+	if err != nil {
+		clog.ErrorE(ctx, err, "Serve failed.")
+		os.Exit(-1)
+	}
+}
+
+func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVerifier, error) {
+	const timeout = 30 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	return auth.NewJWTVerifier(
+		ctx,
+		oidcCfg.Issuer,
+		oidcCfg.ClientID,
+		auth.WithTrustedAlgorithms(oidcCfg.TrustedAlgorithms...),
+		auth.WithTrustedAudiences(oidcCfg.TrustedAudiences...),
+	)
 }

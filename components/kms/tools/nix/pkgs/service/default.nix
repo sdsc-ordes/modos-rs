@@ -1,5 +1,7 @@
 {
   lib,
+  # Add. packages.
+  buf,
   # Own arguments.
   modos,
   build,
@@ -24,14 +26,24 @@ build.buildGoModule {
     ];
   };
 
+  preConfigure = ''
+    # Executing `buf` in `go generate` needs somehow `HOME` to be set.
+    # Nix sandbox has not home.
+    export HOME=$(mktemp -d)
+  '';
+
+  nativeBuildInputs = [
+    buf
+  ];
+
   target = "service";
-  vendorHash = "sha256-+nH/8hoJY2T7qRWSxolF2xWh3Ns2+5DOfT/L5W9ZLdk=";
+  vendorHash = "sha256-69EGfYXwNJXdTZZvp0jHQSIPEF0RrDWZLNMnKHdglko=";
 
   doCheck = true;
 
   meta = {
     description = compName;
-    homepage = "https://gitlab.com/data-custodian/dac-portal";
+    homepage = "https://github.com/sdcs-ordes/modos-rs";
     license = lib.licenses.apsl20;
     maintainers = [ "sdcs-ordes" ];
     mainProgram = compName;

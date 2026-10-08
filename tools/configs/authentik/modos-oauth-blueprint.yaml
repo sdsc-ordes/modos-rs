@@ -136,7 +136,7 @@ entries:
 
             queue.extend(g.parents.all())
 
-        return {"bp-mapper": [v for v in perms.values()]}
+        return {"bps": [v for v in perms.values()]}
   # Property Mapping
   # ==============================================
   # All groups the user is a member of, as a `groups` claim.

@@ -13,16 +13,16 @@ import (
 )
 
 type (
-	clientS3 struct {
-		client *s3.Client
-		sts    *sts.Client
+	Client struct {
+		Client *s3.Client
+		Sts    *sts.Client
 	}
 )
 
 func NewClient(
 	ctx context.Context,
 	conf *bst.S3Connection,
-) (*clientS3, error) {
+) (*Client, error) {
 	clog.Info(ctx, "Create connection to S3 storage.",
 		"endpoint", conf.Endpoint.String())
 
@@ -49,5 +49,5 @@ func NewClient(
 	client := s3.NewFromConfig(cfg, addOpts)
 	sts := sts.NewFromConfig(cfg)
 
-	return &clientS3{client, sts}, nil
+	return &Client{client, sts}, nil
 }
