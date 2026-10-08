@@ -1,7 +1,7 @@
 package service
 
 import (
-	kms "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1"
+	kms "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/kms/v1"
 	"google.golang.org/grpc"
 )
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: v1/kms.proto
+// source: kms/v1/kms.proto
 
 package kmsv1
 
@@ -125,5 +125,5 @@ var KMS_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "v1/kms.proto",
+	Metadata: "kms/v1/kms.proto",
 }

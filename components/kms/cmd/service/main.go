@@ -50,7 +50,11 @@ func main() {
 	log.PanicEf(err, "Could not create GRPC server.")
 
 	clog.Infof(ctx, "Creating GRPC server.")
-	srv := service.Service{Storage: client, JWTVerifier: jwtVerifier}
+	srv := service.Service{
+		Storage:         client,
+		JWTVerifier:     jwtVerifier,
+		UnsafeKMSServer: nil,
+	}
 	srv.RegisterAtGRPCServer(server.S)
 
 	err = server.Serve(ctx, &conf.Server)

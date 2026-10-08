@@ -2,12 +2,12 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: v1/kms.proto
+// source: kms/v1/kms.proto
 
 package kmsv1
 
 import (
-	_ "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/buf/validate"
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -31,7 +31,7 @@ type GetCredentialRequest struct {
 
 func (x *GetCredentialRequest) Reset() {
 	*x = GetCredentialRequest{}
-	mi := &file_v1_kms_proto_msgTypes[0]
+	mi := &file_kms_v1_kms_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *GetCredentialRequest) String() string {
 func (*GetCredentialRequest) ProtoMessage() {}
 
 func (x *GetCredentialRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_kms_proto_msgTypes[0]
+	mi := &file_kms_v1_kms_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *GetCredentialRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCredentialRequest.ProtoReflect.Descriptor instead.
 func (*GetCredentialRequest) Descriptor() ([]byte, []int) {
-	return file_v1_kms_proto_rawDescGZIP(), []int{0}
+	return file_kms_v1_kms_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetCredentialRequest) GetLatitude() float32 {
@@ -74,7 +74,7 @@ type GetCredentialResponse struct {
 
 func (x *GetCredentialResponse) Reset() {
 	*x = GetCredentialResponse{}
-	mi := &file_v1_kms_proto_msgTypes[1]
+	mi := &file_kms_v1_kms_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +86,7 @@ func (x *GetCredentialResponse) String() string {
 func (*GetCredentialResponse) ProtoMessage() {}
 
 func (x *GetCredentialResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_kms_proto_msgTypes[1]
+	mi := &file_kms_v1_kms_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,42 +99,42 @@ func (x *GetCredentialResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCredentialResponse.ProtoReflect.Descriptor instead.
 func (*GetCredentialResponse) Descriptor() ([]byte, []int) {
-	return file_v1_kms_proto_rawDescGZIP(), []int{1}
+	return file_kms_v1_kms_proto_rawDescGZIP(), []int{1}
 }
 
-var File_v1_kms_proto protoreflect.FileDescriptor
+var File_kms_v1_kms_proto protoreflect.FileDescriptor
 
-const file_v1_kms_proto_rawDesc = "" +
+const file_kms_v1_kms_proto_rawDesc = "" +
 	"\n" +
-	"\fv1/kms.proto\x12\x06kms.v1\x1a\x1bbuf/validate/validate.proto\"C\n" +
+	"\x10kms/v1/kms.proto\x12\x06kms.v1\x1a)protovalidate/buf/validate/validate.proto\"C\n" +
 	"\x14GetCredentialRequest\x12+\n" +
 	"\blatitude\x18\x01 \x01(\x02B\x0f\xbaH\f\n" +
 	"\n" +
 	"\x1d\x00\x00\xb4B-\x00\x00\xb4\xc2R\blatitude\"\x17\n" +
 	"\x15GetCredentialResponse2S\n" +
 	"\x03KMS\x12L\n" +
-	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x8f\x01\n" +
+	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x93\x01\n" +
 	"\n" +
-	"com.kms.v1B\bKmsProtoP\x01Z>github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/v1;kmsv1\xa2\x02\x03KXX\xaa\x02\x06Kms.V1\xca\x02\x06Kms\\V1\xe2\x02\x12Kms\\V1\\GPBMetadata\xea\x02\aKms::V1b\x06proto3"
+	"com.kms.v1B\bKmsProtoP\x01ZBgithub.com/sdsc-ordes/modos-rs/components/kms/pkg/api/kms/v1;kmsv1\xa2\x02\x03KXX\xaa\x02\x06Kms.V1\xca\x02\x06Kms\\V1\xe2\x02\x12Kms\\V1\\GPBMetadata\xea\x02\aKms::V1b\x06proto3"
 
 var (
-	file_v1_kms_proto_rawDescOnce sync.Once
-	file_v1_kms_proto_rawDescData []byte
+	file_kms_v1_kms_proto_rawDescOnce sync.Once
+	file_kms_v1_kms_proto_rawDescData []byte
 )
 
-func file_v1_kms_proto_rawDescGZIP() []byte {
-	file_v1_kms_proto_rawDescOnce.Do(func() {
-		file_v1_kms_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_v1_kms_proto_rawDesc), len(file_v1_kms_proto_rawDesc)))
+func file_kms_v1_kms_proto_rawDescGZIP() []byte {
+	file_kms_v1_kms_proto_rawDescOnce.Do(func() {
+		file_kms_v1_kms_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_kms_v1_kms_proto_rawDesc), len(file_kms_v1_kms_proto_rawDesc)))
 	})
-	return file_v1_kms_proto_rawDescData
+	return file_kms_v1_kms_proto_rawDescData
 }
 
-var file_v1_kms_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_v1_kms_proto_goTypes = []any{
+var file_kms_v1_kms_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_kms_v1_kms_proto_goTypes = []any{
 	(*GetCredentialRequest)(nil),  // 0: kms.v1.GetCredentialRequest
 	(*GetCredentialResponse)(nil), // 1: kms.v1.GetCredentialResponse
 }
-var file_v1_kms_proto_depIdxs = []int32{
+var file_kms_v1_kms_proto_depIdxs = []int32{
 	0, // 0: kms.v1.KMS.GetCredential:input_type -> kms.v1.GetCredentialRequest
 	1, // 1: kms.v1.KMS.GetCredential:output_type -> kms.v1.GetCredentialResponse
 	1, // [1:2] is the sub-list for method output_type
@@ -144,26 +144,26 @@ var file_v1_kms_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_v1_kms_proto_init() }
-func file_v1_kms_proto_init() {
-	if File_v1_kms_proto != nil {
+func init() { file_kms_v1_kms_proto_init() }
+func file_kms_v1_kms_proto_init() {
+	if File_kms_v1_kms_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_kms_proto_rawDesc), len(file_v1_kms_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_kms_v1_kms_proto_rawDesc), len(file_kms_v1_kms_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_v1_kms_proto_goTypes,
-		DependencyIndexes: file_v1_kms_proto_depIdxs,
-		MessageInfos:      file_v1_kms_proto_msgTypes,
+		GoTypes:           file_kms_v1_kms_proto_goTypes,
+		DependencyIndexes: file_kms_v1_kms_proto_depIdxs,
+		MessageInfos:      file_kms_v1_kms_proto_msgTypes,
 	}.Build()
-	File_v1_kms_proto = out.File
-	file_v1_kms_proto_goTypes = nil
-	file_v1_kms_proto_depIdxs = nil
+	File_kms_v1_kms_proto = out.File
+	file_kms_v1_kms_proto_goTypes = nil
+	file_kms_v1_kms_proto_depIdxs = nil
 }

@@ -6,15 +6,14 @@ import (
 	"net"
 
 	protoval "buf.build/go/protovalidate"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	protovalMiddlewear "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
+	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/errors"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 	"google.golang.org/grpc"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/middlewear"
-	"github.com/sdsc-ordes/quitsh/pkg/errors"
 )
 
 // Server represents the GRPC server.
@@ -38,10 +37,9 @@ func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error
 
 	// Create gRPC server with middleware chain (matching main.go exactly)
 	server := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
-				authInterceptor,
-				validationInterceptor),
+		grpc.ChainUnaryInterceptor(
+			authInterceptor,
+			validationInterceptor,
 		),
 	)
 
@@ -67,12 +65,14 @@ func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
 	// NOTE: `grpc.Server.Serve` does not observe `ctx`, it only returns once
 	// `Stop`/`GracefulStop` is called. Bridge the cancellation ourselves.
 	go func() {
-		<-ctx.Done()
+		<-ctx.Done() // Wait till ctx is canceled.
 		clog.Info(ctx, "Context cancelled, shutting down GRPC server.")
 		s.close()
 	}()
 
-	return s.S.Serve(listener)
+	err = s.S.Serve(listener)
+
+	return err
 }
 
 // Close cleans up all resources.

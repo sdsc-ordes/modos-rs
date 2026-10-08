@@ -13,7 +13,9 @@ modules:
   # descriptor "strings" on the GRPC field annotation to a [CEL](https://github.com/cel-expr/cel-spec)-abstract-syntax-tree once
   # which is cached and then re-using it to validate against
   # given values on the resp. field.
-  - path: external/proto/protovalidate
+  # We exported the following:
+  # - buf export buf.build/bufbuild/protovalidate external/proto
+  - path: external/proto
 lint:
   use:
     - STANDARD

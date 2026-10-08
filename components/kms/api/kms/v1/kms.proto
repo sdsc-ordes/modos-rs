@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package kms.v1;
 
-import "buf/validate/validate.proto";
+import "protovalidate/buf/validate/validate.proto";
 
 // KMS hands out short-lived storage credentials.
 service KMS {

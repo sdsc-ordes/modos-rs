@@ -14,7 +14,14 @@ managed:
     # Derives `go_package` for our protos as `<prefix>/<dir of .proto>`,
     # e.g. `api/v1/kms.proto` -> `.../pkg/api/v1` (Go package `kmsv1`).
     - file_option: go_package_prefix
+      path: kms
       value: github.com/sdsc-ordes/modos-rs/components/kms/pkg/api
+  disable:
+    # Keep protovalidate's own `go_package`: the protovalidate runtime
+    # already registers `buf/validate/validate.proto` from the upstream Go
+    # package; a second generated copy panics at init (namespace conflict).
+    - file_option: go_package
+      path: protovalidate
 
 plugins:
   - local: ["go", "tool", "protoc-gen-go"]
