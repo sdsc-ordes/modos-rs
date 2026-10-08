@@ -77,7 +77,7 @@ var _ = Describe("A JWT", func() {
 			require.NoError(t, err, "JWT: '%v'", string(b))
 
 			assert.Len(t, cl.BucketPermissions, 1)
-			assert.Equal(t, "bucket-a", cl.BucketPermissions[0].Path)
+			assert.Equal(t, st.Path("bucket-a"), cl.BucketPermissions[0].Path)
 			assert.Len(t, cl.BucketPermissions[0].Permissions, 1)
 			assert.Contains(t, cl.BucketPermissions[0].Permissions, st.PermissionWrite)
 		})

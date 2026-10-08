@@ -126,7 +126,7 @@ func testStorageAccess(
 	}
 
 	for _, p := range cl.BucketPermissions {
-		bucket, rest := p.PathSplit()
+		bucket, rest := p.Path.Split()
 
 		_, err = clientS3.Client.GetObject(ctx,
 			&s3.GetObjectInput{
