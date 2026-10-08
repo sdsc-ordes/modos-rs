@@ -21,6 +21,7 @@ import (
 type Server struct {
 	S        *grpc.Server
 	listener net.Listener
+	ctx      context.Context
 }
 
 // NewServer returns a new GRPC server listening.
@@ -48,7 +49,7 @@ func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error
 }
 
 // Serve serves all endpoints registered.
-// NOTE: [Server.Close] must be called as a `defer` when this is called.
+// This function returns whenever the `ctx` is canceled.
 func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
 	addr := fmt.Sprintf("%v:%v", cfg.Hostname, cfg.Port)
 	clog.Infof(ctx, "Start serving at '%s'.", addr)
@@ -61,11 +62,21 @@ func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
 	}
 
 	s.listener = listener
+	s.ctx = ctx
 
-	return nil
+	// NOTE: `grpc.Server.Serve` does not observe `ctx`, it only returns once
+	// `Stop`/`GracefulStop` is called. Bridge the cancellation ourselves.
+	go func() {
+		<-ctx.Done()
+		clog.Info(ctx, "Context cancelled, shutting down GRPC server.")
+		s.close()
+	}()
+
+	return s.S.Serve(listener)
 }
 
 // Close cleans up all resources.
-func (s *Server) Close() {
+func (s *Server) close() {
+	clog.Info(s.ctx, "Shutting down GRPC server.")
 	s.S.GracefulStop()
 }

@@ -6,6 +6,13 @@ version: v2
 modules:
   - path: api
 deps:
+  # Makes it possible to annotate fields in `.proto` files
+  # with [validation constraints](https://protovalidate.com).
+  # A middleweare on the GRPC server then can read these validation
+  # logic in GRPC field descriptors (generated in the `.pb.go` files): It compiles that
+  # descriptor "strings" on the GRPC field annotation to a [CEL](https://github.com/cel-expr/cel-spec)-abstract-syntax-tree once
+  # which is cached and then re-using it to validate against
+  # given values on the resp. field.
   - buf.build/bufbuild/protovalidate
 lint:
   use:

@@ -54,8 +54,6 @@ func main() {
 	srv.RegisterAtGRPCServer(server.S)
 
 	err = server.Serve(ctx, &conf.Server)
-	defer server.Close()
-
 	if err != nil {
 		clog.ErrorE(ctx, err, "Serve failed.")
 		os.Exit(-1)
