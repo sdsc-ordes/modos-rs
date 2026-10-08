@@ -6,8 +6,10 @@ type Config struct {
 	// Some log settings.
 	Log Log `yaml:"log"`
 
-	// The server information.
+	// The server information for the public endpoints.
 	Server Server `yaml:"server"`
+	// The server information for the management endpoints.
+	ServerManagement Server `yaml:"serverManagement"`
 
 	Storage StorageS3 `yaml:"storage"`
 
@@ -19,7 +21,7 @@ type (
 		// The hostname (use 0.0.0.0 for serving it in the cloud).
 		Hostname string `yaml:"hostname" default:"localhost"`
 
-		// The port for the portal endpoints.
+		// The port for the public endpoints.
 		Port int `yaml:"port" default:"3020"`
 	}
 

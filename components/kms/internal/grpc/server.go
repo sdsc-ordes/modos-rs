@@ -5,6 +5,12 @@ import (
 	"fmt"
 	"net"
 
+	"golang.org/x/sync/errgroup"
+
+	"google.golang.org/grpc/health"
+	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
+
 	protoval "buf.build/go/protovalidate"
 	protovalMiddlewear "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
@@ -18,9 +24,12 @@ import (
 
 // Server represents the GRPC server.
 type Server struct {
-	S        *grpc.Server
-	listener net.Listener
-	ctx      context.Context
+	// The actual server with public endpoints.
+	Public *grpc.Server
+
+	// The health server.
+	management *grpc.Server
+	ctx        context.Context
 }
 
 // NewServer returns a new GRPC server listening.
@@ -43,14 +52,26 @@ func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error
 		),
 	)
 
-	return &Server{S: server}, nil
+	serverMgmt := grpc.NewServer()
+	healthSrv := health.NewServer()
+	healthSrv.SetServingStatus("", healthgrpc.HealthCheckResponse_SERVING)
+	healthgrpc.RegisterHealthServer(serverMgmt, healthSrv)
+	reflection.Register(serverMgmt)
+
+	return &Server{Public: server, management: serverMgmt}, nil
 }
 
 // Serve serves all endpoints registered.
 // This function returns whenever the `ctx` is canceled.
-func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
+func (s *Server) Serve(
+	ctx context.Context,
+	cfg *config.Server,
+	cfgMgmt *config.Server,
+) error {
 	addr := fmt.Sprintf("%v:%v", cfg.Hostname, cfg.Port)
-	clog.Infof(ctx, "Start serving at '%s'.", addr)
+	addrMgmt := fmt.Sprintf("%v:%v", cfgMgmt.Hostname, cfgMgmt.Port)
+	clog.Infof(ctx, "Start serving public endpoints at '%s'.", addr)
+	clog.Infof(ctx, "Start serving management endpoints at '%s'.", addrMgmt)
 
 	// Create TCP socket.
 	lc := net.ListenConfig{} //nolint:exhaustruct // all fields optional
@@ -59,7 +80,11 @@ func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
 		return errors.AddContext(err, "could not create listener at '%s'", addr)
 	}
 
-	s.listener = listener
+	listenerMgmt, err := lc.Listen(ctx, "tcp", addrMgmt)
+	if err != nil {
+		return errors.AddContext(err, "could not create listener at '%s'", addr)
+	}
+
 	s.ctx = ctx
 
 	// NOTE: `grpc.Server.Serve` does not observe `ctx`, it only returns once
@@ -70,13 +95,23 @@ func (s *Server) Serve(ctx context.Context, cfg *config.Server) error {
 		s.close()
 	}()
 
-	err = s.S.Serve(listener)
+	// Spawn all servers and wait on them.
+	eg, _ := errgroup.WithContext(ctx)
 
-	return err
+	eg.Go(func() error {
+		return s.Public.Serve(listener)
+	})
+
+	eg.Go(func() error {
+		return s.management.Serve(listenerMgmt)
+	})
+
+	return eg.Wait()
 }
 
 // Close cleans up all resources.
 func (s *Server) close() {
 	clog.Info(s.ctx, "Shutting down GRPC server.")
-	s.S.GracefulStop()
+	s.Public.GracefulStop()
+	s.management.GracefulStop()
 }

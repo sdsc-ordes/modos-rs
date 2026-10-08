@@ -55,9 +55,9 @@ func main() {
 		JWTVerifier:     jwtVerifier,
 		UnsafeKMSServer: nil,
 	}
-	srv.RegisterAtGRPCServer(server.S)
+	srv.RegisterAtGRPCServer(server.Public)
 
-	err = server.Serve(ctx, &conf.Server)
+	err = server.Serve(ctx, &conf.Server, &conf.ServerManagement)
 	if err != nil {
 		clog.ErrorE(ctx, err, "Serve failed.")
 		os.Exit(-1)
