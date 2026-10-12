@@ -12,6 +12,7 @@
   perSystem =
     {
       config,
+      self',
       inputs',
       modos',
       ...
@@ -173,7 +174,7 @@
 
             package =
               if nix then
-                self.packages.kms
+                self'.packages.kms-service
               else
                 (pkgs.writeShellScriptBin "kms-service" ''
                   just nix::develop "default" just run
@@ -202,7 +203,7 @@
 
       # Note: This `test-services-*` package is exposed on `packages` outputs in the flake.
       process-compose."test-services" = makeServices { nix = false; };
-      process-compose."test-services-nix" = makeServices { nix = false; };
+      process-compose."test-services-nix" = makeServices { nix = true; };
 
       modos.services.config = {
         test-services = config.process-compose.test-services;
