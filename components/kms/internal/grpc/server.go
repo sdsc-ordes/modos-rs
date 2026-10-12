@@ -51,6 +51,7 @@ func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error
 			validationInterceptor,
 		),
 	)
+	reflection.Register(server)
 
 	serverMgmt := grpc.NewServer()
 	healthSrv := health.NewServer()

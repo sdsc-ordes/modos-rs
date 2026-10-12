@@ -96,3 +96,18 @@ check-started:
         echo "Process compose is not started.";
         exit 1
     }
+
+[group('rpc')]
+grpc method="kms.v1.KMS.GetCredential" data="{}" server="localhost:3000":
+    #!/usr/bin/env bash
+    set -eu
+    if [ -n "${FORCE:-}" ] || [ ! -f ".test.tok" ]; then
+        header=$(just -f "{{source_file()}}" device-code-flow --print-gprc-header)
+        echo "$header" > .test.tok
+    else
+        header=$(cat .test.tok)
+    fi
+
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" list
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" describe kms.v1.KMS
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" '{{method}}'

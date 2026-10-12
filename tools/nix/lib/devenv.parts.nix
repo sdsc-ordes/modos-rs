@@ -251,6 +251,8 @@
                     pkgs.dive
                     pkgs.skopeo
 
+                    pkgs.grpcurl
+
                     # Process manager.
                     pkgsPinned.process-compose
 
