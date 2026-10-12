@@ -15,7 +15,7 @@ func (s *Service) GetCredential(
 	ctx context.Context,
 	_ *kms.GetCredentialRequest,
 ) (*kms.GetCredentialResponse, error) {
-	clog.Info(ctx, "asdf")
+	clog.Info(ctx, "Get credential start.")
 
 	return nil, nil
 }

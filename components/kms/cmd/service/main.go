@@ -46,7 +46,7 @@ func main() {
 	jwtVerifier, err := createJWTVerifier(ctx, &conf.OIDC)
 	log.PanicEf(err, "Could not create JWT verifier.")
 
-	server, err := grpc.NewServer(jwtVerifier, &conf.OIDC)
+	server, err := grpc.NewServer(ctx, jwtVerifier, &conf.OIDC)
 	log.PanicEf(err, "Could not create GRPC server.")
 
 	clog.Infof(ctx, "Creating GRPC server.")

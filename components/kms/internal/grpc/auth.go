@@ -1,4 +1,4 @@
-package middlewear
+package grpc
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	mdJwt "github.com/sdsc-ordes/modos-rs/components/kms/internal/jwt"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/auth"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/errors"
+	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -20,7 +21,7 @@ func AuthenticationInterceptor(
 	validator *auth.JWTVerifier,
 	oidcCfg *config.OIDC,
 ) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
 	) (any, error) {
 		token, err := extractToken(ctx)
 		if err != nil {
@@ -28,12 +29,13 @@ func AuthenticationInterceptor(
 		}
 
 		cl := mdJwt.NewClaims(&oidcCfg.ClaimBucketPermissions)
-		// FIXME:
-		// If we know which RPC is called when entering this middlewear:
-		// We need to pass here a hardcoded map of `RPC function name -> scopes needed`
-		// or do it in the handler functions them self by inspecting `cl`.
-		var allowedScopes []string = nil
-		err = auth.ValidateJWT(ctx, validator, token, allowedScopes, cl)
+
+		expectedScopes, err := ExpectedScopes(info.FullMethod)
+		if err != nil {
+			clog.ErrorEf(ctx, err, "Failed to determine allowed scopes for '%v'", info.FullMethod)
+		}
+
+		err = auth.ValidateJWT(ctx, validator, token, expectedScopes, cl)
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}

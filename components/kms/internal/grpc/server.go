@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/health"
 	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/stats"
 
 	protoval "buf.build/go/protovalidate"
 	protovalMiddlewear "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
@@ -19,7 +20,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
-	"github.com/sdsc-ordes/modos-rs/components/kms/internal/middlewear"
 )
 
 // Server represents the GRPC server.
@@ -33,7 +33,10 @@ type Server struct {
 }
 
 // NewServer returns a new GRPC server listening.
-func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error) {
+func NewServer(
+	ctx context.Context,
+	verifier *auth.JWTVerifier,
+	cfgOIDC *config.OIDC) (*Server, error) {
 	protoValidator, err := protoval.New()
 	if err != nil {
 		return nil, errors.AddContext(err,
@@ -42,10 +45,11 @@ func NewServer(verifier *auth.JWTVerifier, cfgOIDC *config.OIDC) (*Server, error
 	validationInterceptor := protovalMiddlewear.UnaryServerInterceptor(protoValidator)
 
 	// Create auth interceptor
-	authInterceptor := middlewear.AuthenticationInterceptor(verifier, cfgOIDC)
+	authInterceptor := AuthenticationInterceptor(verifier, cfgOIDC)
 
 	// Create gRPC server with middleware chain (matching main.go exactly)
 	server := grpc.NewServer(
+		grpc.StatsHandler(logInjector{base: ctx}),
 		grpc.ChainUnaryInterceptor(
 			authInterceptor,
 			validationInterceptor,
@@ -116,3 +120,24 @@ func (s *Server) close() {
 	s.Public.GracefulStop()
 	s.management.GracefulStop()
 }
+
+// Interface implementation guard.
+var _ stats.Handler = (*logInjector)(nil)
+
+// logInjector injects the values of a server-lifetime context into every RPC
+// context, while keeping the RPC's own deadline and cancellation.
+type logInjector struct{ base context.Context }
+
+func (h logInjector) TagRPC(ctx context.Context, s *stats.RPCTagInfo) context.Context {
+	return clog.ContextFromCtx(ctx, h.base)
+}
+
+func (logInjector) HandleRPC(context.Context, stats.RPCStats) {}
+
+func (logInjector) TagConn(
+	ctx context.Context,
+	_ *stats.ConnTagInfo,
+) context.Context {
+	return ctx
+}
+func (logInjector) HandleConn(context.Context, stats.ConnStats) {}
