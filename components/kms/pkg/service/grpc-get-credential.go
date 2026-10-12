@@ -20,5 +20,5 @@ func (s *Service) GetCredential(
 
 	_ = grpc.Claims(ctx)
 
-	return nil, nil
+	return &kms.GetCredentialResponse{}, nil
 }

@@ -16,9 +16,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var KeyClaims = struct{}{}
-
 const authHeader = "authorization"
+const KeyClaims ctxKey = 10000
+
+// To make the key not collide with other packages,
+// since the value and type must be matched.
+type ctxKey int
 
 func AuthenticationInterceptor(
 	validator *auth.JWTVerifier,
@@ -43,14 +46,14 @@ func AuthenticationInterceptor(
 		}
 
 		return handler(
-			context.WithValue(ctx, &KeyClaims, cl),
+			context.WithValue(ctx, KeyClaims, cl),
 			req)
 	}
 }
 
 // Claims returns the claims extracted by the [AuthenticationInterceptor].
 func Claims(ctx context.Context) *mdJwt.Claims {
-	if c, ok := ctx.Value(&KeyClaims).(*mdJwt.Claims); ok {
+	if c, ok := ctx.Value(KeyClaims).(*mdJwt.Claims); ok {
 		return c
 	}
 

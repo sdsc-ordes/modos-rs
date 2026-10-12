@@ -30,6 +30,12 @@ func loadConfigs(configDir string, dataDir string) (conf config.Config) {
 }
 
 func main() {
+	if err := run(); err != nil {
+		os.Exit(-1)
+	}
+}
+
+func run() error {
 	args := parseArgs()
 	conf := loadConfigs(args.ConfigDir, args.DataDir)
 	log.Setup(
@@ -61,8 +67,11 @@ func main() {
 	err = server.Serve(ctx, &conf.Server, &conf.ServerManagement)
 	if err != nil {
 		clog.ErrorE(ctx, err, "Serve failed.")
-		os.Exit(-1)
+
+		return err
 	}
+
+	return nil
 }
 
 func createJWTVerifier(ctx context.Context, oidcCfg *config.OIDC) (*auth.JWTVerifier, error) {

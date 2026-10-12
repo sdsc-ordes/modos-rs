@@ -22,15 +22,24 @@ import (
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 )
 
-// Server represents the GRPC server.
-type Server struct {
-	// The actual server with public endpoints.
-	Public *grpc.Server
+// Interface implementation guard.
+var _ stats.Handler = (*logInjector)(nil)
 
-	// The health server.
-	management *grpc.Server
-	ctx        context.Context
-}
+// Server represents the GRPC server.
+type (
+	Server struct {
+		// The actual server with public endpoints.
+		Public *grpc.Server
+
+		// The health server.
+		management *grpc.Server
+		ctx        context.Context
+	}
+
+	// logInjector injects the values of a server-lifetime context into every RPC
+	// context, while keeping the RPC's own deadline and cancellation.
+	logInjector struct{ base context.Context }
+)
 
 // NewServer returns a new GRPC server listening.
 func NewServer(
@@ -63,7 +72,7 @@ func NewServer(
 	healthgrpc.RegisterHealthServer(serverMgmt, healthSrv)
 	reflection.Register(serverMgmt)
 
-	return &Server{Public: server, management: serverMgmt}, nil
+	return &Server{Public: server, management: serverMgmt, ctx: ctx}, nil
 }
 
 // Serve serves all endpoints registered.
@@ -89,8 +98,6 @@ func (s *Server) Serve(
 	if err != nil {
 		return errors.AddContext(err, "could not create listener at '%s'", addr)
 	}
-
-	s.ctx = ctx
 
 	// NOTE: `grpc.Server.Serve` does not observe `ctx`, it only returns once
 	// `Stop`/`GracefulStop` is called. Bridge the cancellation ourselves.
@@ -121,14 +128,7 @@ func (s *Server) close() {
 	s.management.GracefulStop()
 }
 
-// Interface implementation guard.
-var _ stats.Handler = (*logInjector)(nil)
-
-// logInjector injects the values of a server-lifetime context into every RPC
-// context, while keeping the RPC's own deadline and cancellation.
-type logInjector struct{ base context.Context }
-
-func (h logInjector) TagRPC(ctx context.Context, s *stats.RPCTagInfo) context.Context {
+func (h logInjector) TagRPC(ctx context.Context, _ *stats.RPCTagInfo) context.Context {
 	return clog.ContextFromCtx(ctx, h.base)
 }
 
