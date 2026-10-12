@@ -18,7 +18,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 )
 
-const timeoutServices = 120 * time.Second
+const timeoutServices = 400 * time.Second
 
 // Start starts the services used for the tests.
 // If env. variable `MODOS_TEST_SERVICES` is set to `false`
