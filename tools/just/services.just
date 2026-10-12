@@ -102,11 +102,11 @@ check-started:
 grpc method="kms.v1.KMS.GetCredential" data="{}" server="localhost:3000":
     #!/usr/bin/env bash
     set -eu
-    if [ -n "${FORCE:-}" ] || [ ! -f ".test.tok" ]; then
+    if [ -n "${FORCE:-}" ] || [ ! -f "{{output_dir}}/.test.token" ]; then
         header=$(just -f "{{source_file()}}" device-code-flow --print-gprc-header)
-        echo "$header" > .test.tok
+        echo "$header" > "{{output_dir}}/.test.token"
     else
-        header=$(cat .test.tok)
+        header=$(cat "{{output_dir}}/.test.token")
     fi
 
     grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" list
