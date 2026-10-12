@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
@@ -14,6 +15,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
+
+var KeyClaims = struct{}{}
 
 const authHeader = "authorization"
 
@@ -28,20 +31,34 @@ func AuthenticationInterceptor(
 			return nil, status.Error(codes.Unauthenticated, "missing token")
 		}
 
-		cl := mdJwt.NewClaims(&oidcCfg.ClaimBucketPermissions)
-
 		expectedScopes, err := ExpectedScopes(info.FullMethod)
 		if err != nil {
 			clog.ErrorEf(ctx, err, "Failed to determine allowed scopes for '%v'", info.FullMethod)
 		}
 
+		cl := mdJwt.NewClaims(&oidcCfg.ClaimBucketPermissions)
 		err = auth.ValidateJWT(ctx, validator, token, expectedScopes, cl)
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		return handler(ctx, req)
+		return handler(
+			context.WithValue(ctx, &KeyClaims, cl),
+			req)
 	}
+}
+
+// Claims returns the claims extracted by the [AuthenticationInterceptor].
+func Claims(ctx context.Context) *mdJwt.Claims {
+	if c, ok := ctx.Value(&KeyClaims).(*mdJwt.Claims); ok {
+		return c
+	}
+
+	log.Panic(
+		"Could not extract claim key from context. " +
+			"Did you set the claims on the context?")
+
+	return nil
 }
 
 func extractToken(ctx context.Context) (string, error) {

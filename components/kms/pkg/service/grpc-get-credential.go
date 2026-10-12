@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/sdsc-ordes/modos-rs/components/kms/internal/grpc"
 	kms "github.com/sdsc-ordes/modos-rs/components/kms/pkg/api/kms/v1"
 	clog "gitlab.com/data-custodian/custodian/components/lib-common/pkg/log/context"
 )
@@ -16,6 +17,8 @@ func (s *Service) GetCredential(
 	_ *kms.GetCredentialRequest,
 ) (*kms.GetCredentialResponse, error) {
 	clog.Info(ctx, "Get credential start.")
+
+	_ = grpc.Claims(ctx)
 
 	return nil, nil
 }

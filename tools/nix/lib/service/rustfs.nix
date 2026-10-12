@@ -22,7 +22,7 @@ in
       type = types.str;
       default = "./data";
       description = ''
-        Base directory where keycloak stores its data `<dataDir>/rustfs`.
+        Base directory where rustfs stores its data `<dataDir>/rustfs`.
       '';
     };
 
@@ -142,7 +142,7 @@ in
             inStore = false;
             absolute = false;
           };
-          default = "${config.dataDir}/export/iam-settings";
+          default = "${dataDir}/export/iam-settings";
           description = ''
             Path to the folder where to unzip the RustFS IAM export when the
             manual process '${name}-iam-export runs'.

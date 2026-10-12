@@ -35,31 +35,34 @@ test *args:
 
 # Run an executable.
 [group('general')]
-run  *args:
+run *args:
     #!/usr/bin/env bash
     set -eu
     just build --global-output=false \
         --env-type "{{env}}" \
-        --build-type "{{build_type}}" \
-        "$@"
+        --build-type "{{build_type}}"
 
-    just run-service .output/build/bin/service
+    just run-service .output/build/bin/service "$@"
 
 # Run the Nix build.
 [group('general')]
 run-nix *args:
+    #!/usr/bin/env bash
+    set -eu
     # Stage everything to be current.
     git -C "{{root_dir}}" add .
     just nix::package kms-service
-    just run-service "{{root_dir}}/.output/package/kms-service/bin/kms"
+    just run-service "{{root_dir}}/.output/package/kms-service/bin/kms" "$@"
 
 # Run the executable `service`.
 [group('ci')]
-run-service service:
+run-service service *args:
     #!/usr/bin/env bash
+    set -eu
     "{{service}}" \
         --config-dir data/config \
-        --data-dir data
+        --data-dir data \
+        "${@:2}"
 
 update-deps branchOrTag="main" *args:
     #!/usr/bin/env bash

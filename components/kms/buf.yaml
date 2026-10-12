@@ -6,8 +6,6 @@ version: v2
 modules:
   - path: api
 
-  - path: external/proto
-
     # Makes it possible to annotate fields in `.proto` files
     # with [validation constraints](https://protovalidate.com).
     # A middleweare on the GRPC server then can read these validation
@@ -17,6 +15,7 @@ modules:
     # given values on the resp. field.
     # We exported the following:
     # - buf export buf.build/bufbuild/protovalidate external/proto
+  - path: external/proto
 lint:
   use:
     - STANDARD

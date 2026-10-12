@@ -14,6 +14,7 @@ import (
 
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/config"
 	"github.com/sdsc-ordes/modos-rs/components/kms/internal/grpc"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/build"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/service"
 	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage"
 )
@@ -38,7 +39,7 @@ func main() {
 	ctx, stop := signal.WithSignal(clog.Context(context.Background()))
 	defer stop()
 
-	clog.Infof(ctx, "Starting KMS server.")
+	clog.Info(ctx, "Starting KMS server", "version", build.GetBuildVersion())
 
 	client, err := storage.NewStorageS3(ctx, &conf.Storage.Connection)
 	log.PanicEf(err, "Could not create S3 storage.")
