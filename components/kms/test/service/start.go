@@ -29,7 +29,12 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 	_, rootDir, err := git.NewCtxAtRoot(".")
 	log.PanicE(err, "Could not get root directory.")
 
-	pcConfig := "test-services"
+	var pcConfig string
+	if ci.IsRunning() {
+		pcConfig = "test-services"
+	} else {
+		pcConfig = "test-services-nix"
+	}
 
 	socketPathFile := path.Join(rootDir,
 		fs.OutputDir, fs.OutRunDir, "process-compose",
