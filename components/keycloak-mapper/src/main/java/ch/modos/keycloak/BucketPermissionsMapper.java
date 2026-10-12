@@ -56,6 +56,9 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
     private static final String ACCESS_ATTR = "permission.attribute";
     private static final String WRITE_IMPLIES_READ = "write.implies.read";
 
+    private static final String CLAIM_BPS_PATH_KEY = "claimbps.path.key";
+    private static final String CLAIM_BPS_PERMISSION_KEY = "claimbps.permission.key";
+
     private static final String ACCESS_READ = "read";
     private static final String ACCESS_WRITE = "write";
 
@@ -77,6 +80,22 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         permissionAttr.setDefaultValue("bucket-permission");
         permissionAttr.setHelpText("Name of the group attribute holding the permission level (read/write).");
         CONFIG_PROPERTIES.add(permissionAttr);
+
+        ProviderConfigProperty claimBPSPathKey = new ProviderConfigProperty();
+        claimBPSPathKey.setName(CLAIM_BPS_PATH_KEY);
+        claimBPSPathKey.setLabel("Claim path key name");
+        claimBPSPathKey.setType(ProviderConfigProperty.STRING_TYPE);
+        claimBPSPathKey.setDefaultValue("p");
+        claimBPSPathKey.setHelpText("The key name of the path in the bucket permission claim.");
+        CONFIG_PROPERTIES.add(claimBPSPathKey);
+
+        ProviderConfigProperty claimBPSPermissionKey = new ProviderConfigProperty();
+        claimBPSPermissionKey.setName(CLAIM_BPS_PERMISSION_KEY);
+        claimBPSPermissionKey.setLabel("Claim permission key name");
+        claimBPSPermissionKey.setType(ProviderConfigProperty.STRING_TYPE);
+        claimBPSPermissionKey.setDefaultValue("bp");
+        claimBPSPermissionKey.setHelpText("The key name of the permission in the bucket permission claim.");
+        CONFIG_PROPERTIES.add(claimBPSPermissionKey);
 
         // Standard "Token Claim Name" + "Add to ID/permission token/userinfo" config.
         OIDCAttributeMapperHelper.addTokenClaimNameConfig(CONFIG_PROPERTIES);
@@ -125,6 +144,9 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         String pathAttr = orDefault(config.get(PREFIX_ATTR), "path");
         String permissionAttr = orDefault(config.get(ACCESS_ATTR), "permission");
 
+        String claimBPSPathKey = orDefault(config.get(CLAIM_BPS_PATH_KEY), "p");
+        String claimBPSPermissionsKey = orDefault(config.get(CLAIM_BPS_PERMISSION_KEY), "bp");
+
         // LinkedHashMap book-keeps all permissions.
         // path -> strongest permission seen so far (write beats read).
         Map<String, String> strongest = new LinkedHashMap<>();
@@ -150,7 +172,10 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         for (Map.Entry<String, String> e : strongest.entrySet()) {
             String path = e.getKey();
             String permission = e.getValue();
-            permissions.add(entry(path, permission));
+            permissions.add(
+                entry(claimBPSPathKey, path,
+                      claimBPSPermissionsKey, permission)
+            );
         }
 
         String claimName = mappingModel.getConfig().get(OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME);
@@ -162,10 +187,12 @@ public class BucketPermissionsMapper extends AbstractOIDCProtocolMapper
         JsonUtils.mapClaim(claimPath, permissions, token.getOtherClaims(), true);
     }
 
-    private static Map<String, String> entry(String path, String permission) {
+    private static Map<String, String> entry(
+        String pathKey, String path,
+        String permissionKey, String permission) {
         Map<String, String> m = new LinkedHashMap<>();
-        m.put("path", path);
-        m.put("permissions", permission);
+        m.put(pathKey, path);
+        m.put(permissionKey, permission);
         return m;
     }
 
