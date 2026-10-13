@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package kms.v1;
 
-import "protovalidate/buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 // KMS hands out short-lived storage credentials.
 service KMS {
@@ -11,11 +11,12 @@ service KMS {
   rpc GetCredential(GetCredentialRequest) returns (GetCredentialResponse);
 }
 
-message GetCredentialRequest {
-  float latitude = 1 [
-    (buf.validate.field).float.gte = -90,
-    (buf.validate.field).float.lte = 90
-  ];
-}
+// The only input is the JWT token handled over GRPC metadata.
+message GetCredentialRequest { }
 
-message GetCredentialResponse {}
+message GetCredentialResponse {
+    string access_key_id = 1;
+    string secret_access_key = 2;
+    string session_token = 3;
+    google.protobuf.Timestamp expiration = 4;
+}

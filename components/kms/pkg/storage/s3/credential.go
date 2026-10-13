@@ -7,6 +7,8 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/secret"
 )
 
+const CredentialType = "s3"
+
 // S3Credentials represents temp. credentials from an S3.
 // It is not serializable.
 type S3Credentials struct {
@@ -35,7 +37,7 @@ type marshaller struct {
 
 // Type implements [types.Credential].
 func (c *S3Credentials) Type() string {
-	return "s3"
+	return CredentialType
 }
 
 // MarshalerJSON implements [types.Credential].
