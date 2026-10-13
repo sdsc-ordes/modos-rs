@@ -49,7 +49,6 @@
             self.processComposeModules.keycloak
             self.processComposeModules.authentik
             self.processComposeModules.rustfs
-            self.processComposeModules.mailhog
 
             self.processComposeModules.kms
           ];
@@ -134,7 +133,7 @@
             };
           };
 
-          services.mailhog = {
+          services.mailhog."mailhog" = {
             smtp.port = 1026;
             enable = true;
           };
@@ -171,19 +170,20 @@
 
           services.kms = {
             enable = true;
-
             package =
               if nix then
                 self'.packages.kms-service
               else
                 (pkgs.writeShellScriptBin "kms-service" ''
-                  just nix::develop "default" just run
+                  just nix::develop "default-nogh" just run
                 '');
           };
 
           settings.processes.kms = {
             working_dir = "./components/kms";
-            # watch = {
+            # In ProcessCompose-Flake 1.122 its possible to do
+            # See: https://github.com/Platonic-Systems/process-compose-flake/pull/115
+            # watch = lib.optionalAttrs !nix {
             #   debounce = "300ms";
             #   paths = [
             #     {
@@ -201,11 +201,15 @@
     in
     {
 
+      # This test-services are with modos components running from `just run`
+      # instead of a Nix derivation.
       # Note: This `test-services-*` package is exposed on `packages` outputs in the flake.
       process-compose."test-services" = makeServices { nix = false; };
+      # This test-services are with all Nix derivations.
       process-compose."test-services-nix" = makeServices { nix = true; };
 
       modos.services.config = {
+        # Expose to further inspect.
         test-services = config.process-compose.test-services;
       };
     };
