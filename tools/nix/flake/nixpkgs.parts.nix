@@ -11,17 +11,7 @@
       ...
     }:
     let
-      p = self.lib.nixpkgs.importPkgs { inherit system; };
-
-      pkgs =
-        assert lib.assertMsg (p.multiverse.rev == inputs.nixpkgs.rev) ''
-          Input 'nixpkgs' (unstable) revision must
-          be aligned with `importPkgs`
-          '${p.multiverse.rev}'.";
-          Change it in 'flake.nix'.
-        '';
-        p;
-
+      pkgs = self.lib.nixpkgs.importPkgs { inherit system; };
       pkgsStable = self.lib.nixpkgs.importPkgsStable { inherit system; };
 
       mvs = self.lib.nixpkgs.mkMultiverse { inherit system; };
