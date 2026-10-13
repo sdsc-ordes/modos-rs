@@ -49,7 +49,7 @@
             self.processComposeModules.keycloak
             self.processComposeModules.authentik
             self.processComposeModules.rustfs
-            # self.processComposeModules.mailhog
+            self.processComposeModules.mailhog
 
             self.processComposeModules.kms
           ];
@@ -134,7 +134,7 @@
             };
           };
 
-          services.mailhog."mailhog" = {
+          services.mailhog = {
             smtp.port = 1026;
             enable = true;
           };

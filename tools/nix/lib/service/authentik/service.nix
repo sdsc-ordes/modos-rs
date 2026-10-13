@@ -248,7 +248,7 @@ in
       "${name}-pg-db" = {
         enable = cfg.enable;
         port = cfg.postgres.port;
-        initialScript.before = pkgs.writeText "before" ''
+        initialScript.before = ''
           CREATE USER \"${cfg.postgres.user}\" WITH PASSWORD '${cfg.postgres.password}' CREATEDB;
           CREATE DATABASE \"${cfg.postgres.name}\" OWNER \"${cfg.postgres.user}\"
         '';
