@@ -12,5 +12,7 @@
     authentik = import ./authentik.nix;
     mailhog = import ./mailhog.nix;
     rustfs = import ./rustfs.nix;
+
+    kms = import ./kms.nix;
   };
 }

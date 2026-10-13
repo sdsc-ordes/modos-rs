@@ -12,14 +12,12 @@
   perSystem =
     {
       config,
+      self',
       inputs',
       modos',
       ...
     }:
     let
-      servicesCfg = config.process-compose.test-services;
-      ak = servicesCfg.services.authentik;
-
       setDataDir =
         procs:
         lib.mapAttrs (
@@ -29,17 +27,22 @@
             dataDir = ".output/run/process-compose/data/${k}";
           }
         ) procs;
-    in
-    {
 
-      # Note: This `test-services` package is exposed on `packages` outputs in the flake.
-      process-compose."test-services" =
+      makeServices =
+        {
+          nix ? false,
+        }:
         # Process-compose NixOS module.
         {
+          config,
           pkgs,
           pkgsStable,
           ...
         }:
+        let
+          servicesCfg = config;
+          ak = servicesCfg.services.authentik;
+        in
         {
           imports = [
             inputs.services-flake.processComposeModules.default
@@ -47,6 +50,8 @@
             self.processComposeModules.authentik
             self.processComposeModules.rustfs
             self.processComposeModules.mailhog
+
+            self.processComposeModules.kms
           ];
 
           cli.options = {
@@ -163,10 +168,45 @@
               path = "tools/configs/rustfs/iam-export";
             };
           };
+
+          services.kms = {
+            enable = true;
+
+            package =
+              if nix then
+                self'.packages.kms-service
+              else
+                (pkgs.writeShellScriptBin "kms-service" ''
+                  just nix::develop "default" just run
+                '');
+          };
+
+          settings.processes.kms = {
+            working_dir = "./components/kms";
+            # watch = {
+            #   debounce = "300ms";
+            #   paths = [
+            #     {
+            #       path = "./components/kms";
+            #     }
+            #   ];
+            # };
+            depends_on = {
+              keycloak.condition = "process_healthy";
+              authentik.condition = "process_healthy";
+              rustfs.condition = "process_healthy";
+            };
+          };
         };
+    in
+    {
+
+      # Note: This `test-services-*` package is exposed on `packages` outputs in the flake.
+      process-compose."test-services" = makeServices { nix = false; };
+      process-compose."test-services-nix" = makeServices { nix = true; };
 
       modos.services.config = {
-        test-services = servicesCfg;
+        test-services = config.process-compose.test-services;
       };
     };
 }

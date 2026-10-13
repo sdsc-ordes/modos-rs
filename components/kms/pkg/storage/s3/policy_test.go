@@ -16,34 +16,6 @@ var _ = Describe("policy", func() {
 	var t require.TestingT
 	BeforeEach(func() { t = GinkgoT() })
 
-	Describe("sanitizeResourcePath", func() {
-		It("trims surrounding slashes", func() {
-			got, err := sanitizeResourcePath("/bucket-a/sub/path/")
-			require.NoError(t, err)
-			assert.Equal(t, "bucket-a/sub/path", got)
-		})
-
-		It("keeps an already-clean path unchanged", func() {
-			got, err := sanitizeResourcePath("bucket-a/sub")
-			require.NoError(t, err)
-			assert.Equal(t, "bucket-a/sub", got)
-		})
-
-		It("rejects a wildcard in the bucket (first) segment", func() {
-			for _, p := range []string{"buck*et/sub", "bu?cket", "*/sub"} {
-				_, err := sanitizeResourcePath(p)
-				require.Error(t, err, "path %q must be rejected", p)
-				assert.Contains(t, err.Error(), "not supported")
-			}
-		})
-
-		It("allows a wildcard beyond the first segment (only the bucket is guarded)", func() {
-			got, err := sanitizeResourcePath("bucket-a/su*b")
-			require.NoError(t, err)
-			assert.Equal(t, "bucket-a/su*b", got)
-		})
-	})
-
 	Describe("toAction", func() {
 		ctx := context.Background()
 

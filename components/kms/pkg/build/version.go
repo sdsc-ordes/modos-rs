@@ -8,7 +8,7 @@ import (
 
 // This string is set in the Go runner with
 // `-ldflags -X ".../pkg/build.buildVersion=..."`.
-var buildVersion = "0.0.0" //nolint:gochecknoglobals // Allowed for version.
+var buildVersion = "0.2.0" //nolint:gochecknoglobals // Allowed for version.
 
 func GetBuildVersion() *version.Version {
 	ver, err := version.NewVersion(buildVersion)

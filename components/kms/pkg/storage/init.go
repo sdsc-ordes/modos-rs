@@ -9,7 +9,7 @@ import (
 )
 
 // NewStorageS3 initializes an object storage (S3) client.
-func NewStorageS3(ctx context.Context, conf *st.S3Connection) (st.Client, error) {
+func NewStorageS3(ctx context.Context, conf *st.S3Connection) (*s3.Client, error) {
 	store, err := s3.NewClient(ctx, conf)
 	if err != nil {
 		return nil, errors.AddContext(err, "Could not setup storage client.")

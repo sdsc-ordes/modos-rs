@@ -115,6 +115,10 @@ For technical documentation on setup and development, see the
 
 Acknowledge all contributors and external collaborators here.
 
+## TODO
+
+- Use a Nix-Derivation Build or a NixOS VM test to test kubernetes manifests.
+
 ## Copyright
 
 Copyright © 2025-2028 Swiss Data Science Center (SDSC),

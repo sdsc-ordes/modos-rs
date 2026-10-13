@@ -1,4 +1,5 @@
 {
+  lib,
   inputs,
   ...
 }:
@@ -28,8 +29,21 @@ in
       }:
       let
         mvs = mkMultiverse { inherit system; };
+
+        # Use a 7 days behind a pinned unstable for security reasons.
+        # To update run: `nix flake update multiverse` and `direnv reload`
+        # and check the assert below and take the unstable tip commit.
+        pkgsUnstableCooldown = mvs.daysBehind "34ab99075ac4f7e40cf037eef32cb1c360bb85e9" 7;
+
+        pkgsUnstable =
+          assert lib.assertMsg (pkgsUnstableCooldown.multiverse.rev == inputs.nixpkgs.rev) ''
+            Input 'nixpkgs' must be
+            aligned with cooldown 7 days behind "${pkgsUnstableCooldown.multiverse.rev}".
+            NixOS unstable tip: '${mvs.tip.multiverse.rev}'.
+          '';
+          lib.trace "NixOS unstable tip: '${mvs.tip.multiverse.rev}'." pkgsUnstableCooldown;
       in
-      mvs.daysBehind "tip" 7; # Branch: 7 days behind nixos-unstable.
+      pkgsUnstable;
 
     importPkgsStable =
       {

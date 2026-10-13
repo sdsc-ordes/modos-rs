@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   perSystem =
-    { pkgs, ... }:
+    { pkgs, mvs, ... }:
     {
       # The bootstrap packages with all tools
       # to install over `nix profile install` before

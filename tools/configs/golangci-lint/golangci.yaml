@@ -184,7 +184,7 @@ linters:
       exclude-forbidden: true
       # Forbid the use of the `toolchain` directive.
       toolchain-forbidden: true
-      tool-forbidden: true
+      tool-forbidden: false
       go-debug-forbidden: true
       # Defines a pattern to validate `go` minimum version directive.
       # Default: '' (no match)

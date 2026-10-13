@@ -11,14 +11,18 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/sdsc-ordes/quitsh/pkg/cli"
 	"github.com/sdsc-ordes/quitsh/pkg/errors"
+	"github.com/sdsc-ordes/quitsh/pkg/exec"
 	"github.com/sdsc-ordes/quitsh/pkg/log"
 
 	"github.com/spf13/cobra"
@@ -44,6 +48,8 @@ type Settings struct {
 	Client   string
 	Scope    string
 	PKCE     bool // force PKCE (already implied for keycloak)
+
+	PrintGRPCHeader bool // Print the HTTP authentication header.
 }
 
 // deviceResponse is the JSON returned by the device authorization endpoint.
@@ -88,6 +94,8 @@ func AddCmd(cl cli.ICLI, parent *cobra.Command) {
 		Client:   "modos-cli",
 		Scope:    "openid permissions",
 		PKCE:     false,
+
+		PrintGRPCHeader: false,
 	}
 
 	cmd := &cobra.Command{
@@ -112,6 +120,9 @@ func AddCmd(cl cli.ICLI, parent *cobra.Command) {
 		"Space separated scopes to request.")
 	cmd.Flags().BoolVar(&sett.PKCE, "pkce", sett.PKCE,
 		"Force PKCE (already implied for keycloak).")
+
+	cmd.Flags().
+		BoolVar(&sett.PrintGRPCHeader, "print-gprc-header", sett.PrintGRPCHeader, "Output the grpc authentication header 'authorization Bearer: ...'.")
 
 	parent.AddCommand(cmd)
 }
@@ -193,7 +204,40 @@ func run(ctx context.Context, sett *Settings) error {
 	log.Infof("Or visit %s and enter code: %s\n\n", dev.VerificationURI, dev.UserCode)
 	log.Info("-----------------------------")
 
-	return poll(ctx, tokenEndpoint, dev.DeviceCode, sett.Client, pkceVerifier, interval, expiresIn)
+	openInBrowser(verifyComplete)
+
+	tok, err := poll(
+		ctx,
+		tokenEndpoint,
+		dev.DeviceCode,
+		sett.Client,
+		pkceVerifier,
+		interval,
+		expiresIn,
+	)
+	if err != nil {
+		return err
+	}
+
+	if sett.PrintGRPCHeader {
+		fmt.Fprintf(os.Stdout, "authorization: Bearer %s", tok.AccessToken)
+	}
+
+	return nil
+}
+
+func openInBrowser(url string) {
+	ctx := exec.NewCommandCtx(".")
+
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		err = ctx.Check("xdg-open", url)
+	case "darwin":
+		err = ctx.Check("open", url)
+	}
+
+	log.ErrorEf(err, "Could not open url '%s'.", url)
 }
 
 // requestDeviceCode requests a device code and user code.
@@ -251,7 +295,7 @@ func poll(
 	verifier string,
 	interval int,
 	expiresIn int,
-) error {
+) (tok *tokenResponse, err error) {
 	pollBody := url.Values{}
 	pollBody.Set("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
 	pollBody.Set("device_code", deviceCode)
@@ -269,12 +313,12 @@ func poll(
 
 	for {
 		if time.Now().After(deadline) {
-			return errors.New("device code expired before authorization completed")
+			return nil, errors.New("device code expired before authorization completed")
 		}
 
 		status, body, err := postForm(ctx, tokenEndpoint, pollBody)
 		if err != nil {
-			return errors.AddContext(err, "token request failed")
+			return nil, errors.AddContext(err, "token request failed")
 		}
 
 		if status == http.StatusOK {
@@ -298,24 +342,24 @@ func poll(
 			log.Errorf("✗ Token request failed: %s", errCode)
 			log.Error(string(body))
 
-			return errors.New("token request failed: %s", errCode)
+			return nil, errors.New("token request failed: %s", errCode)
 		}
 
 		select {
 		case <-ctx.Done():
 			log.Warn("Aborted the polling.")
 
-			return ctx.Err()
+			return nil, ctx.Err()
 		case <-time.After(wait):
 		}
 	}
 }
 
 // reportSuccess prints the obtained token and best-effort decodes its claims.
-func reportSuccess(body []byte) error {
+func reportSuccess(body []byte) (*tokenResponse, error) {
 	var tok tokenResponse
 	if err := json.Unmarshal(body, &tok); err != nil {
-		return errors.AddContext(err, "could not decode token response")
+		return nil, errors.AddContext(err, "could not decode token response")
 	}
 
 	hasRefresh := "no"
@@ -332,11 +376,11 @@ func reportSuccess(body []byte) error {
 	// Best-effort decode of the JWT access-token payload.
 	claims, err := decodeJWTClaims(tok.AccessToken)
 	if err != nil {
-		return errors.AddContext(err, "JWT payload not decoded")
+		return nil, errors.AddContext(err, "JWT payload not decoded")
 	}
 	log.Infof("Access-token claims:\n%s", claims)
 
-	return nil
+	return &tok, nil
 }
 
 // newPKCE generates a random verifier and its base64url-encoded S256 challenge.

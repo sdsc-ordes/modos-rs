@@ -3,7 +3,8 @@ set shell := ["bash", "-cue"]
 set dotenv-load := true
 root_dir := `git rev-parse --show-toplevel`
 output_dir := root_dir / ".output" / "run" / "process-compose"
-pc_socket := output_dir / "pc-test-services.sock"
+name := env("SERVICE", "test-services")
+pc_socket := output_dir / ("pc-" + name + ".sock")
 
 default:
     just --list --unsorted -f "{{source_file()}}"
@@ -14,7 +15,7 @@ start-notui *args:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
     just quitsh process-compose start \
-        --flake-dir "./tools/nix" "test-services" \
+        --flake-dir "./tools/nix" "{{name}}" \
         --socket-path-file "{{pc_socket}}" "$@"
 
 # Run the test services with attaching to the TUI.
@@ -40,7 +41,7 @@ stop *args:
 cache:
     #!/usr/bin/env bash
     cd "{{root_dir}}"
-    nix build --show-trace -L --print-out-paths "./tools/nix#test-services" |
+    nix build --show-trace -L --print-out-paths "./tools/nix#{{name}}" |
         cachix push "$CACHIX_CACHE_NAME"
 
 # Attach to the running test services.
@@ -96,3 +97,18 @@ check-started:
         echo "Process compose is not started.";
         exit 1
     }
+
+[group('rpc')]
+grpc method="kms.v1.KMS.GetCredential" data="{}" server="localhost:3000":
+    #!/usr/bin/env bash
+    set -eu
+    if [ -n "${FORCE:-}" ] || [ ! -f "{{output_dir}}/.test.token" ]; then
+        header=$(just -f "{{source_file()}}" device-code-flow --print-gprc-header)
+        echo "$header" > "{{output_dir}}/.test.token"
+    else
+        header=$(cat "{{output_dir}}/.test.token")
+    fi
+
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" list
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" describe kms.v1.KMS
+    grpcurl -plaintext -H "$header" -d '{{data}}' "{{server}}" '{{method}}'

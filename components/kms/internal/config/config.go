@@ -6,23 +6,62 @@ type Config struct {
 	// Some log settings.
 	Log Log `yaml:"log"`
 
-	// The server information.
+	// The server information for the public endpoints.
 	Server Server `yaml:"server"`
+	// The server information for the management endpoints.
+	ServerManagement Server `yaml:"serverManagement"`
 
 	Storage StorageS3 `yaml:"storage"`
+
+	OIDC OIDC `yaml:"oidc"`
 }
 
 type (
 	Server struct {
-		// The hostname.
+		// The hostname (use 0.0.0.0 for serving it in the cloud).
 		Hostname string `yaml:"hostname" default:"localhost"`
 
-		// The port for the portal endpoints.
+		// The port for the public endpoints.
 		Port int `yaml:"port" default:"3020"`
 	}
 
 	StorageS3 struct {
 		Connection types.S3Connection `yaml:"connection"`
+	}
+
+	OIDC struct {
+		// The OpenID Connect issuer URL.
+		Issuer string `yaml:"issuer"`
+
+		// The OpenID Connect client id.
+		ClientID string `yaml:"clientID"`
+
+		// Accepted algorithms on the JWT validator.
+		TrustedAlgorithms []string `yaml:"trustedAlgorithms" default:"[\"EdDSA\", \"RS256\", \"RS512\", \"ES256\"]"`
+
+		// Accepted audiences (claim: `aud`) on the JWT validator (the `ClientID` is added by default).
+		TrustedAudiences []string `yaml:"trustedAudiences"`
+
+		// The bucket permissions claims.
+		ClaimBucketPermissions ClaimBucketPermissions `yaml:"claimBucketPermissions"`
+	}
+
+	ClaimBucketPermissions struct {
+		// The name of the claim with a list
+		// of bucket permissions in the form of
+		// `{<PathName>: "...", <PermissionsName>: "..." }`.
+		Name string `yaml:"name" default:"bps"`
+
+		// The key name of the bucket path.
+		PathName string `yaml:"pathName" default:"p"`
+
+		// The key name of the bucket permissions.
+		PermissionsName string `yaml:"permissionsName" default:"bp"`
+
+		// The tag name of the read permissions.
+		PermissionsReadTagName string `yaml:"permissionsReadTagName" default:"r"`
+		// The tag name of the write permissions.
+		PermissionsWriteTagName string `yaml:"permissionsWriteTagName" default:"w"`
 	}
 
 	Log struct {

@@ -19,6 +19,8 @@ default:
 [group('general')]
 lint *args:
     just quitsh lint --component-dir "$(pwd)" "$@"
+    just lint-proto
+    just lint-proto-breaking
 
 # Build the project.
 # Pass build args with `-K 'build.args: ["--tags "debug,development,auth_disable"]`
@@ -33,27 +35,71 @@ test *args:
 
 # Run an executable.
 [group('general')]
-run  *args:
+run *args:
     #!/usr/bin/env bash
     set -eu
     just build --global-output=false \
         --env-type "{{env}}" \
-        --build-type "{{build_type}}" \
-        "$@"
+        --build-type "{{build_type}}"
 
-    just run-service .output/build/bin/service
+    just run-service .output/build/bin/service "$@"
 
 # Run the Nix build.
 [group('general')]
 run-nix *args:
+    #!/usr/bin/env bash
+    set -eu
     # Stage everything to be current.
     git -C "{{root_dir}}" add .
     just nix::package kms-service
-    just run-service "{{root_dir}}/.output/package/kms-service/bin/kms"
+    just run-service "{{root_dir}}/.output/package/kms-service/bin/kms" "$@"
 
 # Run the executable `service`.
 [group('ci')]
-run-service service:
+run-service service *args:
+    #!/usr/bin/env bash
+    set -eu
     "{{service}}" \
         --config-dir data/config \
-        --data-dir data
+        --data-dir data \
+        "${@:2}"
+
+update-deps branchOrTag="main" *args:
+    #!/usr/bin/env bash
+    set -eu
+
+    echo "Updating 'kms'."
+
+    branchOrTag="{{branchOrTag}}"
+    shift 1
+    pkgs=("$@")
+
+    if [ "${pkgs:-}" = "" ]; then
+        pkgs=("components/lib-common")
+    fi
+
+    sha=$(git ls-remote -q \
+        https://gitlab.com/data-custodian/custodian.git \
+        "refs/heads/$branchOrTag" | cut -f 1)
+
+    for pkg in "${pkgs[@]}"; do
+        echo "Updating pkg '$pkg' to '$sha'"
+        go get -u "gitlab.com/data-custodian/custodian/$pkg@$sha"
+        (cd test && go get -u "gitlab.com/data-custodian/custodian/$pkg@$sha")
+    done
+
+    go mod tidy
+    git add .
+
+
+# Generate the Go API bindings from the protobuf definitions in `api/`.
+[group('general')]
+generate *args:
+    buf generate "$@"
+
+# Lint the protobuf definitions.
+[group('general')]
+[private]
+lint-proto *args:
+    buf lint "$@"
+

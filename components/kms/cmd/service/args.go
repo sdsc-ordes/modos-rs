@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sdsc-ordes/modos-rs/components/kms/internal/build"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/build"
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 
 	"github.com/alexflint/go-arg"
@@ -30,7 +30,10 @@ func parseArgs() (args Args) {
 	log.FatalE(err, "Could not setup parser.")
 
 	err = p.Parse(os.Args[1:])
-	log.FatalE(err, "Could not parse arguments.")
+	if err != nil {
+		p.WriteHelp(os.Stderr)
+		log.FatalE(err, "Could not parse arguments.")
+	}
 
 	if args.Version {
 		printVersionAndExit()

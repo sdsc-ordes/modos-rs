@@ -6,6 +6,7 @@ import (
 	"context"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/sdsc-ordes/modos-rs/tools/quitsh/pkg/nix"
@@ -17,7 +18,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 )
 
-const timeoutServices = 120 * time.Second
+const timeoutServices = 400 * time.Second
 
 // Start starts the services used for the tests.
 // If env. variable `MODOS_TEST_SERVICES` is set to `false`
@@ -28,18 +29,26 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 	_, rootDir, err := git.NewCtxAtRoot(".")
 	log.PanicE(err, "Could not get root directory.")
 
-	pcConfig := "test-services"
+	var pcConfig string
+	// if ci.IsRunning() {
+	pcConfig = "test-services"
+	// } else {
+	// pcConfig = "test-services-nix"
+	// }
 
 	socketPathFile := path.Join(rootDir,
 		fs.OutputDir, fs.OutRunDir, "process-compose",
 		"pc-"+pcConfig+".sock")
 
 	mustBeStarted := false
-	if path, e := os.ReadFile(socketPathFile); e != nil && fs.Exists(string(path)) {
+	if path, e := os.ReadFile(
+		socketPathFile,
+	); e == nil &&
+		fs.Exists(string(strings.TrimSpace(string(path)))) {
 		log.Warnf("Skip starting the test services, socket '%v' exists.", path)
 		mustBeStarted = true
 	} else {
-		log.Info("Starting test services.")
+		log.Infof("Starting test services, file '%v' not existing.", socketPathFile)
 	}
 
 	pcCtx, err = pc.Start(

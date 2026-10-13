@@ -8,6 +8,7 @@
     {
       pkgs,
       modos',
+      mvs,
       ...
     }:
     {
@@ -66,7 +67,15 @@
 
           addSetup = modules: modules ++ quitsh-setup ++ no-devenv-processes;
 
-          build-go = [
+          build-proto = [
+            {
+              packages = [
+                pkgs.buf
+              ];
+            }
+          ];
+
+          build-go = build-proto ++ [
             {
               quitsh.toolchains = [ "build-go" ];
               quitsh.languages.go = {
@@ -214,6 +223,7 @@
             ci
             ++ build-rust
             ++ build-go
+            ++ build-proto
             ++ dev-go
             ++ manifest-ytt
             ++ quitsh-direct
@@ -240,6 +250,8 @@
                     # Inspect/upload images.
                     pkgs.dive
                     pkgs.skopeo
+
+                    pkgs.grpcurl
 
                     # Process manager.
                     pkgsPinned.process-compose
@@ -315,6 +327,7 @@
             # General CI ---------
             build-rust
             build-go
+            build-proto
             lint-go
             lint-trivy
 

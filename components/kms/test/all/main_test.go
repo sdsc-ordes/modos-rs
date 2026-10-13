@@ -13,6 +13,7 @@ import (
 
 var stopServices func() error
 
+// TestAll is the main entry unit test to run all Ginkgo specs.
 func TestAll(t *testing.T) {
 	log.Setup(log.WithForceDevLog(true))
 
