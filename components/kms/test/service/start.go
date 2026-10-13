@@ -18,7 +18,7 @@ import (
 	"gitlab.com/data-custodian/custodian/components/lib-common/pkg/log"
 )
 
-const timeoutServices = 400 * time.Second
+const timeoutServices = 200 * time.Second
 
 // Start starts the services used for the tests.
 // If env. variable `MODOS_TEST_SERVICES` is set to `false`
@@ -30,11 +30,11 @@ func Start() (pcCtx *pc.ProcessComposeCtx, stop func() error) {
 	log.PanicE(err, "Could not get root directory.")
 
 	var pcConfig string
-	// if ci.IsRunning() {
-	pcConfig = "test-services"
-	// } else {
-	// pcConfig = "test-services-nix"
-	// }
+	if ci.IsRunning() {
+		pcConfig = "test-services"
+	} else {
+		pcConfig = "test-services-nix"
+	}
 
 	socketPathFile := path.Join(rootDir,
 		fs.OutputDir, fs.OutRunDir, "process-compose",
