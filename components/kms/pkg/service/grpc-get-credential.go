@@ -16,7 +16,7 @@ import (
 // Assert that service implements the kmsv1.Server.
 var _ kms.KMSServer = (*Service)(nil)
 
-// GetCredential implements [kms.KmsServer].
+// GetCredential implements [kms.KMSServer].
 func (s *Service) GetCredential(
 	ctx context.Context,
 	_ *kms.GetCredentialRequest,
@@ -54,10 +54,11 @@ func (s *Service) GetCredential(
 			SessionToken:    (string)(c.SessionToken),
 			Expiration:      timestamppb.New(c.Expiration),
 		}, nil
-	}
 
-	return nil, status.Errorf(
-		codes.Internal,
-		"storage type '%v' not implemented",
-		creds.Type())
+	default:
+		return nil, status.Errorf(
+			codes.Internal,
+			"credential type '%v' not implemented", creds.Type(),
+		)
+	}
 }
