@@ -34,16 +34,42 @@ with some core packages and services written in Rust and Go.
 <!--toc:start-->
 
 - [modos-rs](#modos-rs)
+  - [Components](#components)
+    - [KMS](#kms)
   - [Installation](#installation)
   - [Usage](#usage)
+    - [Dev. Services](#dev-services)
+    - [KMS](#kms-1)
+      - [Tests](#tests)
+        - [Run Specific Tests](#run-specific-tests)
+    - [Nix Hashes](#nix-hashes)
   - [Development](#development)
   - [Coverage](#coverage)
   - [Acknowledgement](#acknowledgement)
+  - [TODO](#todo)
   - [Copyright](#copyright)
-
-<!--toc:end-->
+  <!--toc:end-->
 
 </details>
+
+## Components
+
+The repository is split into components. Each component lives in
+`components/<name>` and is built, linted and tested on its own.
+
+### KMS
+
+The **KMS** (Key Management Service) is a Go gRPC service in
+[`components/kms`](components/kms). It hands out short-lived S3 credentials over
+the Secret Token Service (STS).
+
+A client authenticates with a JWT. The KMS verifies that token against the
+identity provider, reads the bucket permissions from it, and asks the object
+store for temporary credentials that allow exactly these permissions and nothing
+more. The client therefore never holds a long-lived storage key.
+
+Read [docs/kms.md](docs/kms.md) for the API, the token claims, the generated
+policy and the configuration.
 
 ## Installation
 

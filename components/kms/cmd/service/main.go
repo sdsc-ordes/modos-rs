@@ -64,7 +64,7 @@ func run() error {
 	}
 	srv.RegisterAtGRPCServer(server.Public)
 
-	err = server.Serve(ctx, &conf.Server, &conf.ServerManagement)
+	err = server.Serve(ctx, &conf.Server, &conf.ServerManagement.Server)
 	if err != nil {
 		clog.ErrorE(ctx, err, "Serve failed.")
 
