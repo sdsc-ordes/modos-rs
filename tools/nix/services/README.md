@@ -3,12 +3,12 @@
 ## Start Services
 
 ```bash
-just services-start
+just services start
 ```
 
 > [!NOTE]
 >
-> `Ctrl+D` to detach from the TUI and `just services-attach` to attach again.
+> `Ctrl+D` to detach from the TUI and `just services attach` to attach again.
 
 ## Keycloak
 

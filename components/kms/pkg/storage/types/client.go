@@ -13,6 +13,7 @@ type (
 
 		// NewCredentials returns a scoped token for bucket permissions `permissions`
 		// with duration `dur`.
+		// Returns [CredentialError]s as errors.
 		NewCredentials(
 			ctx context.Context,
 			perms BucketPermissions,

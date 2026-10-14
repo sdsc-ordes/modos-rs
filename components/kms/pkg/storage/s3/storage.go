@@ -76,8 +76,8 @@ func (c *Client) NewCredentials(
 
 	return &S3Credentials{
 		AccessKeyID:     secret.RedactedString(*res.Credentials.AccessKeyId),
-		SessionToken:    secret.RedactedString(*res.Credentials.SessionToken),
 		SecretAccessKey: secret.RedactedString(*res.Credentials.SecretAccessKey),
+		SessionToken:    secret.RedactedString(*res.Credentials.SessionToken),
 		Expiration:      *res.Credentials.Expiration,
 	}, nil
 }

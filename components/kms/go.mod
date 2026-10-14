@@ -6,7 +6,6 @@ go 1.26.0
 // replace gitlab.com/data-custodian/custodian/components/lib-common => ../../../custodian/components/lib-common
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	buf.build/go/protovalidate v1.0.0
 	github.com/alexflint/go-arg v1.5.1
 	github.com/aws/aws-sdk-go-v2 v1.47.0
@@ -28,6 +27,7 @@ require (
 )
 
 require (
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2 // indirect
 	cel.dev/expr v0.25.2 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/alexflint/go-scalar v1.2.0 // indirect

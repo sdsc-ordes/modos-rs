@@ -27,7 +27,11 @@ func AuthenticationInterceptor(
 	validator *auth.JWTVerifier,
 	oidcCfg *config.OIDC,
 ) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+	return func(
+		ctx context.Context,
+		req any,
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
 	) (any, error) {
 		token, err := extractToken(ctx)
 		if err != nil {

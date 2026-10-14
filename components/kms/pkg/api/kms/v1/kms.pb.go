@@ -7,9 +7,9 @@
 package kmsv1
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -22,9 +22,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The only input is the JWT token handled over GRPC metadata.
 type GetCredentialRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Latitude      float32                `protobuf:"fixed32,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,17 +59,14 @@ func (*GetCredentialRequest) Descriptor() ([]byte, []int) {
 	return file_kms_v1_kms_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetCredentialRequest) GetLatitude() float32 {
-	if x != nil {
-		return x.Latitude
-	}
-	return 0
-}
-
 type GetCredentialResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	AccessKeyId     string                 `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`
+	SecretAccessKey string                 `protobuf:"bytes,2,opt,name=secret_access_key,json=secretAccessKey,proto3" json:"secret_access_key,omitempty"`
+	SessionToken    string                 `protobuf:"bytes,3,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	Expiration      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetCredentialResponse) Reset() {
@@ -102,16 +99,47 @@ func (*GetCredentialResponse) Descriptor() ([]byte, []int) {
 	return file_kms_v1_kms_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *GetCredentialResponse) GetAccessKeyId() string {
+	if x != nil {
+		return x.AccessKeyId
+	}
+	return ""
+}
+
+func (x *GetCredentialResponse) GetSecretAccessKey() string {
+	if x != nil {
+		return x.SecretAccessKey
+	}
+	return ""
+}
+
+func (x *GetCredentialResponse) GetSessionToken() string {
+	if x != nil {
+		return x.SessionToken
+	}
+	return ""
+}
+
+func (x *GetCredentialResponse) GetExpiration() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Expiration
+	}
+	return nil
+}
+
 var File_kms_v1_kms_proto protoreflect.FileDescriptor
 
 const file_kms_v1_kms_proto_rawDesc = "" +
 	"\n" +
-	"\x10kms/v1/kms.proto\x12\x06kms.v1\x1a)protovalidate/buf/validate/validate.proto\"C\n" +
-	"\x14GetCredentialRequest\x12+\n" +
-	"\blatitude\x18\x01 \x01(\x02B\x0f\xbaH\f\n" +
+	"\x10kms/v1/kms.proto\x12\x06kms.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x16\n" +
+	"\x14GetCredentialRequest\"\xc8\x01\n" +
+	"\x15GetCredentialResponse\x12\"\n" +
+	"\raccess_key_id\x18\x01 \x01(\tR\vaccessKeyId\x12*\n" +
+	"\x11secret_access_key\x18\x02 \x01(\tR\x0fsecretAccessKey\x12#\n" +
+	"\rsession_token\x18\x03 \x01(\tR\fsessionToken\x12:\n" +
 	"\n" +
-	"\x1d\x00\x00\xb4B-\x00\x00\xb4\xc2R\blatitude\"\x17\n" +
-	"\x15GetCredentialResponse2S\n" +
+	"expiration\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"expiration2S\n" +
 	"\x03KMS\x12L\n" +
 	"\rGetCredential\x12\x1c.kms.v1.GetCredentialRequest\x1a\x1d.kms.v1.GetCredentialResponseB\x93\x01\n" +
 	"\n" +
@@ -133,15 +161,17 @@ var file_kms_v1_kms_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_kms_v1_kms_proto_goTypes = []any{
 	(*GetCredentialRequest)(nil),  // 0: kms.v1.GetCredentialRequest
 	(*GetCredentialResponse)(nil), // 1: kms.v1.GetCredentialResponse
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_kms_v1_kms_proto_depIdxs = []int32{
-	0, // 0: kms.v1.KMS.GetCredential:input_type -> kms.v1.GetCredentialRequest
-	1, // 1: kms.v1.KMS.GetCredential:output_type -> kms.v1.GetCredentialResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: kms.v1.GetCredentialResponse.expiration:type_name -> google.protobuf.Timestamp
+	0, // 1: kms.v1.KMS.GetCredential:input_type -> kms.v1.GetCredentialRequest
+	1, // 2: kms.v1.KMS.GetCredential:output_type -> kms.v1.GetCredentialResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_kms_v1_kms_proto_init() }
