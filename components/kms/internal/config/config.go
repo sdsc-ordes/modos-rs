@@ -1,6 +1,11 @@
 package config
 
-import "github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+import (
+	"github.com/creasty/defaults"
+	"github.com/sdsc-ordes/modos-rs/components/kms/pkg/storage/types"
+)
+
+var _ defaults.Setter = (*ServerManagement)(nil)
 
 type Config struct {
 	// Some log settings.
@@ -9,7 +14,7 @@ type Config struct {
 	// The server information for the public endpoints.
 	Server Server `yaml:"server"`
 	// The server information for the management endpoints.
-	ServerManagement Server `yaml:"serverManagement"`
+	ServerManagement ServerManagement `yaml:"serverManagement"`
 
 	Storage StorageS3 `yaml:"storage"`
 
@@ -22,7 +27,11 @@ type (
 		Hostname string `yaml:"hostname" default:"localhost"`
 
 		// The port for the public endpoints.
-		Port int `yaml:"port" default:"3020"`
+		Port int `yaml:"port" default:"3000"`
+	}
+
+	ServerManagement struct {
+		Server
 	}
 
 	StorageS3 struct {
@@ -68,6 +77,11 @@ type (
 		ForceDevLog bool `yaml:"enableDevLog"`
 	}
 )
+
+// SetDefaults implements [defaults.Setter].
+func (s *ServerManagement) SetDefaults() {
+	s.Port = 3020
+}
 
 // WithDataDir changes the config settings to accommodate
 // for the data directory `dir`. Certain configs (paths) are relative to this
