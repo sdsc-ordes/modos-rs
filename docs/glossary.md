@@ -2,6 +2,7 @@
 
 | Term              | Meaning                                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Authentik         | An other IdP [provider](https://goauthentik.io/).                                                                                          |
 | **ARN**           | Amazon Resource Name. The identifier of a resource in an IAM policy, for example `arn:aws:s3:::bucket-a/*`                                 |
 | **buf**           | The tool used to lint Protocol Buffer files and to generate the Go bindings from them                                                      |
 | **Claim**         | One field inside a JWT, for example `aud` (audience) or the bucket permissions claim `bps`                                                 |
@@ -11,6 +12,7 @@
 | **IdP**           | Identity Provider. The service that authenticates users and issues the JWT. Here Keycloak or Authentik                                     |
 | **JWKS**          | JSON Web Key Set. The set of public keys an IdP publishes so that anybody can verify its tokens                                            |
 | **JWT**           | JSON Web Token. A signed token carrying the user's identity, scopes and claims                                                             |
+| Keycloak          | An IdP [provider](https://keycloak.org).                                                                                                   |
 | **KMS**           | Key Management Service. This component                                                                                                     |
 | **OIDC**          | OpenID Connect. The identity layer on top of OAuth 2.0 that defines how the JWT is obtained and how the issuer publishes its keys          |
 | **Policy**        | A JSON document listing allowed actions on resources. A _session policy_ is passed along with `AssumeRole` and narrows the session further |
