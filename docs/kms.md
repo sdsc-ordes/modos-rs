@@ -219,11 +219,10 @@ Secrets are kept in a separate file (`secrets.yaml`) in the same directory.
 
 ## Build Tags
 
-| Tag            | Effect                                                                                          |
-| -------------- | ----------------------------------------------------------------------------------------------- |
-| `auth_disable` | Sets `build.DisableAuth`. It only takes effect in a development build, never in a release build |
-| `unittest`     | Selects the unit tests under `internal/` and `pkg/`                                             |
-| `integration`  | Selects the integration tests under `test/`                                                     |
+| Tag           | Effect                                               |
+| ------------- | ---------------------------------------------------- |
+| `unittest`    | Selects the unit tests under `internal/` and `pkg/`. |
+| `integration` | Selects the integration tests under `test/`.         |
 
 ## Commands
 
@@ -236,8 +235,9 @@ just quitsh test  -c "kms"
 just quitsh image -c "kms"
 ```
 
-The integration tests need the development services (IdP and object store), they
-can be manually started for faster iteration cycle with
+The integration tests need the development services (IdP and object store)
+**which they will start automatically**. They can be manually started for faster
+iteration cycle with
 
 ```bash
 just services::start

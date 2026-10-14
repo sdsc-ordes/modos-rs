@@ -23,7 +23,7 @@ lint *args:
     just lint-proto-breaking
 
 # Build the project.
-# Pass build args with `-K 'build.args: ["--tags "debug,development,auth_disable"]`
+# Pass build args with `-K 'build.args: ["--tags "debug,development"]`
 [group('general')]
 build *args:
     just quitsh build --component-dir "$(pwd)" "$@"
